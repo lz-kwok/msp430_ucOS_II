@@ -1,0 +1,199 @@
+################################################################################
+# Automatically-generated file. Do not edit!
+################################################################################
+
+SHELL = cmd.exe
+
+CG_TOOL_ROOT := G:/DeveloperFiles/ti/ccsv6/tools/compiler/ti-cgt-msp430_4.4.3
+
+ORDERED_OBJS += \
+"./uCOS-II/Source/os_core.obj" \
+"./uCOS-II/Source/os_flag.obj" \
+"./uCOS-II/Source/os_mbox.obj" \
+"./uCOS-II/Source/os_mem.obj" \
+"./uCOS-II/Source/os_mutex.obj" \
+"./uCOS-II/Source/os_q.obj" \
+"./uCOS-II/Source/os_sem.obj" \
+"./uCOS-II/Source/os_task.obj" \
+"./uCOS-II/Source/os_time.obj" \
+"./uCOS-II/Source/os_tmr.obj" \
+"./uCOS-II/Ports/MSP430X/CCS/os_cpu_a.obj" \
+"./uCOS-II/Ports/MSP430X/CCS/os_cpu_c.obj" \
+"./uC-LIB/lib_ascii.obj" \
+"./uC-LIB/lib_math.obj" \
+"./uC-LIB/lib_mem.obj" \
+"./uC-LIB/lib_str.obj" \
+"./uC-CPU/cpu_core.obj" \
+"./uC-CPU/MSP430/CCS/cpu_a.obj" \
+"./BSP/bsp.obj" \
+"./App/app.obj" \
+"./App/app_hooks.obj" \
+"../lnk_msp430f5259.cmd" \
+$(GEN_CMDS__FLAG) \
+-l"libmath.a" \
+-l"libc.a" \
+
+-include ../makefile.init
+
+RM := DEL /F
+RMDIR := RMDIR /S/Q
+
+# All of the sources participating in the build are defined here
+-include sources.mk
+-include subdir_vars.mk
+-include uCOS-II/Source/subdir_vars.mk
+-include uCOS-II/Ports/MSP430X/CCS/subdir_vars.mk
+-include uC-LIB/subdir_vars.mk
+-include uC-CPU/subdir_vars.mk
+-include uC-CPU/MSP430/CCS/subdir_vars.mk
+-include BSP/subdir_vars.mk
+-include App/subdir_vars.mk
+-include subdir_rules.mk
+-include uCOS-II/Source/subdir_rules.mk
+-include uCOS-II/Ports/MSP430X/CCS/subdir_rules.mk
+-include uC-LIB/subdir_rules.mk
+-include uC-CPU/subdir_rules.mk
+-include uC-CPU/MSP430/CCS/subdir_rules.mk
+-include BSP/subdir_rules.mk
+-include App/subdir_rules.mk
+-include objects.mk
+
+ifneq ($(MAKECMDGOALS),clean)
+ifneq ($(strip $(S_DEPS)),)
+-include $(S_DEPS)
+endif
+ifneq ($(strip $(S_UPPER_DEPS)),)
+-include $(S_UPPER_DEPS)
+endif
+ifneq ($(strip $(S62_DEPS)),)
+-include $(S62_DEPS)
+endif
+ifneq ($(strip $(C64_DEPS)),)
+-include $(C64_DEPS)
+endif
+ifneq ($(strip $(ASM_DEPS)),)
+-include $(ASM_DEPS)
+endif
+ifneq ($(strip $(CC_DEPS)),)
+-include $(CC_DEPS)
+endif
+ifneq ($(strip $(S55_DEPS)),)
+-include $(S55_DEPS)
+endif
+ifneq ($(strip $(C67_DEPS)),)
+-include $(C67_DEPS)
+endif
+ifneq ($(strip $(CLA_DEPS)),)
+-include $(CLA_DEPS)
+endif
+ifneq ($(strip $(C??_DEPS)),)
+-include $(C??_DEPS)
+endif
+ifneq ($(strip $(CPP_DEPS)),)
+-include $(CPP_DEPS)
+endif
+ifneq ($(strip $(S??_DEPS)),)
+-include $(S??_DEPS)
+endif
+ifneq ($(strip $(C_DEPS)),)
+-include $(C_DEPS)
+endif
+ifneq ($(strip $(C62_DEPS)),)
+-include $(C62_DEPS)
+endif
+ifneq ($(strip $(CXX_DEPS)),)
+-include $(CXX_DEPS)
+endif
+ifneq ($(strip $(C++_DEPS)),)
+-include $(C++_DEPS)
+endif
+ifneq ($(strip $(ASM_UPPER_DEPS)),)
+-include $(ASM_UPPER_DEPS)
+endif
+ifneq ($(strip $(K_DEPS)),)
+-include $(K_DEPS)
+endif
+ifneq ($(strip $(C43_DEPS)),)
+-include $(C43_DEPS)
+endif
+ifneq ($(strip $(INO_DEPS)),)
+-include $(INO_DEPS)
+endif
+ifneq ($(strip $(S67_DEPS)),)
+-include $(S67_DEPS)
+endif
+ifneq ($(strip $(SA_DEPS)),)
+-include $(SA_DEPS)
+endif
+ifneq ($(strip $(S43_DEPS)),)
+-include $(S43_DEPS)
+endif
+ifneq ($(strip $(OPT_DEPS)),)
+-include $(OPT_DEPS)
+endif
+ifneq ($(strip $(PDE_DEPS)),)
+-include $(PDE_DEPS)
+endif
+ifneq ($(strip $(S64_DEPS)),)
+-include $(S64_DEPS)
+endif
+ifneq ($(strip $(C_UPPER_DEPS)),)
+-include $(C_UPPER_DEPS)
+endif
+ifneq ($(strip $(C55_DEPS)),)
+-include $(C55_DEPS)
+endif
+endif
+
+-include ../makefile.defs
+
+# Add inputs and outputs from these tool invocations to the build variables 
+EXE_OUTPUTS += \
+glz_msp430_ucOS_II.out \
+
+EXE_OUTPUTS__QUOTED += \
+"glz_msp430_ucOS_II.out" \
+
+BIN_OUTPUTS += \
+glz_msp430_ucOS_II.txt \
+
+BIN_OUTPUTS__QUOTED += \
+"glz_msp430_ucOS_II.txt" \
+
+
+# All Target
+all: glz_msp430_ucOS_II.out
+
+# Tool invocations
+glz_msp430_ucOS_II.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
+	@echo 'Building target: $@'
+	@echo 'Invoking: MSP430 Linker'
+	"G:/DeveloperFiles/ti/ccsv6/tools/compiler/ti-cgt-msp430_4.4.3/bin/cl430" -vmspx --abi=eabi --data_model=restricted --use_hw_mpy=F5 --advice:power=all -g --define=__MSP430F5259__ --diag_warning=225 --diag_wrap=off --display_error_number --silicon_errata=CPU21 --silicon_errata=CPU22 --silicon_errata=CPU40 --printf_support=minimal -z -m"glz_msp430_ucOS_II.map" --heap_size=160 --stack_size=160 --cinit_hold_wdt=on -i"G:/DeveloperFiles/ti/ccsv6/ccs_base/msp430/include" -i"G:/DeveloperFiles/ti/ccsv6/tools/compiler/ti-cgt-msp430_4.4.3/lib" -i"G:/DeveloperFiles/ti/ccsv6/tools/compiler/ti-cgt-msp430_4.4.3/include" -i"G:/DeveloperFiles/ti/ccsv6/ccs_base/msp430/lib/5xx_6xx_FRxx" --reread_libs --warn_sections --diag_wrap=off --display_error_number --xml_link_info="glz_msp430_ucOS_II_linkInfo.xml" --use_hw_mpy=F5 --rom_model -o "glz_msp430_ucOS_II.out" $(ORDERED_OBJS)
+	@echo 'Finished building target: $@'
+	@echo ' '
+	@$(MAKE) --no-print-directory post-build
+
+glz_msp430_ucOS_II.txt: $(EXE_OUTPUTS)
+	@echo 'Invoking: MSP430 Hex Utility'
+	"G:/DeveloperFiles/ti/ccsv6/tools/compiler/ti-cgt-msp430_4.4.3/bin/hex430" --memwidth=8 --romwidth=8 -o "glz_msp430_ucOS_II.txt" $(EXE_OUTPUTS__QUOTED)
+	@echo 'Finished building: $@'
+	@echo ' '
+
+# Other Targets
+clean:
+	-$(RM) $(EXE_OUTPUTS__QUOTED)$(BIN_OUTPUTS__QUOTED)
+	-$(RM) "uCOS-II\Source\os_core.pp" "uCOS-II\Source\os_flag.pp" "uCOS-II\Source\os_mbox.pp" "uCOS-II\Source\os_mem.pp" "uCOS-II\Source\os_mutex.pp" "uCOS-II\Source\os_q.pp" "uCOS-II\Source\os_sem.pp" "uCOS-II\Source\os_task.pp" "uCOS-II\Source\os_time.pp" "uCOS-II\Source\os_tmr.pp" "uCOS-II\Ports\MSP430X\CCS\os_cpu_c.pp" "uC-LIB\lib_ascii.pp" "uC-LIB\lib_math.pp" "uC-LIB\lib_mem.pp" "uC-LIB\lib_str.pp" "uC-CPU\cpu_core.pp" "BSP\bsp.pp" "App\app.pp" "App\app_hooks.pp" 
+	-$(RM) "uCOS-II\Source\os_core.obj" "uCOS-II\Source\os_flag.obj" "uCOS-II\Source\os_mbox.obj" "uCOS-II\Source\os_mem.obj" "uCOS-II\Source\os_mutex.obj" "uCOS-II\Source\os_q.obj" "uCOS-II\Source\os_sem.obj" "uCOS-II\Source\os_task.obj" "uCOS-II\Source\os_time.obj" "uCOS-II\Source\os_tmr.obj" "uCOS-II\Ports\MSP430X\CCS\os_cpu_a.obj" "uCOS-II\Ports\MSP430X\CCS\os_cpu_c.obj" "uC-LIB\lib_ascii.obj" "uC-LIB\lib_math.obj" "uC-LIB\lib_mem.obj" "uC-LIB\lib_str.obj" "uC-CPU\cpu_core.obj" "uC-CPU\MSP430\CCS\cpu_a.obj" "BSP\bsp.obj" "App\app.obj" "App\app_hooks.obj" 
+	-$(RM) "uCOS-II\Ports\MSP430X\CCS\os_cpu_a.pp" "uC-CPU\MSP430\CCS\cpu_a.pp" 
+	-@echo 'Finished clean'
+	-@echo ' '
+
+post-build:
+	-"G:/DeveloperFiles/ti/ccsv6/tools/compiler/ti-cgt-msp430_4.4.3/bin/hex430" --ti_txt "glz_msp430_ucOS_II.out" -o "glz_msp430_ucOS_II.txt" -order MS -romwidth 16
+	-@echo ' '
+
+.PHONY: all clean dependents
+.SECONDARY: post-build
+
+-include ../makefile.targets
+
