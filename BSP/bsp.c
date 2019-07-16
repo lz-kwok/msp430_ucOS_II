@@ -1,6 +1,5 @@
 /*
 *********************************************************************************************************
-*                                              EXAMPLE CODE
 *
 *                          (c) Copyright 2003-2014; Micrium, Inc.; Weston, FL
 *
@@ -14,14 +13,13 @@
 /*
 *********************************************************************************************************
 *
-*                                            EXAMPLE CODE
 *
 *                                      Texas Instruments MSP430
 *                                               on the
 *                                          MSP-EXP430F5259LP
 *                                          Evaluation Board
 *
-* Filename      : app.c
+* Filename      : bsp.c
 * Version       : V1.00
 * Programmer(s) : GLZ
 *********************************************************************************************************
@@ -59,9 +57,9 @@
 *********************************************************************************************************
 */
 
-static  void  BSP_OSTickInit  (void);
-
-
+static  void  BSP_OSTickInit(void);
+static void BSP_OSClockInit(void);
+static void BSP_OSCloseWatchDog(void);
 /*
 ******************************************************************************************************************************
 ******************************************************************************************************************************
@@ -85,6 +83,8 @@ static  void  BSP_OSTickInit  (void);
 
 void  BSP_Init (void)
 {
+    BSP_OSCloseWatchDog();
+    BSP_OSClockInit();
     BSP_OSTickInit();                                           /* Initialize the OS tick timer                         */
 }
 
@@ -102,7 +102,7 @@ void  BSP_Init (void)
 */
 
 
-static void  BSP_OSTickInit (void)
+static void  BSP_OSTickInit(void)
 {
     WDTCTL  = WDT_MDLY_32;                                      /* This configuration produces interrupts every 32  ... */
                                                                 /* ... ms for SMCLK = 1 MHz.                            */
@@ -110,4 +110,17 @@ static void  BSP_OSTickInit (void)
                                                                 /* ... TO CORRESPOND WITH THIS FREQUENCY!               */
 
     SFRIE1 |= 1;                                                /* Enable WDT interrupts.                               */
+}
+
+static void BSP_OSClockInit(void){
+    // Use the REFO oscillator as the FLL reference, and also for ACLK
+    UCSCTL3 = (UCSCTL3 & ~(SELREF_7)) | (SELREF__REFOCLK);   //璁剧疆FLL鍙傝�鏃堕挓涓篟EFOCLK(鍐呴儴32.768kHz鏅舵尟)锛涘綋鏈塜T2,閫夋嫨XT2鍚﹀垯閫塕EFOCLK
+    UCSCTL4 = (UCSCTL4 & ~(SELA_7)) | (SELA__REFOCLK);       //ACLK鍙傝�鏃堕挓婧愰�鎷╂帶鍒讹紱褰撴湁XT2,閫夋嫨XT2鍚﹀垯閫塂COCLKDIV
+    // Start the FLL, which will drive MCLK (not the crystal)
+    Init_FLL(BSP_CPU_CLK_FREQ/1000, BSP_CPU_CLK_FREQ/32768);
+}
+
+static void BSP_OSCloseWatchDog(void)
+{
+	WDTCTL = WDTPW + WDTHOLD;       //CloseWatchDog
 }

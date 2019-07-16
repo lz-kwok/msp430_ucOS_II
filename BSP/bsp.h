@@ -35,7 +35,12 @@
 #ifndef  __BSP_H__
 #define  __BSP_H__
 
-
+#include <hal_device.h>
+#include <hal_macros.h>
+#include <hal_pmm.h>
+#include <hal_tlv.h>
+#include <hal_types.h>
+#include <hal_ucs.h>
 /*
 *********************************************************************************************************
 *                                               CONSTANTS
@@ -57,7 +62,7 @@
 *********************************************************************************************************
 */
 
-void        BSP_Init       (void);
+void BSP_Init(void);
 
 
 #endif
