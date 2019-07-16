@@ -12,20 +12,20 @@ App/app.obj: G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/uC-CPU/MSP430/CCS/cp
 App/app.obj: G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/uC-CPU/cpu_def.h
 App/app.obj: G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/App/cpu_cfg.h
 App/app.obj: G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/BSP/bsp.h
-App/app.obj: G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/BSP/Driverlib/hal_device.h
+App/app.obj: G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/BSP/Hallib/hal_device.h
 App/app.obj: G:/DeveloperFiles/ti/ccsv6/ccs_base/msp430/include/msp430.h
 App/app.obj: G:/DeveloperFiles/ti/ccsv6/ccs_base/msp430/include/msp430f5259.h
 App/app.obj: G:/DeveloperFiles/ti/ccsv6/ccs_base/msp430/include/in430.h
 App/app.obj: G:/DeveloperFiles/ti/ccsv6/tools/compiler/ti-cgt-msp430_4.4.3/include/intrinsics.h
 App/app.obj: G:/DeveloperFiles/ti/ccsv6/tools/compiler/ti-cgt-msp430_4.4.3/include/intrinsics_legacy_undefs.h
-App/app.obj: G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/BSP/Driverlib/hal_macros.h
-App/app.obj: G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/BSP/Driverlib/hal_pmm.h
+App/app.obj: G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/BSP/Hallib/hal_macros.h
+App/app.obj: G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/BSP/Hallib/hal_pmm.h
 App/app.obj: G:/DeveloperFiles/ti/ccsv6/tools/compiler/ti-cgt-msp430_4.4.3/include/stdint.h
-App/app.obj: G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/BSP/Driverlib/hal_macros.h
-App/app.obj: G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/BSP/Driverlib/hal_tlv.h
-App/app.obj: G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/BSP/Driverlib/hal_types.h
-App/app.obj: G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/BSP/Driverlib/hal_ucs.h
-App/app.obj: G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/BSP/Driverlib/hal_macros.h
+App/app.obj: G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/BSP/Hallib/hal_macros.h
+App/app.obj: G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/BSP/Hallib/hal_tlv.h
+App/app.obj: G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/BSP/Hallib/hal_types.h
+App/app.obj: G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/BSP/Hallib/hal_ucs.h
+App/app.obj: G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/BSP/Hallib/hal_macros.h
 App/app.obj: G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/uC-LIB/lib_def.h
 
 ../App/app.c: 
@@ -40,18 +40,18 @@ G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/uC-CPU/MSP430/CCS/cpu.h:
 G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/uC-CPU/cpu_def.h: 
 G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/App/cpu_cfg.h: 
 G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/BSP/bsp.h: 
-G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/BSP/Driverlib/hal_device.h: 
+G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/BSP/Hallib/hal_device.h: 
 G:/DeveloperFiles/ti/ccsv6/ccs_base/msp430/include/msp430.h: 
 G:/DeveloperFiles/ti/ccsv6/ccs_base/msp430/include/msp430f5259.h: 
 G:/DeveloperFiles/ti/ccsv6/ccs_base/msp430/include/in430.h: 
 G:/DeveloperFiles/ti/ccsv6/tools/compiler/ti-cgt-msp430_4.4.3/include/intrinsics.h: 
 G:/DeveloperFiles/ti/ccsv6/tools/compiler/ti-cgt-msp430_4.4.3/include/intrinsics_legacy_undefs.h: 
-G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/BSP/Driverlib/hal_macros.h: 
-G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/BSP/Driverlib/hal_pmm.h: 
+G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/BSP/Hallib/hal_macros.h: 
+G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/BSP/Hallib/hal_pmm.h: 
 G:/DeveloperFiles/ti/ccsv6/tools/compiler/ti-cgt-msp430_4.4.3/include/stdint.h: 
-G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/BSP/Driverlib/hal_macros.h: 
-G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/BSP/Driverlib/hal_tlv.h: 
-G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/BSP/Driverlib/hal_types.h: 
-G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/BSP/Driverlib/hal_ucs.h: 
-G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/BSP/Driverlib/hal_macros.h: 
+G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/BSP/Hallib/hal_macros.h: 
+G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/BSP/Hallib/hal_tlv.h: 
+G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/BSP/Hallib/hal_types.h: 
+G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/BSP/Hallib/hal_ucs.h: 
+G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/BSP/Hallib/hal_macros.h: 
 G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/uC-LIB/lib_def.h: 

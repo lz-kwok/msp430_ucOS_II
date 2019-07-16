@@ -115,6 +115,6 @@ uC-LIB \
 uC-CPU \
 uC-CPU/MSP430/CCS \
 BSP \
-BSP/Driverlib \
+BSP/Hallib \
 App \
 
