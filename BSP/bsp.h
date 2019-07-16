@@ -35,12 +35,24 @@
 #ifndef  __BSP_H__
 #define  __BSP_H__
 
+#include <string.h>
+#include <stdio.h>
+#include <intrinsics.h>
+#include <stdlib.h>
+#include <stdint.h>
+#include <stdbool.h>
+#include <stdarg.h>
+#include <math.h>
+#include <time.h>
+
 #include <hal_device.h>
 #include <hal_macros.h>
 #include <hal_pmm.h>
 #include <hal_tlv.h>
 #include <hal_types.h>
 #include <hal_ucs.h>
+
+#include <g_DeviceRTC.h>
 /*
 *********************************************************************************************************
 *                                               CONSTANTS

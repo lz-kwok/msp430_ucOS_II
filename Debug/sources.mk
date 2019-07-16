@@ -116,5 +116,6 @@ uC-CPU \
 uC-CPU/MSP430/CCS \
 BSP \
 BSP/Hallib \
+BSP/Devicelib \
 App \
 

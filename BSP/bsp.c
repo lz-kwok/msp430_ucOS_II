@@ -85,7 +85,9 @@ void  BSP_Init (void)
 {
     BSP_OSCloseWatchDog();
     BSP_OSClockInit();
-    BSP_OSTickInit();                                           /* Initialize the OS tick timer                         */
+    BSP_OSTickInit();                                           /* Initialize the OS tick timer   */
+
+    g_Device_RTC_Init();                      
 }
 
 
