@@ -54,7 +54,8 @@
 
 #include <g_DeviceRTC.h>
 #include <g_DeviceSpi.h>
-
+#include <g_DeviceSD.h>
+#include <g_DeviceSDMMC.h>
 /*
 *********************************************************************************************************
 *                                               CONSTANTS

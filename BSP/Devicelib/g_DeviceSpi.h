@@ -3,11 +3,8 @@
 
 
 
-
-
-
-// #define Spi_WriteByte   g_Device_SPI2_ReadWriteByte
-// #define Spi_ReadByte()  g_Device_SPI2_ReadWriteByte(0xff)
+void g_Device_SPI2_Init(void);
+void g_Device_SPI3_Init(void);
 
 #endif
 
