@@ -114,6 +114,7 @@ typedef struct
         {
             void (*WriteData)(uint8_t data);
             void (*WriteNData)(uint8_t *data,uint8_t len);
+            uint8_t (*WriteReadData)(uint8_t data);
         }Spi3;
 
 //        struct Timer
