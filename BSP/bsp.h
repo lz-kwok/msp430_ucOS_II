@@ -69,14 +69,77 @@
 *                                            GLOBAL VARIABLES
 *********************************************************************************************************
 */
+typedef struct
+{
+    void (*Init)(void);
+
+    struct Device
+    {
+        struct Usart0
+        {
+            void (*WriteData)(uint8_t data);
+            void (*WriteNData)(uint8_t *data,uint8_t len);
+            void (*WriteString)(uint8_t  *s);
+        }Usart0;
+
+        struct Usart1
+        {
+            void (*WriteData)(uint8_t data);
+            void (*WriteNData)(uint8_t *data,uint8_t len);
+            void (*WriteString)(uint8_t  *s);
+        }Usart1;
+
+        struct Usart2
+        {
+            void (*WriteData)(uint8_t data);
+            void (*WriteNData)(uint8_t *data,uint8_t len);
+            void (*WriteString)(uint8_t  *s);
+        }Usart2;
+
+        struct Usart3
+        {
+            void (*WriteData)(uint8_t data);
+            void (*WriteNData)(uint8_t *data,uint8_t len);
+            void (*WriteString)(uint8_t  *s);
+        }Usart3;
+
+        struct Spi2
+        {
+            void (*WriteData)(uint8_t data);
+            void (*WriteNData)(uint8_t *data,uint8_t len);
+            uint8_t (*WriteReadData)(uint8_t data);
+        }Spi2;
+
+        struct Spi3
+        {
+            void (*WriteData)(uint8_t data);
+            void (*WriteNData)(uint8_t *data,uint8_t len);
+        }Spi3;
+
+//        struct Timer
+//        {
+//            void (*Start)(uint8_t id, TimerModeEnum mode, uint64_t times, function functionPointer);
+//            void (*Stop)(uint8_t id);
+//        }Timer;
+
+        struct InnerFlash
+        {
+        	uint8_t (*innerFLASHRead)(uint8_t index,uint32_t add);
+        	void (*innerFLASHWrite)(uint8_t *data_ptr,uint8_t *flashAddr,uint16_t count);
+        	void (*FlashRsvWrite)(uint8_t *data_ptr,uint8_t index,uint32_t infostartaddr,uint8_t num);
+        }InnerFlash;
+    }Device;
+
+
+}SystemStruct;
+
+extern SystemStruct OSBsp;
 
 /*
 *********************************************************************************************************
 *                                          FUNCTION PROTOTYPES
 *********************************************************************************************************
 */
-
-void BSP_Init(void);
 
 
 #endif

@@ -81,8 +81,10 @@ static void BSP_OSCloseWatchDog(void);
 *********************************************************************************************************
 */
 
-void  BSP_Init (void)
+void  BSP_Init(void)
 {
+    __disable_interrupt();                                      /* Disable all int. until we are ready to accept them   */
+    
     BSP_OSCloseWatchDog();
     BSP_OSClockInit();
     BSP_OSTickInit();                                           /* Initialize the OS tick timer   */
@@ -128,3 +130,17 @@ static void BSP_OSCloseWatchDog(void)
 {
 	WDTCTL = WDTPW + WDTHOLD;       //CloseWatchDog
 }
+
+
+
+
+
+static void Init(void)
+{
+    BSP_Init();
+}
+
+SystemStruct OSBsp =
+{
+    Init,
+};

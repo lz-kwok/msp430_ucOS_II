@@ -76,11 +76,8 @@ void  main (void)
 {
     CPU_INT08U  err;
 
-    WDTCTL = WDTPW | WDTHOLD;                                   /* Disable the watchdog timer.                          */
-    __disable_interrupt();                                      /* Disable all int. until we are ready to accept them   */
-
     OSInit();                                                   /* Initialize "uC/OS-II, The Real-Time Kernel"          */
-
+    OSBsp.Init();                                               /* Initialize BSP functions                             */
     err = OSTaskCreate(AppTaskStart,                            /* Create the start task                                */
                        DEF_NULL,
                       &AppTaskStartStk[APP_START_TASK_STK_SIZE - 1u],
@@ -112,9 +109,7 @@ void  main (void)
 
 static  void  AppTaskStart (void *p_arg)
 {
-    (void)p_arg;
-
-    BSP_Init();                                                 /* Initialize BSP functions                             */
+    (void)p_arg;                   
 
 #if (OS_TASK_STAT_EN > 0)
     OSStatInit();                                               /* Determine CPU capacity                               */
