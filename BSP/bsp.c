@@ -90,8 +90,7 @@ void  BSP_Init(void)
     BSP_OSTickInit();                                           /* Initialize the OS tick timer   */
 
     g_Device_RTC_Init();                  
-    g_Device_SPI2_Init();    
-    g_Device_SPI3_Init();
+    g_Device_SD_Init();
 }
 
 
@@ -144,3 +143,4 @@ SystemStruct OSBsp =
 {
     Init,
 };
+

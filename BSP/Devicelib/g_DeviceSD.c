@@ -47,13 +47,13 @@ void TestSDCard(void)
 	if(status != 0)
 	{
 #if DEBUG
-		System.Device.Usart2.WriteString("Init Failure,Please Check SD!\r\n");
+		uint8_t.Device.Usart2.WriteString("Init Failure,Please Check SD!\r\n");
 #endif
 	}
 	else
 	{
 #if DEBUG
-		System.Device.Usart2.WriteString("Init SD Success!\r\n");
+		uint8_t.Device.Usart2.WriteString("Init SD Success!\r\n");
 		cardSize =  MMC_ReadCardSize();                 //从SD卡寄存器读取MMC/SD卡容量大小，返回长整型
 		SDsizeDisplay(cardSize);
 #endif
@@ -68,17 +68,17 @@ void SDsizeDisplay(unsigned long Capacity)
 {
 	static unsigned int SizeQ,SizeB,SizeS,SizeG;
 	unsigned long Size;
-	System.Device.Usart2.WriteString("SD Size:");           //显示SD卡容量
+	OSBsp.Device.Usart2.WriteString("SD Size:");           //显示SD卡容量
 	Size=Capacity/1024/1024;
 	SizeQ=Size/1000;
 	SizeB=(Size%1000)/100;
 	SizeS=(Size%1000)%100/10;
 	SizeG=(Size%1000)%100%10;
-	SendByteToUart2(SizeQ+'0');
-	SendByteToUart2(SizeB+'0');
-	SendByteToUart2(SizeS+'0');
-	SendByteToUart2(SizeG+'0');
-	System.Device.Usart2.WriteString("MB\r\n");  		    //显示SD卡容量单位
+	OSBsp.Device.Usart2.WriteData(SizeQ+'0');
+	OSBsp.Device.Usart2.WriteData(SizeB+'0');
+	OSBsp.Device.Usart2.WriteData(SizeS+'0');
+	OSBsp.Device.Usart2.WriteData(SizeG+'0');
+	OSBsp.Device.Usart2.WriteString("MB\r\n");  		    //显示SD卡容量单位
 }
 
 /*******************************************************************************
@@ -258,18 +258,18 @@ uint8_t SD_Idle_Sta(void)
 }														    
 
 /*******************************************************************************
-* 函数名	: SD_Init
+* 函数名	: g_Device_SD_Init
 * 描述	: SD卡初始化
 * 输入参数  : 无
 * 返回参数  : SD卡返回的响应
 *******************************************************************************/
-uint8_t SD_Init(void)
+uint8_t g_Device_SD_Init(void)
 {								 
 	uint8_t r1;     		// 存放SD卡的返回值
 	uint16_t retry;  		// 用来进行超时计数
 	uint8_t buff[6];
 
-	SPIx_Init(); 
+	g_Device_SPI2_Init(); 
 	SD_CS_High();
     if(SD_Idle_Sta())
     	return 1;			//超时返回1 设置到idle 模式失败

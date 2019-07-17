@@ -39,6 +39,9 @@ App/app.obj: G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/BSP/Hallib/hal_types
 App/app.obj: G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/BSP/Hallib/hal_ucs.h
 App/app.obj: G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/BSP/Hallib/hal_macros.h
 App/app.obj: G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/BSP/Devicelib/g_DeviceRTC.h
+App/app.obj: G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/BSP/Devicelib/g_DeviceSpi.h
+App/app.obj: G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/BSP/Devicelib/g_DeviceSD.h
+App/app.obj: G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/BSP/Devicelib/g_DeviceSDMMC.h
 App/app.obj: G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/uC-LIB/lib_def.h
 
 ../App/app.c: 
@@ -80,4 +83,7 @@ G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/BSP/Hallib/hal_types.h:
 G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/BSP/Hallib/hal_ucs.h: 
 G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/BSP/Hallib/hal_macros.h: 
 G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/BSP/Devicelib/g_DeviceRTC.h: 
+G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/BSP/Devicelib/g_DeviceSpi.h: 
+G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/BSP/Devicelib/g_DeviceSD.h: 
+G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/BSP/Devicelib/g_DeviceSDMMC.h: 
 G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/uC-LIB/lib_def.h: 

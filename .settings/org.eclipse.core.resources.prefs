@@ -1,4 +1,6 @@
 eclipse.preferences.version=1
+encoding//BSP/Devicelib/g_DeviceSDMMC.c=UTF-8
+encoding//BSP/Devicelib/g_DeviceSDMMC.h=UTF-8
 encoding//BSP/bsp.c=UTF-8
 encoding//Debug/App/subdir_rules.mk=UTF-8
 encoding//Debug/App/subdir_vars.mk=UTF-8
