@@ -56,6 +56,11 @@
 #include <g_DeviceSpi.h>
 #include <g_DeviceSD.h>
 #include <g_DeviceSDMMC.h>
+
+#include <Diskio.h>
+#include <FatFS.h>
+#include <Ffconf.h>
+#include <FileTxt.h>
 /*
 *********************************************************************************************************
 *                                               CONSTANTS

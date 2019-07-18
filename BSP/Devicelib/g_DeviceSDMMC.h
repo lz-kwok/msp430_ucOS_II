@@ -1,11 +1,17 @@
-//*************************************************************************************
-//MMC/SD����дͷ�ļ�mmc.h
-//������SD����Ӳ�����ӡ��궨����MMC/SD�������������д�������������ش���(�ɹ����롢�������)
-//����Ӳ�����Ӳ�ͬ�����Ը��Ķ˿�
-//���Ի�����EW430 V5.30
-//���ߣ����� www.avrgcc.com
-//ʱ�䣺2011.09.19
-// *************************************************************************************
+/*
+*********************************************************************************************************
+*
+*
+*                                      Texas Instruments MSP430
+*                                               on the
+*                                          MSP-EXP430F5259LP
+*                                          Evaluation Board
+*
+* Filename      : g_DeviceSDMMC.h
+* Version       : V1.00
+* Programmer(s) : GLZ
+*********************************************************************************************************
+*/
 #ifndef G_DEVICESDMMC_H
 #define G_DEVICESDMMC_H
 
@@ -94,13 +100,11 @@
 //extern unsigned long numSector;	     //向SD卡中写入数据的地址，为扇区数，对于一个扇区为512字节的SD卡实际地址为numSector*512字节
 
 
-
-char mmc_GoIdle();
+uint8_t g_MMC_init (void);
 unsigned char mmcGetResponse(void);
 unsigned char mmcGetXXResponse(const char resp);
 unsigned char mmcCheckBusy(void);
 unsigned char mmcGoIdle();
-unsigned char initMMC (void);
 unsigned char mmcEreaseBlock(unsigned long Sector);
 void mmcSendCmd (unsigned char cmd, unsigned long data, unsigned char crc);
 unsigned char mmcSetBlockLength (unsigned int blocklength);

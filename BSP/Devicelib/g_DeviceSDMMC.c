@@ -19,7 +19,7 @@
 *                                          MSP-EXP430F5259LP
 *                                          Evaluation Board
 *
-* Filename      : g_DeviceSD.c
+* Filename      : g_DeviceSDMMC.c
 * Version       : V1.00
 * Programmer(s) : GLZ
 *********************************************************************************************************
@@ -29,6 +29,8 @@
 
 #ifndef _MMCLIB_C
 #define _MMCLIB_C
+
+static char mmc_GoIdle();
 
 /***********************************************************************
                     定义变量缓冲区
@@ -43,7 +45,7 @@ unsigned long numSector=200;	    //向SD卡中写入数据的地址，为扇区�
 操作内容：1、拉高CS片选和MOSI至少74个时钟周期
           2、SPI发送10个FF
 ***********************************************************************/
-unsigned char initMMC (void)
+uint8_t g_MMC_init(void)
 {
   int i;
   
@@ -62,13 +64,13 @@ unsigned char initMMC (void)
           2、判断MMC卡还是SD卡
           3、SD卡循环10次发送CMD55+ACMD41，MMC卡发送CMD1
 ***********************************************************************/
-char mmc_GoIdle()
+static char mmc_GoIdle()
 {
   char response=0x01;
-  unsigned char i;
-  unsigned char sdcard=0x00;               //SD卡标志位，为0表示SD卡，为1表示为MMC卡
+  uint8_t i;
+  uint8_t sdcard=0x00;                        //SD卡标志位，为0表示SD卡，为1表示为MMC卡
   SD_CS_Low();                                //选中MMC/SD卡，片选有效，接下来发送命令
-  mmcSendCmd(MMC_GO_IDLE_STATE,0,0x95);    //发送CMD0，MMC/SD卡设置为SPI模式，0x95为CRC值
+  mmcSendCmd(MMC_GO_IDLE_STATE,0,0x95);       //发送CMD0，MMC/SD卡设置为SPI模式，0x95为CRC值
   //Now wait for READY RESPONSE
   if(mmcGetResponse()!=0x01)
     return MMC_INIT_ERROR;
@@ -78,31 +80,31 @@ char mmc_GoIdle()
     SD_CS_High();
     OSBsp.Device.Spi2.WriteReadData(0xff);
     SD_CS_Low();
-  if(sdcard==0x00)                                //先识别是否为SD卡，发送SD卡命令CMD55+ACMD41
-  {
-   for(i=0;i<10;i++)                              //循环10次，如果为SD卡，一般2次即可正确返回0x00
-   {
-    mmcSendCmd(SD_APP_COND,0x00,0xff);            //发送SD卡判断命令，如果成功返回0x00，则为SD卡
-    while(response=mmcGetResponse()!=0x01);       //返回值为0x01，则表示处于空闲状态，再发ACMD41命令
+    if(sdcard==0x00)                                  //先识别是否为SD卡，发送SD卡命令CMD55+ACMD41
+    {
+      for(i=0;i<10;i++)                               //循环10次，如果为SD卡，一般2次即可正确返回0x00
+      {
+        mmcSendCmd(SD_APP_COND,0x00,0xff);            //发送SD卡判断命令，如果成功返回0x00，则为SD卡
+        while(response=mmcGetResponse()!=0x01);       //返回值为0x01，则表示处于空闲状态，再发ACMD41命令
     
-    mmcSendCmd(SD_APP_OP_COND,0x00,0xff);         //发送ACMD41命令
-    if(response=mmcGetResponse()==0x00)           //返回值为0x00，则初始化成功，否则使用MMC命令CMD1继续初始化
-     {
-      SD_CS_High();
-      OSBsp.Device.Spi2.WriteReadData(0xff);
-      return (MMC_SUCCESS);                       //返回初始化成功代码
-     }
-   }
-   sdcard=0x01;                                   //为1表示SD卡命令无效，卡为MMC卡，准备下面发送CMD1命令
-  }
-    response=0x01;                                //准备发送MMC卡命令CMD1
-    mmcSendCmd(MMC_SEND_OP_COND,0x00,0xff);       //发送MMC卡CMD1命令，成功则返回0x00
-    response=mmcGetResponse();                    //返回值为0x00，则表示MMC卡初始化成功
+        mmcSendCmd(SD_APP_OP_COND,0x00,0xff);         //发送ACMD41命令
+        if(response=mmcGetResponse()==0x00)           //返回值为0x00，则初始化成功，否则使用MMC命令CMD1继续初始化
+        {
+          SD_CS_High();
+          OSBsp.Device.Spi2.WriteReadData(0xff);
+          return (MMC_SUCCESS);                       //返回初始化成功代码
+        }
+      }
+      sdcard=0x01;                                    //为1表示SD卡命令无效，卡为MMC卡，准备下面发送CMD1命令
+    }
+    response=0x01;                                    //准备发送MMC卡命令CMD1
+    mmcSendCmd(MMC_SEND_OP_COND,0x00,0xff);           //发送MMC卡CMD1命令，成功则返回0x00
+    response=mmcGetResponse();                        //返回值为0x00，则表示MMC卡初始化成功
   }
   
-  SD_CS_High();                                      //MMC/SD卡片选无效
+  SD_CS_High();                                       //MMC/SD卡片选无效
   OSBsp.Device.Spi2.WriteReadData(0xff);
-  return (MMC_SUCCESS);                           //返回初始化成功代码
+  return (MMC_SUCCESS);                               //返回初始化成功代码
 }
 
 /***********************************************************************
