@@ -41,19 +41,19 @@ void TestSDCard(void)
 	/***********Test SD Card*******************/
 	while((status != 0)&(timeout < 100))          //初始化50次MMC/SD卡，如果依然返回错误代码，则初始化失败，可能是没有SD卡或损坏
 	{
-		status = initMMC();
+		status = g_MMC_init();
 		timeout++;
 	}
 	if(status != 0)
 	{
 #if DEBUG
-		uint8_t.Device.Usart2.WriteString("Init Failure,Please Check SD!\r\n");
+		OSBsp.Device.Usart2.WriteString("Init Failure,Please Check SD!\r\n");
 #endif
 	}
 	else
 	{
 #if DEBUG
-		uint8_t.Device.Usart2.WriteString("Init SD Success!\r\n");
+		OSBsp.Device.Usart2.WriteString("Init SD Success!\r\n");
 		cardSize =  MMC_ReadCardSize();                 //从SD卡寄存器读取MMC/SD卡容量大小，返回长整型
 		SDsizeDisplay(cardSize);
 #endif

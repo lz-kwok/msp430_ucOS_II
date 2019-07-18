@@ -24,11 +24,12 @@
 * Programmer(s) : GLZ
 *********************************************************************************************************
 */
+#include <bsp.h>
 
 
 char TimeString[20] = "20170804 16:00:00";
 
-unsigned char File_name[]={"0:/20170314.txt"};
+char File_name[]={"0:/20170314.txt"};
 
 extern unsigned char time_buf[8];
 
@@ -100,22 +101,6 @@ void Write_dataToTxt(const char *file_path,char *dat)
 		f_close(&fsrc);
 	}
 	f_mount(0,NULL);
-}
-
-void WriteDataToSD(DataStruct *DataPointer)
-{
-	char *jsonBody = mymalloc(512);
-    uint32_t JsonLen;
-
-	mem_init();
-    jsonBody = MakeJsonBody(DataPointer);
-    JsonLen = strlen(jsonBody);
-
-	Write_dataToTxt(File_name,jsonBody);                //存储数据
-    Write_dataToTxt(File_name,"\r\n");
-    OSBsp.Device.Usart2.WriteString(jsonBody);
-	
-    myfree(jsonBody);
 }
 
 

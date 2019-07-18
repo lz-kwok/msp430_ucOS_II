@@ -36,7 +36,7 @@ DSTATUS disk_initialize (
 )
 {
 	uint8_t state;
-	state=SD_Init();
+	state=g_Device_SD_Init();
 	if(!state){
 	 return STA_NODISK;
 	}   

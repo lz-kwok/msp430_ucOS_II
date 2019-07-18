@@ -311,7 +311,7 @@ unsigned char mmcSetBlockLength (unsigned int blocklength)
   mmcSendCmd(MMC_SET_BLOCKLEN, blocklength, 0xFF); //传送设置块长度命令CMD16
   if(mmcGetResponse()!=0x00)                       //命令传送不成功，则重新复位MMC/SD卡，然后重新设置
   	{ 
-  		initMMC();
+  		g_MMC_init();
     	mmcSendCmd(MMC_SET_BLOCKLEN, blocklength, 0xFF);
     	mmcGetResponse();
   	}

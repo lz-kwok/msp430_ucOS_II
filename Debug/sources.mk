@@ -114,6 +114,7 @@ uCOS-II/Ports/MSP430X/CCS \
 uC-LIB \
 uC-CPU \
 uC-CPU/MSP430/CCS \
+FatFs \
 BSP \
 BSP/Hallib \
 BSP/Devicelib \

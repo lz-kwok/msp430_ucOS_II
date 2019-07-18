@@ -34,6 +34,10 @@ BSP/bsp.obj: G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/BSP/Devicelib/g_Devi
 BSP/bsp.obj: G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/BSP/Devicelib/g_DeviceSpi.h
 BSP/bsp.obj: G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/BSP/Devicelib/g_DeviceSD.h
 BSP/bsp.obj: G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/BSP/Devicelib/g_DeviceSDMMC.h
+BSP/bsp.obj: G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/FatFs/Diskio.h
+BSP/bsp.obj: G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/FatFs/FatFS.h
+BSP/bsp.obj: G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/FatFs/Ffconf.h
+BSP/bsp.obj: G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/FatFs/FileTxt.h
 
 ../BSP/bsp.c: 
 G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/BSP/bsp.h: 
@@ -69,3 +73,7 @@ G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/BSP/Devicelib/g_DeviceRTC.h:
 G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/BSP/Devicelib/g_DeviceSpi.h: 
 G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/BSP/Devicelib/g_DeviceSD.h: 
 G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/BSP/Devicelib/g_DeviceSDMMC.h: 
+G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/FatFs/Diskio.h: 
+G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/FatFs/FatFS.h: 
+G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/FatFs/Ffconf.h: 
+G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/FatFs/FileTxt.h: 
