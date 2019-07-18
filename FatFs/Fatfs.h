@@ -1,7 +1,7 @@
 #ifndef _FATFS
 #define _FATFS	8237	/* Revision ID */
 
-#include "../System.Device.FatFS/Ffconf.h"		/* FatFs configuration options */
+#include <Ffconf.h>		/* FatFs configuration options */
 
 
 #ifdef __cplusplus
