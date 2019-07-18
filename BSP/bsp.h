@@ -45,6 +45,7 @@
 #include <math.h>
 #include <time.h>
 
+#include <hal_layer_api.h>
 #include <hal_device.h>
 #include <hal_macros.h>
 #include <hal_pmm.h>
@@ -67,7 +68,7 @@
 *********************************************************************************************************
 */
 
-#define  BSP_CPU_CLK_FREQ       25000000u                       /* Frequency in Hz                                      */
+#define  BSP_CPU_CLK_FREQ       16000000u                       /* Frequency in Hz                                      */
 
 
 /*

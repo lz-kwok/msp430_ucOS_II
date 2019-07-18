@@ -19,6 +19,8 @@ BSP/Devicelib/g_DeviceSpi.obj: G:/DeveloperFiles/ti/ccsv6/tools/compiler/ti-cgt-
 BSP/Devicelib/g_DeviceSpi.obj: G:/DeveloperFiles/ti/ccsv6/tools/compiler/ti-cgt-msp430_4.4.3/include/ymath.h
 BSP/Devicelib/g_DeviceSpi.obj: G:/DeveloperFiles/ti/ccsv6/tools/compiler/ti-cgt-msp430_4.4.3/include/float.h
 BSP/Devicelib/g_DeviceSpi.obj: G:/DeveloperFiles/ti/ccsv6/tools/compiler/ti-cgt-msp430_4.4.3/include/time.h
+BSP/Devicelib/g_DeviceSpi.obj: G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/BSP/Hallib/hal_layer_api.h
+BSP/Devicelib/g_DeviceSpi.obj: G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/BSP/bsp.h
 BSP/Devicelib/g_DeviceSpi.obj: G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/BSP/Hallib/hal_device.h
 BSP/Devicelib/g_DeviceSpi.obj: G:/DeveloperFiles/ti/ccsv6/ccs_base/msp430/include/msp430.h
 BSP/Devicelib/g_DeviceSpi.obj: G:/DeveloperFiles/ti/ccsv6/ccs_base/msp430/include/msp430f5259.h
@@ -58,6 +60,8 @@ G:/DeveloperFiles/ti/ccsv6/tools/compiler/ti-cgt-msp430_4.4.3/include/math.h:
 G:/DeveloperFiles/ti/ccsv6/tools/compiler/ti-cgt-msp430_4.4.3/include/ymath.h: 
 G:/DeveloperFiles/ti/ccsv6/tools/compiler/ti-cgt-msp430_4.4.3/include/float.h: 
 G:/DeveloperFiles/ti/ccsv6/tools/compiler/ti-cgt-msp430_4.4.3/include/time.h: 
+G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/BSP/Hallib/hal_layer_api.h: 
+G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/BSP/bsp.h: 
 G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/BSP/Hallib/hal_device.h: 
 G:/DeveloperFiles/ti/ccsv6/ccs_base/msp430/include/msp430.h: 
 G:/DeveloperFiles/ti/ccsv6/ccs_base/msp430/include/msp430f5259.h: 
