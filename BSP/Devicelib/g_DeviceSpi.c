@@ -19,7 +19,7 @@
 *                                          MSP-EXP430F5259LP
 *                                          Evaluation Board
 *
-* Filename      : g_DeviceRTC.c
+* Filename      : g_DeviceSpi.c
 * Version       : V1.00
 * Programmer(s) : GLZ
 *********************************************************************************************************
@@ -28,10 +28,10 @@
 
 
 /*******************************************************************************
-* º¯ÊýÃû	: g_Device_SendByte_SPI2
-* ÃèÊö		: SPI2·¢ËÍ×Ö½Úº¯Êý
-* ÊäÈë²ÎÊý  : chr
-* ·µ»Ø²ÎÊý  : ÎÞ
+* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½	: g_Device_SendByte_SPI2
+* ï¿½ï¿½ï¿½ï¿½		: SPI2ï¿½ï¿½ï¿½ï¿½ï¿½Ö½Úºï¿½ï¿½ï¿½
+* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½  : chr
+* ï¿½ï¿½ï¿½Ø²ï¿½ï¿½ï¿½  : ï¿½ï¿½
 *******************************************************************************/
 void g_Device_SendByte_SPI2(uint8_t chr)
 {
@@ -55,10 +55,10 @@ void g_Device_SendNByte_SPI2(uint8_t *data,uint8_t len)
 	}
 }
 /*******************************************************************************
-* º¯ÊýÃû	: g_Device_SPI2_ReadWriteByte ÓÃÓÚSD¿¨
-* ÃèÊö		: SPI¶ÁÐ´º¯Êý
-* ÊäÈë²ÎÊý  : TxData
-* ·µ»Ø²ÎÊý  : RXBUF1
+* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½	: g_Device_SPI2_ReadWriteByte ï¿½ï¿½ï¿½ï¿½SDï¿½ï¿½
+* ï¿½ï¿½ï¿½ï¿½		: SPIï¿½ï¿½Ð´ï¿½ï¿½ï¿½ï¿½
+* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½  : TxData
+* ï¿½ï¿½ï¿½Ø²ï¿½ï¿½ï¿½  : RXBUF1
 *******************************************************************************/
 uint8_t g_Device_SPI2_ReadWriteByte(uint8_t TxData)
 {
@@ -73,10 +73,10 @@ uint8_t g_Device_SPI2_ReadWriteByte(uint8_t TxData)
 }
 
 /*******************************************************************************
-* º¯ÊýÃû	: g_Device_SendByte_SPI3
-* ÃèÊö		: SPI3·¢ËÍ×Ö½Úº¯Êý
-* ÊäÈë²ÎÊý  : chr
-* ·µ»Ø²ÎÊý  : ÎÞ
+* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½	: g_Device_SendByte_SPI3
+* ï¿½ï¿½ï¿½ï¿½		: SPI3ï¿½ï¿½ï¿½ï¿½ï¿½Ö½Úºï¿½ï¿½ï¿½
+* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½  : chr
+* ï¿½ï¿½ï¿½Ø²ï¿½ï¿½ï¿½  : ï¿½ï¿½
 *******************************************************************************/
 void g_Device_SendByte_SPI3(uint8_t chr)
 {
@@ -84,10 +84,10 @@ void g_Device_SendByte_SPI3(uint8_t chr)
 	while(!(UCB3IFG & UCTXIFG));
 }
 /*******************************************************************************
-* º¯ÊýÃû	: SPI_B2_Init
-* ÃèÊö:    SPI_B2³õÊ¼»¯
-* ÊäÈë²ÎÊý  : ÎÞ
-* ·µ»Ø²ÎÊý  : ÎÞ
+* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½	: SPI_B2_Init
+* ï¿½ï¿½ï¿½ï¿½:    SPI_B2ï¿½ï¿½Ê¼ï¿½ï¿½
+* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½  : ï¿½ï¿½
+* ï¿½ï¿½ï¿½Ø²ï¿½ï¿½ï¿½  : ï¿½ï¿½
 *******************************************************************************/
 void g_Device_SPI2_Init(void)
 {
@@ -95,14 +95,14 @@ void g_Device_SPI2_Init(void)
 	P7DIR |= BIT2+BIT3+BIT5;
 
 	UCB2CTL1 |= UCSWRST;               		    // Enable SW reset
-	UCB2CTL0 |= UCCKPH+UCMSB+UCMST+UCSYNC;      //+UCCKPL;//3ÏßSPIÄ£Ê½£¬µ±UCxSTE=1Ê±´Ó»úÊ¹ÄÜ
-	                                            //UCCKPH(SD CARDÐèÒªÔÚÉÏÉýÑØ¶ÁÐ´Êý¾ÝÇÒUCCKPL==0£©
-											    //8Î»Êý¾ÝSPIÖ÷»ú£¬²»»î¶¯×´Ì¬Îª¸ßµçÆ½£¬¸ßÎ»ÔÚÇ°
-	UCB2CTL1 |= UCSSEL__SMCLK;                  // Ñ¡Ôñ²Î¿¼Ê±ÖÓÎªSCMLK=16MHz
-	UCB2BR0 = 6;								//6·ÖÆµ
+	UCB2CTL0 |= UCCKPH+UCMSB+UCMST+UCSYNC;      //+UCCKPL;//3ï¿½ï¿½SPIÄ£Ê½ï¿½ï¿½ï¿½ï¿½UCxSTE=1Ê±ï¿½Ó»ï¿½Ê¹ï¿½ï¿½
+	                                            //UCCKPH(SD CARDï¿½ï¿½Òªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ø¶ï¿½Ð´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½UCCKPL==0ï¿½ï¿½
+											    //8Î»ï¿½ï¿½ï¿½ï¿½SPIï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½î¶¯×´Ì¬Îªï¿½ßµï¿½Æ½ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½Ç°
+	UCB2CTL1 |= UCSSEL__SMCLK;                  // Ñ¡ï¿½ï¿½Î¿ï¿½Ê±ï¿½ï¿½ÎªSCMLK=16MHz
+	UCB2BR0 = 6;								//6ï¿½ï¿½Æµ
 	UCB2BR1 = 0;
-	UCB2CTL1 &= ~UCSWRST;						//Íê³É¼Ä´æÆ÷ÉèÖÃ
-	//UCB2IE |= UCRXIE;							//Ê¹ÄÜÖÐ¶Ï
+	UCB2CTL1 &= ~UCSWRST;						//ï¿½ï¿½É¼Ä´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	//UCB2IE |= UCRXIE;							//Ê¹ï¿½ï¿½ï¿½Ð¶ï¿½
 	OSBsp.Device.Spi2.WriteData = g_Device_SendByte_SPI2;
 	OSBsp.Device.Spi2.WriteNData = g_Device_SendNByte_SPI2;
 	OSBsp.Device.Spi2.WriteReadData = g_Device_SPI2_ReadWriteByte;
@@ -125,22 +125,22 @@ void g_Device_SendNByte_SPI3(uint8_t *data,uint8_t len)
 }
 
 /*******************************************************************************
-* º¯ÊýÃû	: g_Device_SPI3_Init
-* ÃèÊö		: SPI3³õÊ¼»¯
-* ÊäÈë²ÎÊý  : ÎÞ
-* ·µ»Ø²ÎÊý  : ÎÞ
+* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½	: g_Device_SPI3_Init
+* ï¿½ï¿½ï¿½ï¿½		: SPI3ï¿½ï¿½Ê¼ï¿½ï¿½
+* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½  : ï¿½ï¿½
+* ï¿½ï¿½ï¿½Ø²ï¿½ï¿½ï¿½  : ï¿½ï¿½
 *******************************************************************************/
 void g_Device_SPI3_Init(void)
 {
 	P2SEL |= BIT2+BIT3+BIT4;						// Set P2.2-5 as SPI peripheral
 	UCB3CTL1 |= UCSWRST;               				// Enable SW reset
-	UCB3CTL0 |= UCMSB+UCMST+UCSYNC+UCCKPL;			//3ÏßSPIÄ£Ê½£¬µ±UCxSTE=1Ê±´Ó»úÊ¹ÄÜ
-													//8Î»Êý¾ÝSPIÖ÷»ú£¬²»»î¶¯×´Ì¬Îª¸ßµçÆ½£¬¸ßÎ»ÔÚÇ°
-	UCB3CTL1 |= UCSSEL_2;                     		// Ñ¡Ôñ²Î¿¼Ê±ÖÓÎªSCMLK=16MHz
-	UCB3BR0 = 2;									//2·ÖÆµ
+	UCB3CTL0 |= UCMSB+UCMST+UCSYNC+UCCKPL;			//3ï¿½ï¿½SPIÄ£Ê½ï¿½ï¿½ï¿½ï¿½UCxSTE=1Ê±ï¿½Ó»ï¿½Ê¹ï¿½ï¿½
+													//8Î»ï¿½ï¿½ï¿½ï¿½SPIï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½î¶¯×´Ì¬Îªï¿½ßµï¿½Æ½ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½Ç°
+	UCB3CTL1 |= UCSSEL_2;                     		// Ñ¡ï¿½ï¿½Î¿ï¿½Ê±ï¿½ï¿½ÎªSCMLK=16MHz
+	UCB3BR0 = 2;									//2ï¿½ï¿½Æµ
 	UCB3BR1 = 0;
-	UCB3CTL1 &= ~UCSWRST;							//Íê³É¼Ä´æÆ÷ÉèÖÃ
-	UCB3IE |= UCRXIE;								//Ê¹ÄÜÖÐ¶Ï
+	UCB3CTL1 &= ~UCSWRST;							//ï¿½ï¿½É¼Ä´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	UCB3IE |= UCRXIE;								//Ê¹ï¿½ï¿½ï¿½Ð¶ï¿½
 
 	OSBsp.Device.Spi3.WriteData = g_Device_SendByte_SPI3;
 	OSBsp.Device.Spi3.WriteNData = g_Device_SendNByte_SPI3;
@@ -148,7 +148,7 @@ void g_Device_SPI3_Init(void)
 
 
 
-//------USCI_B2ÖÐ¶Ï·þÎñ·þÎñº¯Êý-------------------------------------------------+
+//------USCI_B2ï¿½Ð¶Ï·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½-------------------------------------------------+
 #pragma vector=USCI_B2_VECTOR
 __interrupt void USCI_B2_ISR(void)
 {
@@ -164,7 +164,7 @@ __interrupt void USCI_B2_ISR(void)
   default: break;
   }
 }
-//------USCI_B3ÖÐ¶Ï·þÎñ·þÎñº¯Êý-------------------------------------------------+
+//------USCI_B3ï¿½Ð¶Ï·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½-------------------------------------------------+
 #pragma vector=USCI_B3_VECTOR
 __interrupt void USCI_B3_ISR(void)
 {

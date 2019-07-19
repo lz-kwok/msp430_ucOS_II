@@ -53,6 +53,7 @@
 #include <hal_types.h>
 #include <hal_ucs.h>
 
+#include <g_DeviceUart.h>
 #include <g_DeviceRTC.h>
 #include <g_DeviceSpi.h>
 #include <g_DeviceSD.h>
@@ -86,28 +87,28 @@ typedef struct
         {
             void (*WriteData)(uint8_t data);
             void (*WriteNData)(uint8_t *data,uint8_t len);
-            void (*WriteString)(uint8_t  *s);
+            void (*WriteString)(char *s);
         }Usart0;
 
         struct Usart1
         {
             void (*WriteData)(uint8_t data);
             void (*WriteNData)(uint8_t *data,uint8_t len);
-            void (*WriteString)(uint8_t  *s);
+            void (*WriteString)(char *s);
         }Usart1;
 
         struct Usart2
         {
             void (*WriteData)(uint8_t data);
             void (*WriteNData)(uint8_t *data,uint8_t len);
-            void (*WriteString)(uint8_t  *s);
+            void (*WriteString)(char *s);
         }Usart2;
 
         struct Usart3
         {
             void (*WriteData)(uint8_t data);
             void (*WriteNData)(uint8_t *data,uint8_t len);
-            void (*WriteString)(uint8_t  *s);
+            void (*WriteString)(char  *s);
         }Usart3;
 
         struct Spi2
