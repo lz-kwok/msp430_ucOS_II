@@ -9,7 +9,7 @@
 ## Note : ##
 ### 1. The branch of "master" is the original branch, so you can't upload code at will. You can test your own code in the branch of "develop" and Refer to the following steps: ###
 ### 2. git clone https://github.com/lz-kwok/msp430_ucOS_II.git ###
-### 3. git checkout -b develop origin/develop ###
+### 3. git checkout develop ###
 ### 4. git branch ###
 to check if your local branch is "develop"
 =============================================================================================================================================================================
