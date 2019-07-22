@@ -52,7 +52,7 @@
 
 
 #define  OS_TASK_TMR_PRIO            (OS_LOWEST_PRIO - 4)
-#define  APP_START_TASK_PRIO                   5
+#define  SCADA_TASK_TASK_PRIO         5
 
 /*
 *********************************************************************************************************
@@ -60,7 +60,7 @@
 *********************************************************************************************************
 */
 
-#define  APP_START_TASK_STK_SIZE            128
+#define  DEFAULT_TASK_STK_SIZE        512
 
 
 /*

@@ -33,6 +33,7 @@
 #include  <lib_def.h>
 #include  <app_cfg.h>
 #include  <msp430.h>
+#include  <hal_layer_api.h>
 
 
 /*
@@ -48,7 +49,7 @@
 *********************************************************************************************************
 */
 
-static  OS_STK      AppTaskStartStk[APP_START_TASK_STK_SIZE];
+static OS_STK ScadaTaskStartStk[APP_START_TASK_STK_SIZE];
 
 
 /*
@@ -56,9 +57,7 @@ static  OS_STK      AppTaskStartStk[APP_START_TASK_STK_SIZE];
 *                                            FUNCTION PROTOTYPES
 *********************************************************************************************************
 */
-
-static  void  AppTaskCreate (void);
-static  void  AppTaskStart  (void        *p_arg);
+static  void  ScadaTaskStart(void *p_arg);
 
 
 /*
@@ -74,20 +73,20 @@ static  void  AppTaskStart  (void        *p_arg);
 
 void  main (void)
 {
-    CPU_INT08U  err;
-
-    OSInit();                                                   /* Initialize "uC/OS-II, The Real-Time Kernel"          */
-    OSBsp.Init();                                               /* Initialize BSP functions                             */
-    err = OSTaskCreate(AppTaskStart,                            /* Create the start task                                */
-                       DEF_NULL,
-                      &AppTaskStartStk[APP_START_TASK_STK_SIZE - 1u],
-                       APP_START_TASK_PRIO);
-
-#if OS_TASK_NAME_EN > 0
-    OSTaskNameSet(APP_START_TASK_PRIO, "Startup", &err);
+    OSInit();                                /* Initialize "uC/OS-II, The Real-Time Kernel"          */
+    OSBsp.Init();                            /* Initialize BSP functions                             */
+#if (OS_TASK_STAT_EN > 0)
+    OSStatInit();                            /* Determine CPU capacity                               */
 #endif
 
-    OSStart();                                                  /* Start multitasking (i.e. give control to uC/OS-II)   */
+    Hal_ThreadCreate(ScadaTaskStart,
+                    (void *)"ScadaTaskStart",
+                    &ScadaTaskStartStk,
+                    512,
+                    DEFAULT_TASK_STK_SIZE,
+                    SCADA_TASK_TASK_PRIO);
+
+    OSStart();                               /* Start multitasking (i.e. give control to uC/OS-II)   */
 }
 
 
@@ -107,15 +106,9 @@ void  main (void)
 *********************************************************************************************************
 */
 
-static  void  AppTaskStart (void *p_arg)
+static  void  ScadaTaskStart (void *p_arg)
 {
     (void)p_arg;                   
-
-#if (OS_TASK_STAT_EN > 0)
-    OSStatInit();                                               /* Determine CPU capacity                               */
-#endif
-
-    AppTaskCreate();                                            /* Create application tasks                             */
 
     while (DEF_TRUE) {                                          /* Task body, always written as an infinite loop.       */
         APP_TRACE_INFO(("Hello, world!\n"));
@@ -124,18 +117,4 @@ static  void  AppTaskStart (void *p_arg)
 }
 
 
-/*
-*********************************************************************************************************
-*                                               AppTaskCreate()
-*
-* Description: This function creates the application tasks.
-*
-* Arguments  : none.
-*
-* Note(s)    : none.
-*********************************************************************************************************
-*/
 
-static  void  AppTaskCreate (void)
-{
-}
