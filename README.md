@@ -7,10 +7,12 @@
  Copyright (C) 2013 - 2020, liangzhiGuo, <lz_kwok@163.com>, et al 
  msp430_ucOS_II
 ## Note : ##
-### 1.The master branch is the original branch, so you can't upload code at will. You can test your own code in the branch of "develop" and Refer to the following steps: ###
-### 2.git clone https://github.com/lz-kwok/msp430_ucOS_II.git ###
-### 3.git checkout -b develop origin/develop ###
-=====================
+### 1. The branch of "master" is the original branch, so you can't upload code at will. You can test your own code in the branch of "develop" and Refer to the following steps: ###
+### 2. git clone https://github.com/lz-kwok/msp430_ucOS_II.git ###
+### 3. git checkout -b develop origin/develop ###
+### 4. git branch ###
+to check if your local branch is "develop"
+=============================================================================================================================================================================
 ## 1. hal_layer_api.c ##
 ### 1.1. int Hal_ThreadCreate(void *func, void *funcname,void *TaskStk, int stack_size,int priority)  ###
 Create tasks and set stack pointers, sizes, and priorities for tasks
