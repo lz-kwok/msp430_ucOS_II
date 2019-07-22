@@ -13,7 +13,8 @@
 |  This file is included in other source code files                           |
 |  and this only one place to change the included device header               |
 +----------------------------------------------------------------------------*/
- 
+#ifndef  HAL_DEVICE_H
+#define  HAL_DEVICE_H
 
 #include <msp430.h>
 
@@ -42,4 +43,55 @@
     #error Define a constant of format __MSP430Fxxxx__ within the projects preprocessor settings,
     according to the device being used.
 #endif
+
 /*------------------------ Nothing Below This Line --------------------------*/
+// 无线模组为GPRS
+#define HAVE_GPRS_CONFIG 
+// 无线模组为LoRa
+#define HAVE_LORA_CONFIG 
+// 无线模组为NB-IoT
+#define HAVE_NB_CONFIG 
+// 定义是否具备GPS功能
+#define HAVE_GPS_SERVICE
+// 定义是否具备蓝牙功能
+#define HAVE_BT_SERVICE
+//*****************终端类型*********************//
+#define Air_Station           		0x01	 //空气监测仪
+#define Voc_Station           		0x02	 //VOC监测仪
+#define Dust_Station	      		0x03	 //扬尘噪音监测仪
+#define WRain_Station	      		0x04	 //水雨情监测仪
+#define Wether_Station        		0x05	 //气象监测仪
+#define Water_Station	      		0x06	 //水质水况监测仪
+#define Soil_Station          		0x07	 //土壤墒情监测仪
+#define Agriculture_Station   		0x08	 //农业监测仪
+#define Flowmeter_Station     		0x09	 //流量计监测仪
+
+#define Seeper_Station        		0x11	 //易涝点液位监测仪
+#define Flow_Station          		0x12	 //窨井管道流量监测仪
+#define Rain_Station          		0x13	 //雨量监测仪
+#define IntegratedPitWell     		0x14	 //一体化窨井液位监测仪
+#define InputmodeWell         		0x15	 //投入式窨井液位监测仪
+
+#define NoxiousGas_Station    		0x18	 //有害气体监测仪
+#define WetherSoil_Station    		0x19	 //气象土壤监测仪
+#define Planting_Station      		0x20	 //农作物种植环境监测仪
+
+#define LevelFlowrate_Station 		0x21	 //雷达水位流速监测仪
+
+#define TankMonitor_Station   		0x0A	 //TankMonitor监测仪
+#define MagicSTICK_Station    		0x0B	 //MagicSTICK监测仪
+#define AliveNest_Station     		0x0C	 //AliveNest监测仪     一体化空气检测仪
+#define CLCupboard_Station    		0x0D	 //氯离子柜式监测站
+
+#define Custom_Station	      		0x55	 //定制需求监测站
+
+
+#define PRODUCT_TYPE                Air_Station
+
+
+
+
+
+
+
+#endif

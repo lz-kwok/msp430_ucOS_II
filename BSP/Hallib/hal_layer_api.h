@@ -38,6 +38,9 @@ struct hal_message{
 #define hal_Delay_sec(x)               __delay_cycles((long)(BSP_CPU_CLK_FREQ*(long)x))
 
 
+#define PRODUCT_NAMES_LEN             (32)
+
+
 void *Hal_Malloc(int size);
 void *Hal_Calloc(int count, int size);
 void Hal_Free(void *ptr);
