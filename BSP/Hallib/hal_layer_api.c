@@ -125,3 +125,37 @@ int Hal_QueueRecv(Queue_t queue, struct hal_message* msg, int timeout)
 
     return -1;
 }
+
+Mutex_t Hal_MutexCreate(int priority)
+{
+    Mutex_t pmutex;
+    uint8_t err;
+    pmutex = OSMutexCreate (priority, &err);
+    if(pmutex == null){
+        TRACE_LEVEL_DBG(("%s failed\n",__func__));
+    }
+
+    return pmutex;
+}
+
+void Hal_MutexDestory(Mutex_t mutex)
+{
+    Mutex_t pmutex;
+    uint8_t err;
+    pmutex = OSMutexDel (mutex,OS_DEL_ALWAYS,&err);
+    if(pmutex != (OS_EVENT *)0){
+        TRACE_LEVEL_DBG(("%s failed\n",__func__));
+    }
+}
+
+void Hal_MutexLock(Mutex_t mutex)
+{
+    uint8_t err;
+    OSMutexPend(mutex,100,&err);
+}
+
+void Hal_MutexUnlock(Mutex_t mutex)
+{
+    uint8_t err;
+    err = OSMutexPost(mutex);
+}

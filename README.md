@@ -26,3 +26,15 @@ Send message function. Send message is a structure pointer, which includes messa
 ### 1.6. Hal_QueueRecv(Queue_t queue, struct hal_message* msg, int timeout)  ###
 Receiving message function, receiving message is a structure pointer, which includes message type and message content.
 
+### 1.7. Mutex_t Hal_MutexCreate(int priority) ###
+Create a mutually exclusive semaphore with input parameters as the priority of the semaphore
+
+### 1.8. Mutex_t Hal_MutexCreate(Mutex_t mutex) ###
+Destroy mutually exclusive semaphore and input parameter is the pointer of the semaphore
+
+### 1.9. Mutex_t Hal_MutexLock(Mutex_t mutex) ###
+Obtain the right to use semaphores
+
+### 2.0. Mutex_t Hal_MutexLock(Mutex_t mutex) ###
+Release semaphore usage rights
+

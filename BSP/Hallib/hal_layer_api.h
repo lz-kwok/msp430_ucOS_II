@@ -16,6 +16,7 @@
 #define invalid                       0xFF
 
 typedef OS_EVENT*                     Queue_t;
+typedef OS_EVENT*                     Mutex_t;
 typedef void                          (*message_free_cb)(void* content);
 
 
@@ -47,6 +48,10 @@ Queue_t Hal_QueueCreate(void **start,int size);
 void Hal_QueueDestory(Queue_t queue);
 int Hal_QueueSend(Queue_t queue, struct hal_message* msg, int timeout);
 int Hal_QueueRecv(Queue_t queue, struct hal_message* msg, int timeout);
+Mutex_t Hal_MutexCreate(int priority);
+void Hal_MutexDestory(Mutex_t mutex);
+void Hal_MutexLock(Mutex_t mutex);
+void Hal_MutexUnlock(Mutex_t mutex);
 
 
 
