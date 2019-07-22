@@ -24,10 +24,6 @@
 * Programmer(s) : GLZ
 *********************************************************************************************************
 */
-#include  <ucos_ii.h>
-#include  <cpu.h>
-#include  <lib_def.h>
-#include  <app_cfg.h>
 #include  <hal_layer_api.h>
 
 
@@ -80,6 +76,50 @@ int Hal_ThreadDestory(int priority)
             return -1;
 	    }
 
+        return err;
+    }
+
+    return -1;
+}
+
+Queue_t Hal_QueueCreate(void **start,int size)
+{
+    Queue_t queue = OSQCreate(start,size);
+    return queue;
+}
+
+void Hal_QueueDestory(Queue_t queue)
+{
+    uint8_t err;
+    Queue_t queasw;
+    queasw = OSQDel(queue,OS_DEL_ALWAYS,&err);
+    if(queasw != (OS_EVENT *)0){
+        TRACE_LEVEL_DBG(("%s failed\n",__func__));
+    }
+}
+
+int Hal_QueueSend(Queue_t queue, struct hal_message* msg, int timeout)
+{
+    uint8_t err;
+    void *pMsg = (void *)msg;
+	if(pMsg == null){
+        return -1;
+    }
+	err = OSQPost (queue,pMsg);
+    if(err != OS_ERR_NONE){
+        TRACE_LEVEL_DBG(("%s failed\n",__func__));
+        return -1;
+    }
+    
+	return err;
+}
+
+int Hal_QueueRecv(Queue_t queue, struct hal_message* msg, int timeout)
+{
+    uint8_t err;
+    void* pMsg = OSQPend(queue, timeout, &err);
+    if (OS_ERR_NONE == err){
+        memcpy(msg, pMsg, sizeof(struct hal_message));
         return err;
     }
 

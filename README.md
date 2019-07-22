@@ -14,5 +14,15 @@ Create tasks and set stack pointers, sizes, and priorities for tasks
 ### 1.2. int Hal_ThreadDestory(int priority)  ###
 Destroy tasks, enter parameters as priority of tasks
 
+### 1.3. int Hal_QueueCreate(void **start,int size)  ###
+Create a message queue with parameters of array pointer and queue size. The size of array pointer should be no less than queue size.
 
+### 1.4. int Hal_QueueDestory(Queue_t queue)  ###
+Destroy message queue with input parameter as queue pointer to destroy
+
+### 1.5. Hal_QueueSend(Queue_t queue, struct hal_message* msg, int timeout)  ###
+Send message function. Send message is a structure pointer, which includes message type and message content.
+
+### 1.6. Hal_QueueRecv(Queue_t queue, struct hal_message* msg, int timeout)  ###
+Receiving message function, receiving message is a structure pointer, which includes message type and message content.
 
