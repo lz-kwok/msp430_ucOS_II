@@ -35,6 +35,6 @@ Destroy mutually exclusive semaphore and input parameter is the pointer of the s
 ### 1.9. Mutex_t Hal_MutexLock(Mutex_t mutex) ###
 Obtain the right to use semaphores
 
-### 2.0. Mutex_t Hal_MutexLock(Mutex_t mutex) ###
+### 2.0. Mutex_t Hal_MutexUnlock(Mutex_t mutex) ###
 Release semaphore usage rights
 
