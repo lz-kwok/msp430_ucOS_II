@@ -50,7 +50,8 @@ uint8_t Inqure_PM[CMDLength]={0x05,0x03,0x00,0x00,0x00,0x02,0xC5,0x8F};         
 
 uint32_t SensorCahe = 0;
 uint32_t sSensorCahe = 0;
-
+static uint8_t SensorStatus_H;
+static uint8_t SensorStatus_L;
 
 
 /*******************************************************************************
@@ -192,6 +193,83 @@ void InqureSensor(void)
 }
 
 
+char *MakeJsonBodyData(DataStruct *DataPointer)
+{
+    mallco_dev.init();
+
+    cJSON * pJsonRoot = NULL;
+	cJSON * pSubJson;
+	cJSON * pBack;
+	char * p;
+
+    pJsonRoot = cJSON_CreateObject();
+    if(NULL == pJsonRoot)
+    {
+        cJSON_Delete(pJsonRoot);
+        return NULL;
+    }
+
+    cJSON_AddNumberToObject(pJsonRoot, "SN",DataPointer->TerminalInfoData.SerialNumber);
+    cJSON_AddNumberToObject(pJsonRoot, "DeviceID",DataPointer->TerminalInfoData.DeviceID);
+//    cJSON_AddNumberToObject(pJsonRoot, "DeviceType",DataPointer->TerminalInfoData.DeviceType);
+    cJSON_AddNumberToObject(pJsonRoot, "SeqNum",DataPointer->TransMethodData.SeqNumber);
+//    cJSON_AddNumberToObject(pJsonRoot, "DecSensorStatus",DataPointer->TerminalInfoData.SensorStatus);//10进制传感器状态
+
+    pSubJson = NULL;
+    pSubJson = cJSON_CreateObject();
+    if(NULL == pSubJson)
+    {
+      //create object faild, exit
+      cJSON_Delete(pSubJson);
+      return NULL;
+    }
+
+	if(GetBit(SensorStatus_H, 1)) {
+		cJSON_AddNumberToObject(pSubJson, "温度",DataPointer->DustData.Temperature);
+	}
+	if(GetBit(SensorStatus_H, 0)) {
+		cJSON_AddNumberToObject(pSubJson, "湿度",DataPointer->DustData.Humidity);
+	}
+	if(GetBit(SensorStatus_L, 7)) {
+		cJSON_AddNumberToObject(pSubJson, "风速",DataPointer->DustData.WindSpeed);
+	}
+	if(GetBit(SensorStatus_L, 6)) {
+		cJSON_AddNumberToObject(pSubJson, "风向",DataPointer->DustData.WindDirection);
+	}
+	if(GetBit(SensorStatus_L, 5)) {
+		cJSON_AddNumberToObject(pSubJson, "PM2.5",DataPointer->DustData.PM25);
+	}
+	if(GetBit(SensorStatus_L, 4)) {
+		cJSON_AddNumberToObject(pSubJson, "PM10",DataPointer->DustData.PM10);
+	}
+	if(GetBit(SensorStatus_L, 3)) {
+		cJSON_AddNumberToObject(pSubJson, "噪音",DataPointer->DustData.Noise);
+	}
+	cJSON_AddItemToObject(pJsonRoot, "DustData", pSubJson);
+	pBack = NULL;
+	pBack = cJSON_CreateObject();
+	if(NULL == pBack)
+	{
+		// create object faild, exit
+		cJSON_Delete(pJsonRoot);
+		return NULL;
+	}
+	cJSON_AddNumberToObject(pJsonRoot, "Version",DataPointer->TerminalInfoData.Version);
+	cJSON_AddNumberToObject(pJsonRoot, "Quanity",DataPointer->TerminalInfoData.PowerQuantity);
+	cJSON_AddStringToObject(pJsonRoot, "Uptime",TimeString);
+
+    p = cJSON_Print(pJsonRoot);
+    if(NULL == p)
+    {
+      //convert json list to string faild, exit
+      //because sub json pSubJson han been add to pJsonRoot, so just delete pJsonRoot, if you also delete pSubJson, it will coredump, and error is : double free
+      cJSON_Delete(pJsonRoot);
+      return NULL;
+    }
+
+    cJSON_Delete(pJsonRoot);
+    return p;
+}
 
 
 #endif //(PRODUCT_TYPE == Voc_Station)

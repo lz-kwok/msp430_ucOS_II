@@ -336,6 +336,7 @@ extern uint32_t SensorCahe;
 extern uint32_t sSensorCahe;
 
 void InqureSensor(void);
+char *MakeJsonBodyData(DataStruct *DataPointer);
 
 
 
