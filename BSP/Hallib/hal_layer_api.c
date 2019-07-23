@@ -235,3 +235,4 @@ int Hal_getProductName(char *proName)
 #endif
 }
 //add test 190723
+//add 19-07-23 14：00
