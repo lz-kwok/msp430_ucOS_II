@@ -167,70 +167,70 @@ void Hal_MutexUnlock(Mutex_t mutex)
 int Hal_getProductName(char *proName)
 {
 #if (PRODUCT_TYPE == Air_Station) 
-	strncpy(proName, "DustData", PRODUCT_NAMES_LEN-1);
+	strncpy(proName, "AirData", PRODUCT_NAMES_LEN-1);
 	return 0;
 #elif (PRODUCT_TYPE == Voc_Station) 
-	strncpy(proName, "CRD4001", PRODUCT_NAMES_LEN-1);
+	strncpy(proName, "VocData", PRODUCT_NAMES_LEN-1);
 	return 0;
 #elif (PRODUCT_TYPE == Dust_Station) 
-	strncpy(proName, "CRD4001", PRODUCT_NAMES_LEN-1);
+	strncpy(proName, "DustData", PRODUCT_NAMES_LEN-1);
 	return 0;
 #elif (PRODUCT_TYPE == WRain_Station) 
-	strncpy(proName, "CRD4001", PRODUCT_NAMES_LEN-1);
+	strncpy(proName, "WRainData", PRODUCT_NAMES_LEN-1);
 	return 0;
 #elif (PRODUCT_TYPE == Wether_Station) 
-	strncpy(proName, "CRD4001", PRODUCT_NAMES_LEN-1);
+	strncpy(proName, "WetherData", PRODUCT_NAMES_LEN-1);
 	return 0;
 #elif (PRODUCT_TYPE == Soil_Station) 
-	strncpy(proName, "CRD4001", PRODUCT_NAMES_LEN-1);
+	strncpy(proName, "SoilData", PRODUCT_NAMES_LEN-1);
 	return 0;
 #elif (PRODUCT_TYPE == Agriculture_Station) 
-	strncpy(proName, "CRD4001", PRODUCT_NAMES_LEN-1);
+	strncpy(proName, "AgricultureData", PRODUCT_NAMES_LEN-1);
 	return 0;	
 #elif (PRODUCT_TYPE == Flowmeter_Station) 
-	strncpy(proName, "CRD4001", PRODUCT_NAMES_LEN-1);
+	strncpy(proName, "FlowmeterData", PRODUCT_NAMES_LEN-1);
 	return 0;
 #elif (PRODUCT_TYPE == Seeper_Station) 
-	strncpy(proName, "CRD4001", PRODUCT_NAMES_LEN-1);
+	strncpy(proName, "SeeperData", PRODUCT_NAMES_LEN-1);
 	return 0;
 #elif (PRODUCT_TYPE == Flow_Station) 
-	strncpy(proName, "CRD4001", PRODUCT_NAMES_LEN-1);
+	strncpy(proName, "FlowData", PRODUCT_NAMES_LEN-1);
 	return 0;
 #elif (PRODUCT_TYPE == Rain_Station) 
-	strncpy(proName, "CRD4001", PRODUCT_NAMES_LEN-1);
+	strncpy(proName, "RainData", PRODUCT_NAMES_LEN-1);
 	return 0;
-#elif (PRODUCT_TYPE == IntegratedPitWell) 
-	strncpy(proName, "CRD4001", PRODUCT_NAMES_LEN-1);
+#elif (PRODUCT_TYPE == IntegratedPitWell_Station)
+	strncpy(proName, "IntegratedPitWellData", PRODUCT_NAMES_LEN-1);
 	return 0;
-#elif (PRODUCT_TYPE == InputmodeWell) 
-	strncpy(proName, "CRD4001", PRODUCT_NAMES_LEN-1);
+#elif (PRODUCT_TYPE == InputmodeWell_Station)
+	strncpy(proName, "InputmodeWellData", PRODUCT_NAMES_LEN-1);
 	return 0;	
 #elif (PRODUCT_TYPE == NoxiousGas_Station) 
-	strncpy(proName, "CRD4001", PRODUCT_NAMES_LEN-1);
+	strncpy(proName, "NoxiousGasData", PRODUCT_NAMES_LEN-1);
 	return 0;	
 #elif (PRODUCT_TYPE == WetherSoil_Station) 
-	strncpy(proName, "CRD4001", PRODUCT_NAMES_LEN-1);
+	strncpy(proName, "WetherSoilData", PRODUCT_NAMES_LEN-1);
 	return 0;
 #elif (PRODUCT_TYPE == Planting_Station) 
-	strncpy(proName, "CRD4001", PRODUCT_NAMES_LEN-1);
+	strncpy(proName, "PlantingData", PRODUCT_NAMES_LEN-1);
 	return 0;
 #elif (PRODUCT_TYPE == LevelFlowrate_Station) 
-	strncpy(proName, "CRD4001", PRODUCT_NAMES_LEN-1);
+	strncpy(proName, "LevelFlowrateData", PRODUCT_NAMES_LEN-1);
 	return 0;
 #elif (PRODUCT_TYPE == TankMonitor_Station) 
-	strncpy(proName, "CRD4001", PRODUCT_NAMES_LEN-1);
+	strncpy(proName, "TankMonitorData", PRODUCT_NAMES_LEN-1);
 	return 0;
 #elif (PRODUCT_TYPE == MagicSTICK_Station) 
-	strncpy(proName, "CRD4001", PRODUCT_NAMES_LEN-1);
+	strncpy(proName, "MagicSTICKData", PRODUCT_NAMES_LEN-1);
 	return 0;
 #elif (PRODUCT_TYPE == AliveNest_Station) 
-	strncpy(proName, "CRD4001", PRODUCT_NAMES_LEN-1);
+	strncpy(proName, "AliveNestData", PRODUCT_NAMES_LEN-1);
 	return 0;
 #elif (PRODUCT_TYPE == CLCupboard_Station) 
-	strncpy(proName, "CRD4001", PRODUCT_NAMES_LEN-1);
+	strncpy(proName, "CLCupboardData", PRODUCT_NAMES_LEN-1);
 	return 0;
 #elif (PRODUCT_TYPE == Custom_Station) 
-	strncpy(proName, "CRD4001", PRODUCT_NAMES_LEN-1);
+	strncpy(proName, "CustomData", PRODUCT_NAMES_LEN-1);
 	return 0;
 #endif
 }
