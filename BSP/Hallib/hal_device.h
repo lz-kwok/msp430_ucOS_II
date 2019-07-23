@@ -47,6 +47,15 @@
 /*------------------------ Nothing Below This Line --------------------------*/
 // 无线模组为GPRS
 #define HAVE_GPRS_CONFIG 
+#ifdef HAVE_GPRS_CONFIG
+//这俩预定义只能选一个
+	#define SIM800C
+//	#define AIR202
+//这俩预定义只能选一个
+	#define ReportToAliOnly
+	//#define ReportTo30000IoT
+//这俩预定义只能选一个
+#endif
 // 无线模组为LoRa
 #define HAVE_LORA_CONFIG 
 // 无线模组为NB-IoT
@@ -89,10 +98,7 @@
 #define PRODUCT_TYPE                Voc_Station
 
 
-//这俩预定义只能选一个
-#define ReportToAliOnly
-//#define ReportTo30000IoT
-//这俩预定义只能选一个
+
 
 
 
