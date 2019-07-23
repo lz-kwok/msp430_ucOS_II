@@ -28,6 +28,12 @@ struct hal_message{
 	message_free_cb freecb; /* free content func */
 };
 
+typedef union
+{
+	uint8_t Hex[4];
+	float Data;
+}Hex2Float;
+
 /*Bit Operation Function*/
 #define hal_SetBit(data, offset)      data |= 1 << offset      //置位某位为1
 #define hal_ResetBit(data, offset)    data &= ~(1 << offset)   //复位某位为0
@@ -56,6 +62,7 @@ void Hal_MutexDestory(Mutex_t mutex);
 void Hal_MutexLock(Mutex_t mutex);
 void Hal_MutexUnlock(Mutex_t mutex);
 
+int Hal_getProductName(char *proName);
 
 
 

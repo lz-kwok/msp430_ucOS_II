@@ -766,13 +766,9 @@ __interrupt void USCI_A3_ISR(void)
 			while(!(UCA3IFG&UCTXIFG));            // USCI_A3 TX buffer ready?
 			{
 				TA1R=0;
-				Do_Flag_Uart3=1;
-				if(dRxNum<dRxLength)
-				{
+				if(dRxNum<dRxLength){
 				  dRxBuff[dRxNum++] = UCA3RXBUF;
-				}
-				else
-				{
+				}else{
 				  dRxNum=0;
 				}
 			}

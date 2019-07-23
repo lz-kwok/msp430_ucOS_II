@@ -86,9 +86,13 @@
 #define Custom_Station	      		0x55	 //定制需求监测站
 
 
-#define PRODUCT_TYPE                Air_Station
+#define PRODUCT_TYPE                Voc_Station
 
 
+//这俩预定义只能选一个
+#define ReportToAliOnly
+//#define ReportTo30000IoT
+//这俩预定义只能选一个
 
 
 
