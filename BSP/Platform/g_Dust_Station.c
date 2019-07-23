@@ -272,4 +272,4 @@ char *MakeJsonBodyData(DataStruct *DataPointer)
 }
 
 
-#endif //(PRODUCT_TYPE == Voc_Station)
+#endif //(PRODUCT_TYPE == Dust_Station)

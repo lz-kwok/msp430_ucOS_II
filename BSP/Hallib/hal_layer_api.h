@@ -38,6 +38,8 @@ typedef union
 #define hal_SetBit(data, offset)      data |= 1 << offset      //置位某位为1
 #define hal_ResetBit(data, offset)    data &= ~(1 << offset)   //复位某位为0
 #define hal_GetBit(data, offset)      ((data >> offset) &0x01) //获取某位
+#define UshortToByte1(data)     	  ((uint8_t *)(&data))[0]  //获取ushort类型数据低位(low 8 bit)高位(high 8 bit)
+#define UshortToByte0(data)     	  ((uint8_t *)(&data))[1]  //获取ushort类型数据
 
 #define hal_Delay_us(x)                __delay_cycles((long)(BSP_CPU_CLK_FREQ*(long)x/1000000.0))
 #define hal_Delay_ms(x)                __delay_cycles((long)(BSP_CPU_CLK_FREQ*(long)x/1000.0))
@@ -46,7 +48,7 @@ typedef union
 
 #define PRODUCT_NAMES_LEN             (32)
 
-
+uint16_t Crc16(uint8_t *bufferpoint,int16_t sum);
 void *Hal_Malloc(int size);
 void *Hal_Calloc(int count, int size);
 void Hal_Free(void *ptr);
