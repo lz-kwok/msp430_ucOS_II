@@ -53,6 +53,13 @@
 #include <hal_types.h>
 #include <hal_ucs.h>
 
+#include <cjson.h>
+#include <malloc.h>
+#include <utils_hmac.h>
+#include <utils_md5.h>
+#include <utils_sha1.h>
+
+
 #include <g_DeviceUart.h>
 #include <g_DeviceRTC.h>
 #include <g_DeviceSpi.h>

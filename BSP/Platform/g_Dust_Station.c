@@ -67,8 +67,8 @@ static void AnalyzeComand(uint8_t *data,uint8_t Len)
 		hal_Delay_ms(50);
 
 		CalcuResult = Crc16(data,Len-2);
-		CRC_Result[0] = (unsigned char)((CalcuResult & 0xFF00) >> 8);
-		CRC_Result[1] = (unsigned char)(CalcuResult & 0xFF);
+		CRC_Result[0] = (uint8_t)((CalcuResult & 0xFF00) >> 8);
+		CRC_Result[1] = (uint8_t)(CalcuResult & 0xFF);
 		if((data[Len-2] == CRC_Result[0]) && (data[Len-1] == CRC_Result[1]))   //判断数据接收是否存在异常
 		{
 			if(data[1]==0x03)
