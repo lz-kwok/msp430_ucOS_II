@@ -1,7 +1,8 @@
 #ifndef G_DEVICEGPRS_H
 #define G_DEVICEGPRS_H
 
-#include  <hal_layer_api.h>
+#include <hal_layer_api.h>
+#include <g_Platform.h>
 
 
 extern uint8_t GprsInitStatus;

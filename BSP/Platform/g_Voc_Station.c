@@ -37,11 +37,14 @@
 AppStruct  App;
 DataStruct *AppDataPointer;
 
+uint32_t Send_Buffer[34] = {0xaa,0x00,0x00,0x01,0x01,0x00,0x01,0x7F,0xFF,0x7F,0xFF,0x7F,
+0xFF,0x7F,0xFF,0x7F,0xFF,0x7F,0xFF,0x7F,0xFF,0x7F,0xFF,0x7F,0xFF,0x7F,0xFF,0x00,0x00,0x00,0x00,0x00,0x00,0xff};
 uint8_t ScadaGas[GasCMDLength] = {0xFF,0xFF,0x01,0x01,0x05,0x01,0x00,0x6C,0x07,0x74,0xDD};
 
 uint32_t SensorCahe = 0;
-
-
+static uint8_t SensorStatus_H;
+static uint8_t SensorStatus_L;
+static uint8_t  SensorStatusBuff[2];       //传感器状态数组
 /*******************************************************************************
 * 函数名		: AnalyzeComand
 * 描述	    	: 解析传感器指令
@@ -55,7 +58,6 @@ static void AnalyzeComand(uint8_t *data,uint8_t Len)
 		hal_Delay_ms(50);
 		if((data[0] == 0xFF)&&(data[17] == 0xDD)&&(dRxNum == 18))
 		{
-			Flag_SDSaveData=1;   //SD卡保存数据标识
 			switch(data[3])
 			{
 				case 0x27:	    //VOC
@@ -147,3 +149,4 @@ void InqureSensor(void)
 
 
 #endif //(PRODUCT_TYPE == Voc_Station)
+

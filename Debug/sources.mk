@@ -115,7 +115,10 @@ uC-LIB \
 uC-CPU \
 uC-CPU/MSP430/CCS \
 FatFs \
+BSP/utils \
+BSP/cJSON \
 BSP \
+BSP/Platform \
 BSP/Hallib \
 BSP/Devicelib \
 App \

@@ -113,12 +113,12 @@ void Hal_Free(void *ptr)
         free(ptr);
 }
 
-int Hal_ThreadCreate(void *func, void *funcname,void *TaskStk, int stack_size,int priority)
+int Hal_ThreadCreate(void (*func)(void *p_arg), void *funcname,OS_STK *TaskStk, int priority)
 {
     CPU_INT08U err;
     err = OSTaskCreate(func,                            /* Create the func task                                */
                        DEF_NULL,
-                       TaskStk[stack_size - 1u],
+                       TaskStk,
                        priority);
 
 #if OS_TASK_NAME_EN > 0
@@ -142,7 +142,7 @@ int Hal_ThreadDestory(int priority)
         //De-allocate any dynamic memory;
         err = OSTaskDel(priority);
         if (err != OS_ERR_NONE){
-            APP_TRACE_INFO(("%s failed\n",__func__));
+            APP_TRACE_DBG(("%s failed\n",__func__));
             return -1;
 	    }
 
@@ -164,7 +164,7 @@ void Hal_QueueDestory(Queue_t queue)
     Queue_t queasw;
     queasw = OSQDel(queue,OS_DEL_ALWAYS,&err);
     if(queasw != (OS_EVENT *)0){
-        TRACE_LEVEL_DBG(("%s failed\n",__func__));
+        APP_TRACE_DBG(("%s failed\n",__func__));
     }
 }
 
@@ -177,7 +177,7 @@ int Hal_QueueSend(Queue_t queue, struct hal_message* msg, int timeout)
     }
 	err = OSQPost (queue,pMsg);
     if(err != OS_ERR_NONE){
-        TRACE_LEVEL_DBG(("%s failed\n",__func__));
+        APP_TRACE_DBG(("%s failed\n",__func__));
         return -1;
     }
     
@@ -202,7 +202,7 @@ Mutex_t Hal_MutexCreate(int priority)
     uint8_t err;
     pmutex = OSMutexCreate (priority, &err);
     if(pmutex == null){
-        TRACE_LEVEL_DBG(("%s failed\n",__func__));
+    	APP_TRACE_DBG(("%s failed\n",__func__));
     }
 
     return pmutex;
@@ -214,7 +214,7 @@ void Hal_MutexDestory(Mutex_t mutex)
     uint8_t err;
     pmutex = OSMutexDel (mutex,OS_DEL_ALWAYS,&err);
     if(pmutex != (OS_EVENT *)0){
-        TRACE_LEVEL_DBG(("%s failed\n",__func__));
+    	APP_TRACE_DBG(("%s failed\n",__func__));
     }
 }
 

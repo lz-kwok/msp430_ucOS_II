@@ -31,18 +31,18 @@ const uint8_t USCIModulation[16] = {0x00,0x10,0x20,0x30,0x40,0x50,0x60,0x70,0x80
 		                          0xA0,0xB0,0xC0,0xD0,0xE0,0xF0};
 
 
-//串口同步时间变量
+//涓插彛鍚屾鏃堕棿鍙橀噺
 uint8_t *Rcv_TimePoint;     //+++++++++++++//
 uint8_t Rcv_TimeNum = 0;
 uint8_t Rcv_TimeData[50];
 uint8_t TimebuffNum = 0;
-uint8_t TimeBuff_Hex[8] = {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00}; //16进制的时间Buffer  2018年3月15号 20时50分00秒 星期4
+uint8_t TimeBuff_Hex[8] = {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00}; //16杩涘埗鐨勬椂闂碆uffer  2018骞�鏈�5鍙�20鏃�0鍒�0绉�鏄熸湡4
 
 
 uint8_t Do_Flag_Uart3=0;
-uint8_t Uart_0_Flag=0;		//串口接受完，在接受中断会置0，接受完1s后定时内置1
-uint8_t Uart_1_Flag=0;		//串口接受完，在接受中断会置0，接受完1s后定时内置1
-uint8_t Uart_2_Flag=0;		//串口接受完，在接受中断会置0，接受完1s后定时内置1
+uint8_t Uart_0_Flag=0;		//涓插彛鎺ュ彈瀹岋紝鍦ㄦ帴鍙椾腑鏂細缃�锛屾帴鍙楀畬1s鍚庡畾鏃跺唴缃�
+uint8_t Uart_1_Flag=0;		//涓插彛鎺ュ彈瀹岋紝鍦ㄦ帴鍙椾腑鏂細缃�锛屾帴鍙楀畬1s鍚庡畾鏃跺唴缃�
+uint8_t Uart_2_Flag=0;		//涓插彛鎺ュ彈瀹岋紝鍦ㄦ帴鍙椾腑鏂細缃�锛屾帴鍙楀畬1s鍚庡畾鏃跺唴缃�
 
 
 uint8_t aRxBuff[aRxLength];		//UART0 receive data buff
@@ -123,11 +123,11 @@ void g_Device_Usart0_Init(uint32_t BaudRate)
 	uint32_t tem;
 	uint8_t UCBRF;
 
-	Mainclk = MCLK_FREQ;
+	Mainclk = BSP_CPU_CLK_FREQ;
 
 	P3SEL |= BIT3+BIT4;                       // P3.3,4 = USCI_A0 TXD/RXD
-    UCA0CTL1 |= UCSWRST;                      // 复位设备状态
-    UCA0CTL1 |= UCSSEL_2;                     // 选择参考时钟为SCMLK=16MHz
+    UCA0CTL1 |= UCSWRST;                      // 澶嶄綅璁惧鐘舵�
+    UCA0CTL1 |= UCSSEL_2;                     // 閫夋嫨鍙傝�鏃堕挓涓篠CMLK=16MHz
 
     MidValue = (float)Mainclk/16/BaudRate;
     tem = Mainclk/16/BaudRate;
@@ -139,14 +139,14 @@ void g_Device_Usart0_Init(uint32_t BaudRate)
     UCA0BR1 = 0;                              //
 	UCA0MCTL |= UCBRS_0 + UCBRF + UCOS16;     // Modulation UCBRSx=1, UCBRFx=3
 
-    UCA0CTL1 &= ~UCSWRST;                     // 完成USCI初始化配置
-    UCA0IE |= UCRXIE;                         // 使能接收中断
+    UCA0CTL1 &= ~UCSWRST;                     // 瀹屾垚USCI鍒濆鍖栭厤缃�
+    UCA0IE |= UCRXIE;                         // 浣胯兘鎺ユ敹涓柇
 
     OSBsp.Device.Usart0.WriteData   = g_Device_SendByte_Uart0;
 	OSBsp.Device.Usart0.WriteNData  = g_Device_SendNByte_Uart0;
 	OSBsp.Device.Usart0.WriteString = g_Device_SendString_Uart0;
 
-    am_util_stdio_printf_init((am_util_stdio_print_char_t)g_Device_SendString_Uart0); //串口打印映射到串口0
+    am_util_stdio_printf_init((am_util_stdio_print_char_t)g_Device_SendString_Uart0); //涓插彛鎵撳嵃鏄犲皠鍒颁覆鍙�
 }
 /*******************************************************************************
 * Function Name  : g_Device_SendByte_Uart1
@@ -184,12 +184,12 @@ void g_Device_SendString_Uart1(char *s)
 {
 	while(*s != '\0')
 	{
-		SendByteToUart1((uint8_t)*s++);
+		g_Device_SendByte_Uart1((uint8_t)*s++);
 	}
 }
 /*******************************************************************************
 * Function Name  : g_Device_Usart1_Init		
-* Description    : BaudRate9600bps Used for GPS定位
+* Description    : BaudRate9600bps Used for GPS瀹氫綅
 * Input para     : None
 * Output para    : None
 *******************************************************************************/
@@ -203,8 +203,8 @@ void g_Device_Usart1_Init(uint32_t BaudRate)
 	Mainclk = BSP_CPU_CLK_FREQ;
 
 	P4SEL |= BIT4+BIT5;                       // P4.4,5 = USCI_A1 TXD/RXD
-    UCA1CTL1 |= UCSWRST;                      // 复位设备状态
-    UCA1CTL1 |= UCSSEL_2;                     // 选择参考时钟为SCMLK=16MHz
+    UCA1CTL1 |= UCSWRST;                      // 澶嶄綅璁惧鐘舵�
+    UCA1CTL1 |= UCSSEL_2;                     // 閫夋嫨鍙傝�鏃堕挓涓篠CMLK=16MHz
 
     MidValue = (float)Mainclk/16/BaudRate;
     tem = Mainclk/16/BaudRate;
@@ -216,12 +216,12 @@ void g_Device_Usart1_Init(uint32_t BaudRate)
     UCA1BR1 = 0;                              //
 	UCA1MCTL |= UCBRS_0 + UCBRF + UCOS16;     // Modulation UCBRSx=1, UCBRFx=3
 
-    UCA1CTL1 &= ~UCSWRST;                     // 完成USCI初始化配置
-    UCA1IE |= UCRXIE;                         // 使能接收中断
+    UCA1CTL1 &= ~UCSWRST;                     // 瀹屾垚USCI鍒濆鍖栭厤缃�
+    UCA1IE |= UCRXIE;                         // 浣胯兘鎺ユ敹涓柇
 
-    System.Device.Usart1.WriteData   = g_Device_SendByte_Uart1;
-	System.Device.Usart1.WriteNData  = g_Device_SendNByte_Uart1;
-	System.Device.Usart1.WriteString = g_Device_SendString_Uart1;
+    OSBsp.Device.Usart1.WriteData   = g_Device_SendByte_Uart1;
+	OSBsp.Device.Usart1.WriteNData  = g_Device_SendNByte_Uart1;
+	OSBsp.Device.Usart1.WriteString = g_Device_SendString_Uart1;
 }
 /*******************************************************************************
 * Function Name  : g_Device_SendByte_Uart2
@@ -278,8 +278,8 @@ void g_Device_Usart2_Init(uint32_t BaudRate)
 	Mainclk = BSP_CPU_CLK_FREQ;
 
 	P7SEL |= BIT0+BIT1;                       // P7.0,1 = USCI_A1 TXD/RXD
-    UCA2CTL1 |= UCSWRST;                      // 复位设备状态
-    UCA2CTL1 |= UCSSEL_2;                     // 选择参考时钟为SCMLK=16MHz
+    UCA2CTL1 |= UCSWRST;                      // 澶嶄綅璁惧鐘舵�
+    UCA2CTL1 |= UCSSEL_2;                     // 閫夋嫨鍙傝�鏃堕挓涓篠CMLK=16MHz
 
     MidValue = (float)Mainclk/16/BaudRate;
     tem = Mainclk/16/BaudRate;
@@ -291,13 +291,13 @@ void g_Device_Usart2_Init(uint32_t BaudRate)
     UCA2BR1 = 0;                              //
 	UCA2MCTL |= UCBRS_0 + UCBRF + UCOS16;   // Modulation UCBRSx=1, UCBRFx=3
 
-    UCA2CTL1 &= ~UCSWRST;                     // 完成USCI初始化配置
-    UCA2IE |= UCRXIE;                         // 使能接收中断
+    UCA2CTL1 &= ~UCSWRST;                     // 瀹屾垚USCI鍒濆鍖栭厤缃�
+    UCA2IE |= UCRXIE;                         // 浣胯兘鎺ユ敹涓柇
 
-    System.Device.Usart2.WriteData   = g_Device_SendByte_Uart2;
-	System.Device.Usart2.WriteNData  = g_Device_SendNByte_Uart2;
-	System.Device.Usart2.WriteString = g_Device_SendString_Uart2;
-//    am_util_stdio_printf_init((am_util_stdio_print_char_t)SendStringToUart2); //串口打印映射到串口0
+    OSBsp.Device.Usart2.WriteData   = g_Device_SendByte_Uart2;
+	OSBsp.Device.Usart2.WriteNData  = g_Device_SendNByte_Uart2;
+	OSBsp.Device.Usart2.WriteString = g_Device_SendString_Uart2;
+//    am_util_stdio_printf_init((am_util_stdio_print_char_t)SendStringToUart2); //涓插彛鎵撳嵃鏄犲皠鍒颁覆鍙�
 }
 /*******************************************************************************
 * Function Name  : g_Device_SendByte_Uart3
@@ -354,8 +354,8 @@ void g_Device_Usart3_Init(uint32_t BaudRate)
 	Mainclk = BSP_CPU_CLK_FREQ;
 
 	P4SEL |= BIT6+BIT7;                       // P7.0,1 = USCI_A1 TXD/RXD
-    UCA3CTL1 |= UCSWRST;                      // 复位设备状态
-    UCA3CTL1 |= UCSSEL_2;                     // 选择参考时钟为SCMLK=16MHz
+    UCA3CTL1 |= UCSWRST;                      // 澶嶄綅璁惧鐘舵�
+    UCA3CTL1 |= UCSSEL_2;                     // 閫夋嫨鍙傝�鏃堕挓涓篠CMLK=16MHz
 
     MidValue = (float)Mainclk/16/BaudRate;
     tem = Mainclk/16/BaudRate;
@@ -367,19 +367,19 @@ void g_Device_Usart3_Init(uint32_t BaudRate)
     UCA3BR1 = 0;                              //
 	UCA3MCTL |= UCBRS_0 + UCBRF + UCOS16;     // Modulation UCBRSx=1, UCBRFx=3
 
-    UCA3CTL1 &= ~UCSWRST;                     // 完成USCI初始化配置
-    UCA3IE |= UCRXIE;                         // 使能接收中断
+    UCA3CTL1 &= ~UCSWRST;                     // 瀹屾垚USCI鍒濆鍖栭厤缃�
+    UCA3IE |= UCRXIE;                         // 浣胯兘鎺ユ敹涓柇
 
-    System.Device.Usart3.WriteData   = g_Device_SendByte_Uart3;
-	System.Device.Usart3.WriteNData   = g_Device_SendNByte_Uart3;
-	System.Device.Usart3.WriteString = g_Device_SendString_Uart3;
-//    am_util_stdio_printf_init((am_util_stdio_print_char_t)SendStringToLoRa); //串口打印映射到串口3
+    OSBsp.Device.Usart3.WriteData   = g_Device_SendByte_Uart3;
+	OSBsp.Device.Usart3.WriteNData   = g_Device_SendNByte_Uart3;
+	OSBsp.Device.Usart3.WriteString = g_Device_SendString_Uart3;
+//    am_util_stdio_printf_init((am_util_stdio_print_char_t)SendStringToLoRa); //涓插彛鎵撳嵃鏄犲皠鍒颁覆鍙�
 }
 
 
 
 
-//------USCI_A0中断服务服务函数-------------------------------------------------+
+//------USCI_A0涓柇鏈嶅姟鏈嶅姟鍑芥暟-------------------------------------------------+
 #pragma vector=USCI_A0_VECTOR
 __interrupt void USCI_A0_ISR(void)
 {
@@ -387,14 +387,14 @@ __interrupt void USCI_A0_ISR(void)
 	{
 		case 0:break;                             // Vector 0 - no interrupt
 		case 2:                                   // Vector 2 - RXIFG
-		    __bic_SR_register_on_exit(LPM0_bits);	//退出低功耗
+		    __bic_SR_register_on_exit(LPM0_bits);	//閫�嚭浣庡姛鑰�
 			while(!(UCA0IFG&UCTXIFG));            // USCI_A3 TX buffer ready?
 			{
-				Uart_0_Flag=1;		//串口接受完标志置1
+				Uart_0_Flag=1;		//涓插彛鎺ュ彈瀹屾爣蹇楃疆1
 				switch(CommunicationIndex)
 				{
 					case GPRS_Mode:
-// 						OSBsp.Device.Usart2.WriteData(UCA0RXBUF);  //Debug口
+// 						OSBsp.Device.Usart2.WriteData(UCA0RXBUF);  //Debug鍙�
 // 						aRxBuff[aRxNum++] = UCA0RXBUF;
 // 						if((aRxBuff[aRxNum-2] == 0x0D)&&(aRxBuff[aRxNum-1] == 0x0A))
 // 						{
@@ -415,7 +415,7 @@ __interrupt void USCI_A0_ISR(void)
 // 								System.Device.Usart2.WriteString("Web Closed\r\n");
 // //								AllowSend=0;
 // //								GPRSReset;
-// //								Ctr_GPRS_OFF;  //关闭GPRS
+// //								Ctr_GPRS_OFF;  //鍏抽棴GPRS
 // 							}
 // 							else if(CheckString(aRxBuff,"+CSQ:"))
 // 							{
@@ -445,15 +445,15 @@ __interrupt void USCI_A0_ISR(void)
 						break;
 
 					case NBIoT_BC95_Mode:
-						// System.Device.Usart2.WriteData(UCA0RXBUF);  //Debug口
+						// System.Device.Usart2.WriteData(UCA0RXBUF);  //Debug鍙�
 						// aRxBuff[aRxNum++] = UCA0RXBUF;
 
 						// if(aRxNum>aRxLength)
 						// 	aRxNum=0;
-						 break;////20181006 ML增加
+						 break;////20181006 ML澧炲姞
 
 					case LoRa_F8L10D_Mode:
-// 						System.Device.Usart2.WriteData(UCA0RXBUF);  //Debug口
+// 						System.Device.Usart2.WriteData(UCA0RXBUF);  //Debug鍙�
 // 						aRxBuff[aRxNum++] = UCA0RXBUF;
 
 // 						if((aRxNum > 3)&&(aRxBuff[aRxNum-1] == '\n'))
@@ -466,8 +466,8 @@ __interrupt void USCI_A0_ISR(void)
 // //								}
 // 								if(CheckString(aRxBuff,"+STI"))
 // 								{
-// 									Flag_AutomaticTime = 1;//自动校时标志
-// 									Rcv_TimePoint = strstr(aRxBuff,"+STI");         //判断接收到的数据是否有效
+// 									Flag_AutomaticTime = 1;//鑷姩鏍℃椂鏍囧織
+// 									Rcv_TimePoint = strstr(aRxBuff,"+STI");         //鍒ゆ柇鎺ユ敹鍒扮殑鏁版嵁鏄惁鏈夋晥
 // 									while(*(Rcv_TimePoint+6) != '\r')
 // 									{
 // 										Rcv_TimeData[Rcv_TimeNum] = *(Rcv_TimePoint+6);
@@ -482,9 +482,9 @@ __interrupt void USCI_A0_ISR(void)
 
 // 									for(TimebuffNum=1;TimebuffNum<7;TimebuffNum++)
 // 									{
-// 										time_buf[TimebuffNum]= HexToBCD(TimeBuff_Hex[TimebuffNum]);    //存“年月日时分秒周”
+// 										time_buf[TimebuffNum]= HexToBCD(TimeBuff_Hex[TimebuffNum]);    //瀛樷�骞存湀鏃ユ椂鍒嗙鍛ㄢ�
 // 									}
-// 									DS1302_write_time();   //写入时间
+// 									DS1302_write_time();   //鍐欏叆鏃堕棿
 // 									System.Device.Usart2.WriteString("LoRa Automatic Time OK\r\n");
 // 								}
 // 							}
@@ -502,7 +502,7 @@ __interrupt void USCI_A0_ISR(void)
 // //										AllowSend=1;
 // 									}
 // 									System.Device.Usart2.WriteString("LoRa is on Net...\r\n");
-// 									LoRaNet = 1;		//实际入网后置位
+// 									LoRaNet = 1;		//瀹為檯鍏ョ綉鍚庣疆浣�
 // 									LoRaReJoin = 0;
 // 								}
 // 								else if(CheckString(aRxBuff,"+JON:") & CheckString(aRxBuff,"OK"))
@@ -513,7 +513,7 @@ __interrupt void USCI_A0_ISR(void)
 // //										AllowSend=1;
 // 									}
 // 									System.Device.Usart2.WriteString("LoRa is on Net...\r\n");
-// 									LoRaNet = 1;		//实际入网后置位
+// 									LoRaNet = 1;		//瀹為檯鍏ョ綉鍚庣疆浣�
 // 									LoRaReJoin = 0;
 // 								}
 // 								else if(CheckString(aRxBuff,"+NJS:0"))
@@ -543,7 +543,7 @@ __interrupt void USCI_A0_ISR(void)
 // 							aRxNum=0;
 						break;
 					case LoRa_OM402_Mode:
-// //						System.Device.Usart2.WriteData(UCA0RXBUF);  //Debug口
+// //						System.Device.Usart2.WriteData(UCA0RXBUF);  //Debug鍙�
 // 						aRxBuff[aRxNum++] = UCA0RXBUF;
 // 						if( (aRxNum > 3)&&(aRxBuff[aRxNum-1] == 0x40) )
 // 						{
@@ -581,9 +581,9 @@ __interrupt void USCI_A0_ISR(void)
 // 						}
 // 						if(aRxNum>aRxLength)
 // 							aRxNum=0;
-						break;////20181006 ML增加
+						break;////20181006 ML澧炲姞
 					case GPRS_AIR202_Mode:
-						// System.Device.Usart2.WriteData(UCA0RXBUF);  //Debug口
+						// System.Device.Usart2.WriteData(UCA0RXBUF);  //Debug鍙�
 						// aRxBuff[aRxNum++] = UCA0RXBUF;
 						// if((aRxBuff[aRxNum-2] == 0x0D)&&(aRxBuff[aRxNum-1] == 0x0A))
 						// {
@@ -669,7 +669,7 @@ __interrupt void USCI_A0_ISR(void)
 }
 
 
-//------USCI_A1中断服务服务函数-------------------------------------------------+
+//------USCI_A1涓柇鏈嶅姟鏈嶅姟鍑芥暟-------------------------------------------------+
 #pragma vector=USCI_A1_VECTOR
 __interrupt void USCI_A1_ISR(void)
 {
@@ -677,46 +677,46 @@ __interrupt void USCI_A1_ISR(void)
 	{
 		case 0:break;                             // Vector 0 - no interrupt
 		case 2:                                   // Vector 2 - RXIFG
-	        __bic_SR_register_on_exit(LPM0_bits);	//退出低功耗
+	        __bic_SR_register_on_exit(LPM0_bits);	//閫�嚭浣庡姛鑰�
 			while(!(UCA1IFG&UCTXIFG));            // USCI_A1 TX buffer ready?
 			{
-			    switch(AccessoryIndex)   //配件类型
+			    switch(AccessoryIndex)   //閰嶄欢绫诲瀷
 			    {
 			    	case GPS_Mode:
-						TA1R=0;
-						GPSRxBuff = UCA1RXBUF;
-						if(GPSRxBuff == '$')
-						{
-							bRxNum = 0;
-						}
-						bRxBuff[bRxNum++] = GPSRxBuff;
-						if( (bRxBuff[0] == '$')&&(bRxBuff[3] == 'G')&&(bRxBuff[4] == 'L')&&(bRxBuff[5] == 'L') )
-						{
-							if(GPSRxBuff == '\n')
-							{
-								//保存数据
-								for(GPSRxNum=0;GPSRxNum<bRxNum;GPSRxNum++)
-								{
-									GPSLngLat_data[GPSRxNum] = bRxBuff[GPSRxNum];
-								}
-								//
-								bRxNum = 0;
-								Uart_1_Flag=1;
-							}
-						}
+						// TA1R=0;
+						// GPSRxBuff = UCA1RXBUF;
+						// if(GPSRxBuff == '$')
+						// {
+						// 	bRxNum = 0;
+						// }
+						// bRxBuff[bRxNum++] = GPSRxBuff;
+						// if( (bRxBuff[0] == '$')&&(bRxBuff[3] == 'G')&&(bRxBuff[4] == 'L')&&(bRxBuff[5] == 'L') )
+						// {
+						// 	if(GPSRxBuff == '\n')
+						// 	{
+						// 		//淇濆瓨鏁版嵁
+						// 		for(GPSRxNum=0;GPSRxNum<bRxNum;GPSRxNum++)
+						// 		{
+						// 			GPSLngLat_data[GPSRxNum] = bRxBuff[GPSRxNum];
+						// 		}
+						// 		//
+						// 		bRxNum = 0;
+						// 		Uart_1_Flag=1;
+						// 	}
+						// }
 						break;
 			    	case RS485_Mode:
 			    	case RS232_Mode:
-						TA1R=0;
-						Uart_1_Flag=1;		//串口接受完标志置0，接受完1s后定时内置1
-						if(bRxNum<bRxLength)
-						{
-						  bRxBuff[bRxNum++] = UCA1RXBUF;
-						}
-						else
-						{
-						  bRxNum=0;
-						}
+						// TA1R=0;
+						// Uart_1_Flag=1;		//涓插彛鎺ュ彈瀹屾爣蹇楃疆0锛屾帴鍙楀畬1s鍚庡畾鏃跺唴缃�
+						// if(bRxNum<bRxLength)
+						// {
+						//   bRxBuff[bRxNum++] = UCA1RXBUF;
+						// }
+						// else
+						// {
+						//   bRxNum=0;
+						// }
 						break;
 					default:
 						break;
@@ -727,7 +727,7 @@ __interrupt void USCI_A1_ISR(void)
 		default: break;
 	}
 }
-//------USCI_A2中断服务服务函数-------------------------------------------------+
+//------USCI_A2涓柇鏈嶅姟鏈嶅姟鍑芥暟-------------------------------------------------+
 #pragma vector=USCI_A2_VECTOR
 __interrupt void USCI_A2_ISR(void)
 {
@@ -735,11 +735,11 @@ __interrupt void USCI_A2_ISR(void)
   {
   case 0:break;                             // Vector 0 - no interrupt
   case 2:                                   // Vector 2 - RXIFG
-	  __bic_SR_register_on_exit(LPM0_bits);	//退出低功耗
+	  __bic_SR_register_on_exit(LPM0_bits);	//閫�嚭浣庡姛鑰�
       while(!(UCA2IFG&UCTXIFG));            // USCI_A1 TX buffer ready?
 	  {
     	  TA1R=0;
-    	  Uart_2_Flag=1;		//串口接受完标志置0，接受完1s后定时内置1
+    	  Uart_2_Flag=1;		//涓插彛鎺ュ彈瀹屾爣蹇楃疆0锛屾帴鍙楀畬1s鍚庡畾鏃跺唴缃�
     	  if(cRxNum<cRxLength)
     	  {
     		  cRxBuff[cRxNum++] = UCA2RXBUF;
@@ -754,7 +754,7 @@ __interrupt void USCI_A2_ISR(void)
   default: break;
   }
 }
-//------USCI_A3中断服务服务函数-------------------------------------------------+
+//------USCI_A3涓柇鏈嶅姟鏈嶅姟鍑芥暟-------------------------------------------------+
 #pragma vector=USCI_A3_VECTOR
 __interrupt void USCI_A3_ISR(void)
 {
@@ -762,7 +762,7 @@ __interrupt void USCI_A3_ISR(void)
 	{
 		case 0:break;                             // Vector 0 - no interrupt
 		case 2:                                   // Vector 2 - RXIFG
-		    __bic_SR_register_on_exit(LPM0_bits);	//退出低功耗
+		    __bic_SR_register_on_exit(LPM0_bits);	//閫�嚭浣庡姛鑰�
 			while(!(UCA3IFG&UCTXIFG));            // USCI_A3 TX buffer ready?
 			{
 				TA1R=0;

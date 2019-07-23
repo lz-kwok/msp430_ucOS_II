@@ -98,8 +98,21 @@
 #define PRODUCT_TYPE                Voc_Station
 
 
-
-
+//*****************通信方式*********************//
+#define GPRS_Mode		      		0x01
+#define NBIoT_BC95_Mode	      		0x02
+#define NBIoT_M5310_Mode	  		0x03
+#define LoRa_F8L10D_Mode	  		0x04
+#define LoRa_S78S_Mode		  		0x05
+#define LoRa_OM402_Mode		  		0x06
+#define GPRS_AIR202_Mode      		0x07
+#define CommunicationIndex 			GPRS_Mode
+//*****************配件方式*********************//
+#define GPS_Mode		      		0x01     //GPS配件
+#define RS485_Mode		      		0x02     //485配件
+#define RS232_Mode		      		0x03     //232配件
+#define None_Mode	          		0xFF     //无配件
+#define AccessoryIndex              GPS_Mode
 
 
 

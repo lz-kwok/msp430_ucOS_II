@@ -28,15 +28,26 @@ ORDERED_OBJS += \
 "./FatFs/Diskio.obj" \
 "./FatFs/Fatfs.obj" \
 "./FatFs/FileTxt.obj" \
+"./BSP/utils/utils_hmac.obj" \
+"./BSP/utils/utils_list.obj" \
+"./BSP/utils/utils_md5.obj" \
+"./BSP/utils/utils_sha1.obj" \
+"./BSP/cJSON/cjson.obj" \
+"./BSP/cJSON/malloc.obj" \
 "./BSP/bsp.obj" \
+"./BSP/Platform/g_Dust_Station.obj" \
+"./BSP/Platform/g_Voc_Station.obj" \
 "./BSP/Hallib/hal_layer_api.obj" \
 "./BSP/Hallib/hal_pmm.obj" \
 "./BSP/Hallib/hal_tlv.obj" \
 "./BSP/Hallib/hal_ucs.obj" \
+"./BSP/Devicelib/g_DeviceGprs.obj" \
+"./BSP/Devicelib/g_DevicePrintf.obj" \
 "./BSP/Devicelib/g_DeviceRTC.obj" \
 "./BSP/Devicelib/g_DeviceSD.obj" \
 "./BSP/Devicelib/g_DeviceSDMMC.obj" \
 "./BSP/Devicelib/g_DeviceSpi.obj" \
+"./BSP/Devicelib/g_DeviceUart.obj" \
 "./App/app.obj" \
 "./App/app_hooks.obj" \
 "../lnk_msp430f5259.cmd" \
@@ -58,7 +69,10 @@ RMDIR := RMDIR /S/Q
 -include uC-CPU/subdir_vars.mk
 -include uC-CPU/MSP430/CCS/subdir_vars.mk
 -include FatFs/subdir_vars.mk
+-include BSP/utils/subdir_vars.mk
+-include BSP/cJSON/subdir_vars.mk
 -include BSP/subdir_vars.mk
+-include BSP/Platform/subdir_vars.mk
 -include BSP/Hallib/subdir_vars.mk
 -include BSP/Devicelib/subdir_vars.mk
 -include App/subdir_vars.mk
@@ -69,7 +83,10 @@ RMDIR := RMDIR /S/Q
 -include uC-CPU/subdir_rules.mk
 -include uC-CPU/MSP430/CCS/subdir_rules.mk
 -include FatFs/subdir_rules.mk
+-include BSP/utils/subdir_rules.mk
+-include BSP/cJSON/subdir_rules.mk
 -include BSP/subdir_rules.mk
+-include BSP/Platform/subdir_rules.mk
 -include BSP/Hallib/subdir_rules.mk
 -include BSP/Devicelib/subdir_rules.mk
 -include App/subdir_rules.mk
@@ -199,8 +216,10 @@ glz_msp430_ucOS_II.txt: $(EXE_OUTPUTS)
 # Other Targets
 clean:
 	-$(RM) $(EXE_OUTPUTS__QUOTED)$(BIN_OUTPUTS__QUOTED)
-	-$(RM) "uCOS-II\Source\os_core.pp" "uCOS-II\Source\os_flag.pp" "uCOS-II\Source\os_mbox.pp" "uCOS-II\Source\os_mem.pp" "uCOS-II\Source\os_mutex.pp" "uCOS-II\Source\os_q.pp" "uCOS-II\Source\os_sem.pp" "uCOS-II\Source\os_task.pp" "uCOS-II\Source\os_time.pp" "uCOS-II\Source\os_tmr.pp" "uCOS-II\Ports\MSP430X\CCS\os_cpu_c.pp" "uC-LIB\lib_ascii.pp" "uC-LIB\lib_math.pp" "uC-LIB\lib_mem.pp" "uC-LIB\lib_str.pp" "uC-CPU\cpu_core.pp" "FatFs\Diskio.pp" "FatFs\Fatfs.pp" "FatFs\FileTxt.pp" "BSP\bsp.pp" "BSP\Hallib\hal_layer_api.pp" "BSP\Hallib\hal_pmm.pp" "BSP\Hallib\hal_tlv.pp" "BSP\Hallib\hal_ucs.pp" "BSP\Devicelib\g_DeviceRTC.pp" "BSP\Devicelib\g_DeviceSD.pp" "BSP\Devicelib\g_DeviceSDMMC.pp" "BSP\Devicelib\g_DeviceSpi.pp" "App\app.pp" "App\app_hooks.pp" 
-	-$(RM) "uCOS-II\Source\os_core.obj" "uCOS-II\Source\os_flag.obj" "uCOS-II\Source\os_mbox.obj" "uCOS-II\Source\os_mem.obj" "uCOS-II\Source\os_mutex.obj" "uCOS-II\Source\os_q.obj" "uCOS-II\Source\os_sem.obj" "uCOS-II\Source\os_task.obj" "uCOS-II\Source\os_time.obj" "uCOS-II\Source\os_tmr.obj" "uCOS-II\Ports\MSP430X\CCS\os_cpu_a.obj" "uCOS-II\Ports\MSP430X\CCS\os_cpu_c.obj" "uC-LIB\lib_ascii.obj" "uC-LIB\lib_math.obj" "uC-LIB\lib_mem.obj" "uC-LIB\lib_str.obj" "uC-CPU\cpu_core.obj" "uC-CPU\MSP430\CCS\cpu_a.obj" "FatFs\Diskio.obj" "FatFs\Fatfs.obj" "FatFs\FileTxt.obj" "BSP\bsp.obj" "BSP\Hallib\hal_layer_api.obj" "BSP\Hallib\hal_pmm.obj" "BSP\Hallib\hal_tlv.obj" "BSP\Hallib\hal_ucs.obj" "BSP\Devicelib\g_DeviceRTC.obj" "BSP\Devicelib\g_DeviceSD.obj" "BSP\Devicelib\g_DeviceSDMMC.obj" "BSP\Devicelib\g_DeviceSpi.obj" "App\app.obj" "App\app_hooks.obj" 
+	-$(RM) "uCOS-II\Source\os_core.pp" "uCOS-II\Source\os_flag.pp" "uCOS-II\Source\os_mbox.pp" "uCOS-II\Source\os_mem.pp" "uCOS-II\Source\os_mutex.pp" "uCOS-II\Source\os_q.pp" "uCOS-II\Source\os_sem.pp" "uCOS-II\Source\os_task.pp" "uCOS-II\Source\os_time.pp" "uCOS-II\Source\os_tmr.pp" "uCOS-II\Ports\MSP430X\CCS\os_cpu_c.pp" "uC-LIB\lib_ascii.pp" "uC-LIB\lib_math.pp" "uC-LIB\lib_mem.pp" "uC-LIB\lib_str.pp" "uC-CPU\cpu_core.pp" "FatFs\Diskio.pp" "FatFs\Fatfs.pp" "FatFs\FileTxt.pp" "BSP\utils\utils_hmac.pp" "BSP\utils\utils_list.pp" "BSP\utils\utils_md5.pp" "BSP\utils\utils_sha1.pp" "BSP\cJSON\cjson.pp" "BSP\cJSON\malloc.pp" "BSP\bsp.pp" "BSP\Platform\g_Dust_Station.pp" "BSP\Platform\g_Voc_Station.pp" "BSP\Hallib\hal_layer_api.pp" "BSP\Hallib\hal_pmm.pp" "BSP\Hallib\hal_tlv.pp" "BSP\Hallib\hal_ucs.pp" "BSP\Devicelib\g_DeviceGprs.pp" "BSP\Devicelib\g_DevicePrintf.pp" "BSP\Devicelib\g_DeviceRTC.pp" "BSP\Devicelib\g_DeviceSD.pp" "BSP\Devicelib\g_DeviceSDMMC.pp" "BSP\Devicelib\g_DeviceSpi.pp" "BSP\Devicelib\g_DeviceUart.pp" 
+	-$(RM) "App\app.pp" "App\app_hooks.pp" 
+	-$(RM) "uCOS-II\Source\os_core.obj" "uCOS-II\Source\os_flag.obj" "uCOS-II\Source\os_mbox.obj" "uCOS-II\Source\os_mem.obj" "uCOS-II\Source\os_mutex.obj" "uCOS-II\Source\os_q.obj" "uCOS-II\Source\os_sem.obj" "uCOS-II\Source\os_task.obj" "uCOS-II\Source\os_time.obj" "uCOS-II\Source\os_tmr.obj" "uCOS-II\Ports\MSP430X\CCS\os_cpu_a.obj" "uCOS-II\Ports\MSP430X\CCS\os_cpu_c.obj" "uC-LIB\lib_ascii.obj" "uC-LIB\lib_math.obj" "uC-LIB\lib_mem.obj" "uC-LIB\lib_str.obj" "uC-CPU\cpu_core.obj" "uC-CPU\MSP430\CCS\cpu_a.obj" "FatFs\Diskio.obj" "FatFs\Fatfs.obj" "FatFs\FileTxt.obj" "BSP\utils\utils_hmac.obj" "BSP\utils\utils_list.obj" "BSP\utils\utils_md5.obj" "BSP\utils\utils_sha1.obj" "BSP\cJSON\cjson.obj" "BSP\cJSON\malloc.obj" "BSP\bsp.obj" "BSP\Platform\g_Dust_Station.obj" "BSP\Platform\g_Voc_Station.obj" "BSP\Hallib\hal_layer_api.obj" "BSP\Hallib\hal_pmm.obj" "BSP\Hallib\hal_tlv.obj" "BSP\Hallib\hal_ucs.obj" "BSP\Devicelib\g_DeviceGprs.obj" "BSP\Devicelib\g_DevicePrintf.obj" "BSP\Devicelib\g_DeviceRTC.obj" 
+	-$(RM) "BSP\Devicelib\g_DeviceSD.obj" "BSP\Devicelib\g_DeviceSDMMC.obj" "BSP\Devicelib\g_DeviceSpi.obj" "BSP\Devicelib\g_DeviceUart.obj" "App\app.obj" "App\app_hooks.obj" 
 	-$(RM) "uCOS-II\Ports\MSP430X\CCS\os_cpu_a.pp" "uC-CPU\MSP430\CCS\cpu_a.pp" 
 	-@echo 'Finished clean'
 	-@echo ' '

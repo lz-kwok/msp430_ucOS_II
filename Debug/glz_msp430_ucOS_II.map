@@ -1,10 +1,10 @@
 ******************************************************************************
                   MSP430 Linker PC v4.4.3                      
 ******************************************************************************
->> Linked Thu Jul 18 22:35:51 2019
+>> Linked Tue Jul 23 22:57:37 2019
 
 OUTPUT FILE NAME:   <glz_msp430_ucOS_II.out>
-ENTRY POINT SYMBOL: "_c_int00_noargs"  address: 0000a442
+ENTRY POINT SYMBOL: "_c_int00_noargs"  address: 0000a4c2
 
 
 MEMORY CONFIGURATION
@@ -18,8 +18,8 @@ MEMORY CONFIGURATION
   INFOC                 00001880   00000080  00000000  00000080  RWIX
   INFOB                 00001900   00000080  00000000  00000080  RWIX
   INFOA                 00001980   00000080  00000000  00000080  RWIX
-  RAM                   00002400   00008000  0000108d  00006f73  RWIX
-  FLASH                 0000a400   00005b80  0000029c  000058e4  RWIX
+  RAM                   00002400   00008000  00001431  00006bcf  RWIX
+  FLASH                 0000a400   00005b80  00000376  0000580a  RWIX
   INT00                 0000ff80   00000002  00000000  00000002  RWIX
   INT01                 0000ff82   00000002  00000000  00000002  RWIX
   INT02                 0000ff84   00000002  00000000  00000002  RWIX
@@ -84,7 +84,7 @@ MEMORY CONFIGURATION
   INT61                 0000fffa   00000002  00000002  00000000  RWIX
   INT62                 0000fffc   00000002  00000002  00000000  RWIX
   RESET                 0000fffe   00000002  00000002  00000000  RWIX
-  FLASH2                00010000   0001a400  00002a8e  00017972  RWIX
+  FLASH2                00010000   0001a400  00002ac8  00017938  RWIX
 
 
 SECTION ALLOCATION MAP
@@ -92,113 +92,123 @@ SECTION ALLOCATION MAP
  output                                  attributes/
 section   page    origin      length       input sections
 --------  ----  ----------  ----------   ----------------
-.bss       0    00002400    00000c3b     UNINITIALIZED
+.bss       0    00002400    00000fd1     UNINITIALIZED
                   00002400    00000408     (.common:OSTCBTbl)
-                  00002808    00000100     (.common:AppTaskStartStk)
-                  00002908    00000100     (.common:OSTaskIdleStk)
-                  00002a08    00000100     (.common:OSTaskStatStk)
-                  00002b08    00000100     (.common:OSTmrTaskStk)
-                  00002c08    000000b4     (.common:OSEventTbl)
-                  00002cbc    000000b4     (.common:OSTmrTbl)
-                  00002d70    000000a0     (.common:__TI_tmpnams)
-                  00002e10    00000080     (.common:OSTCBPrioTbl)
-                  00002e90    00000078     (.common:OSMemTbl)
-                  00002f08    00000060     (.common:OSQTbl)
-                  00002f68    0000003c     (.common:OSFlagTbl)
-                  00002fa4    0000002a     (.common:OSTmrWheelTbl)
-                  00002fce    00000008     (.common:parmbuf)
-                  00002fd6    00000004     (.common:OSCtxSwCtr)
-                  00002fda    00000004     (.common:OSEventFreeList)
-                  00002fde    00000004     (.common:OSFlagFreeList)
-                  00002fe2    00000004     (.common:OSISRStkPtr)
-                  00002fe6    00000004     (.common:OSIdleCtr)
-                  00002fea    00000004     (.common:OSIdleCtrMax)
-                  00002fee    00000004     (.common:OSIdleCtrRun)
-                  00002ff2    00000004     (.common:OSMemFreeList)
-                  00002ff6    00000004     (.common:OSQFreeList)
-                  00002ffa    00000004     (.common:OSRdyTbl)
-                  00002ffe    00000004     (.common:OSTCBCur)
-                  00003002    00000004     (.common:OSTCBFreeList)
-                  00003006    00000004     (.common:OSTCBHighRdy)
-                  0000300a    00000004     (.common:OSTCBList)
-                  0000300e    00000004     (.common:OSTime)
-                  00003012    00000004     (.common:OSTmrFreeList)
-                  00003016    00000004     (.common:OSTmrSem)
-                  0000301a    00000004     (.common:OSTmrSemSignal)
-                  0000301e    00000004     (.common:OSTmrTime)
-                  00003022    00000004     (.common:sys_base)
-                  00003026    00000004     (.common:sys_free)
-                  0000302a    00000002     (.common:OSTmrFree)
-                  0000302c    00000002     (.common:OSTmrUsed)
-                  0000302e    00000002     (.common:memsize)
-                  00003030    00000001     (.common:OSCPUUsage)
-                  00003031    00000001     (.common:OSIntNesting)
-                  00003032    00000001     (.common:OSLockNesting)
-                  00003033    00000001     (.common:OSPrioCur)
-                  00003034    00000001     (.common:OSPrioHighRdy)
-                  00003035    00000001     (.common:OSRdyGrp)
-                  00003036    00000001     (.common:OSRunning)
-                  00003037    00000001     (.common:OSStatRdy)
-                  00003038    00000001     (.common:OSTaskCtr)
-                  00003039    00000001     (.common:OSTaskRegNextAvailID)
-                  0000303a    00000001     (.common:OSTickStepState)
+                  00002808    00000400     (.common:ScadaTaskStartStk)
+                  00002c08    00000100     (.common:OSTaskIdleStk)
+                  00002d08    00000100     (.common:OSTaskStatStk)
+                  00002e08    00000100     (.common:OSTmrTaskStk)
+                  00002f08    000000b4     (.common:OSEventTbl)
+                  00002fbc    000000b4     (.common:OSTmrTbl)
+                  00003070    000000a0     (.common:__TI_tmpnams)
+                  00003110    00000080     (.common:OSTCBPrioTbl)
+                  00003190    00000078     (.common:OSMemTbl)
+                  00003208    00000064     (.common:cRxBuff)
+                  0000326c    00000060     (.common:OSQTbl)
+                  000032cc    0000003c     (.common:OSFlagTbl)
+                  00003308    00000032     (.common:dRxBuff)
+                  0000333a    0000002a     (.common:OSTmrWheelTbl)
+                  00003364    00000008     (.common:parmbuf)
+                  0000336c    00000004     (.common:OSCtxSwCtr)
+                  00003370    00000004     (.common:OSEventFreeList)
+                  00003374    00000004     (.common:OSFlagFreeList)
+                  00003378    00000004     (.common:OSISRStkPtr)
+                  0000337c    00000004     (.common:OSIdleCtr)
+                  00003380    00000004     (.common:OSIdleCtrMax)
+                  00003384    00000004     (.common:OSIdleCtrRun)
+                  00003388    00000004     (.common:OSMemFreeList)
+                  0000338c    00000004     (.common:OSQFreeList)
+                  00003390    00000004     (.common:OSRdyTbl)
+                  00003394    00000004     (.common:OSTCBCur)
+                  00003398    00000004     (.common:OSTCBFreeList)
+                  0000339c    00000004     (.common:OSTCBHighRdy)
+                  000033a0    00000004     (.common:OSTCBList)
+                  000033a4    00000004     (.common:OSTime)
+                  000033a8    00000004     (.common:OSTmrFreeList)
+                  000033ac    00000004     (.common:OSTmrSem)
+                  000033b0    00000004     (.common:OSTmrSemSignal)
+                  000033b4    00000004     (.common:OSTmrTime)
+                  000033b8    00000004     (.common:sys_base)
+                  000033bc    00000004     (.common:sys_free)
+                  000033c0    00000002     (.common:OSTmrFree)
+                  000033c2    00000002     (.common:OSTmrUsed)
+                  000033c4    00000002     (.common:memsize)
+                  000033c6    00000001     (.common:OSCPUUsage)
+                  000033c7    00000001     (.common:OSIntNesting)
+                  000033c8    00000001     (.common:OSLockNesting)
+                  000033c9    00000001     (.common:OSPrioCur)
+                  000033ca    00000001     (.common:OSPrioHighRdy)
+                  000033cb    00000001     (.common:OSRdyGrp)
+                  000033cc    00000001     (.common:OSRunning)
+                  000033cd    00000001     (.common:OSStatRdy)
+                  000033ce    00000001     (.common:OSTaskCtr)
+                  000033cf    00000001     (.common:OSTaskRegNextAvailID)
+                  000033d0    00000001     (.common:OSTickStepState)
 
-.data      0    0000303c    000001f2     UNINITIALIZED
-                  0000303c    000000c8     rts430x_lc_rd_eabi.lib : defs.obj (.data:_ftable)
-                  00003104    00000078                            : lowlev.obj (.data:_device)
-                  0000317c    00000058     bsp.obj (.data)
-                  000031d4    0000003c     rts430x_lc_rd_eabi.lib : lowlev.obj (.data:_stream)
-                  00003210    00000008     g_DeviceSD.obj (.data)
-                  00003218    00000004     rts430x_lc_rd_eabi.lib : boot.obj (.data:__TI_cleanup_ptr)
-                  0000321c    00000004                            : boot.obj (.data:__TI_dtors_ptr)
-                  00003220    00000004                            : _lock.obj (.data:_lock)
-                  00003224    00000004                            : _lock.obj (.data:_unlock)
-                  00003228    00000002     g_DeviceSpi.obj (.data)
-                  0000322a    00000002     rts430x_lc_rd_eabi.lib : defs.obj (.data)
-                  0000322c    00000002                            : memory.obj (.data)
+.data      0    000033d2    00000200     UNINITIALIZED
+                  000033d2    000000c8     rts430x_lc_rd_eabi.lib : defs.obj (.data:_ftable)
+                  0000349a    00000078                            : lowlev.obj (.data:_device)
+                  00003512    00000058     bsp.obj (.data)
+                  0000356a    0000003c     rts430x_lc_rd_eabi.lib : lowlev.obj (.data:_stream)
+                  000035a6    0000000e     g_DeviceUart.obj (.data)
+                  000035b4    00000008     g_DeviceSD.obj (.data)
+                  000035bc    00000004     rts430x_lc_rd_eabi.lib : boot.obj (.data:__TI_cleanup_ptr)
+                  000035c0    00000004                            : boot.obj (.data:__TI_dtors_ptr)
+                  000035c4    00000004                            : _lock.obj (.data:_lock)
+                  000035c8    00000004                            : _lock.obj (.data:_unlock)
+                  000035cc    00000002     g_DeviceSpi.obj (.data)
+                  000035ce    00000002     rts430x_lc_rd_eabi.lib : defs.obj (.data)
+                  000035d0    00000002                            : memory.obj (.data)
 
-.cio       0    0000322e    00000120     UNINITIALIZED
-                  0000322e    00000120     rts430x_lc_rd_eabi.lib : trgmsg.obj (.cio)
+.cio       0    000035d2    00000120     UNINITIALIZED
+                  000035d2    00000120     rts430x_lc_rd_eabi.lib : trgmsg.obj (.cio)
 
-.sysmem    0    00003350    000000a0     UNINITIALIZED
-                  00003350    00000006     rts430x_lc_rd_eabi.lib : memory.obj (.sysmem)
-                  00003356    0000009a     --HOLE--
+.sysmem    0    000036f4    000000a0     UNINITIALIZED
+                  000036f4    00000006     rts430x_lc_rd_eabi.lib : memory.obj (.sysmem)
+                  000036fa    0000009a     --HOLE--
 
 .stack     0    0000a360    000000a0     UNINITIALIZED
                   0000a360    00000004     rts430x_lc_rd_eabi.lib : boot.obj (.stack)
                   0000a364    0000009c     --HOLE--
 
 .text:_isr 
-*          0    0000a400    00000082     
-                  0000a400    00000042     os_cpu_a.obj (.text:_isr)
-                  0000a442    0000001c     rts430x_lc_rd_eabi.lib : boot_special.obj (.text:_isr:_c_int00_noargs)
-                  0000a45e    0000000e     g_DeviceSpi.obj (.text:_isr:USCI_B2_ISR)
-                  0000a46c    0000000e     g_DeviceSpi.obj (.text:_isr:USCI_B3_ISR)
-                  0000a47a    00000006     rts430x_lc_rd_eabi.lib : isr_trap.obj (.text:_isr:__TI_ISR_TRAP)
-                  0000a480    00000002     g_DeviceRTC.obj (.text:_isr:RTC_ISR)
+*          0    0000a400    0000012e     
+                  0000a400    00000042     g_DeviceUart.obj (.text:_isr:USCI_A2_ISR)
+                  0000a442    00000042     os_cpu_a.obj (.text:_isr)
+                  0000a484    0000003e     g_DeviceUart.obj (.text:_isr:USCI_A3_ISR)
+                  0000a4c2    0000001c     rts430x_lc_rd_eabi.lib : boot_special.obj (.text:_isr:_c_int00_noargs)
+                  0000a4de    00000018     g_DeviceUart.obj (.text:_isr:USCI_A0_ISR)
+                  0000a4f6    00000014     g_DeviceUart.obj (.text:_isr:USCI_A1_ISR)
+                  0000a50a    0000000e     g_DeviceSpi.obj (.text:_isr:USCI_B2_ISR)
+                  0000a518    0000000e     g_DeviceSpi.obj (.text:_isr:USCI_B3_ISR)
+                  0000a526    00000006     rts430x_lc_rd_eabi.lib : isr_trap.obj (.text:_isr:__TI_ISR_TRAP)
+                  0000a52c    00000002     g_DeviceRTC.obj (.text:_isr:RTC_ISR)
 
-.const     0    0000a482    00000186     
-                  0000a482    00000100     os_core.obj (.const:.string:OSUnMapTbl)
-                  0000a582    00000036     os_tmr.obj (.const:.string)
-                  0000a5b8    0000001e     os_core.obj (.const:.string)
-                  0000a5d6    00000018     app.obj (.const:.string)
-                  0000a5ee    00000014     rts430x_lc_rd_eabi.lib : _printfi_min.obj (.const:.string)
-                  0000a602    00000002     os_flag.obj (.const:.string)
-                  0000a604    00000002     os_mem.obj (.const:.string)
-                  0000a606    00000002     os_sem.obj (.const:.string)
+.const     0    0000a52e    000001b4     
+                  0000a52e    00000100     os_core.obj (.const:.string:OSUnMapTbl)
+                  0000a62e    00000036     os_tmr.obj (.const:.string)
+                  0000a664    00000020     app.obj (.const:.string)
+                  0000a684    0000001e     os_core.obj (.const:.string)
+                  0000a6a2    00000014     hal_layer_api.obj (.const:.string)
+                  0000a6b6    00000014     rts430x_lc_rd_eabi.lib : _printfi_min.obj (.const:.string)
+                  0000a6ca    00000011     hal_layer_api.obj (.const:.string:$P$T0$1)
+                  0000a6db    00000001     --HOLE-- [fill = 0]
+                  0000a6dc    00000002     os_flag.obj (.const:.string)
+                  0000a6de    00000002     os_mem.obj (.const:.string)
+                  0000a6e0    00000002     os_sem.obj (.const:.string)
 
-.cinit     0    0000a608    00000094     
-                  0000a608    00000064     (.cinit..data.load) [load image, compression = rle]
-                  0000a66c    0000000c     (__TI_handler_table)
-                  0000a678    00000006     (.cinit..bss.load) [load image, compression = zero_init]
-                  0000a67e    00000006     (.cinit..cio.load) [load image, compression = zero_init]
-                  0000a684    00000018     (__TI_cinit_table)
+.cinit     0    0000a6e2    00000094     
+                  0000a6e2    00000064     (.cinit..data.load) [load image, compression = rle]
+                  0000a746    0000000c     (__TI_handler_table)
+                  0000a752    00000006     (.cinit..bss.load) [load image, compression = zero_init]
+                  0000a758    00000006     (.cinit..cio.load) [load image, compression = zero_init]
+                  0000a75e    00000018     (__TI_cinit_table)
 
 .init_array 
 *          0    0000a400    00000000     UNINITIALIZED
 
 .TI.persistent 
-*          0    0000303c    00000000     UNINITIALIZED
+*          0    000033d2    00000000     UNINITIALIZED
 
 PORT6      0    0000ffc8    00000002     
                   0000ffc8    00000002     rts430x_lc_rd_eabi.lib : int36.obj (.int36)
@@ -240,7 +250,7 @@ USCI_B3    0    0000ffdc    00000002
                   0000ffdc    00000002     g_DeviceSpi.obj (.int46)
 
 USCI_A3    0    0000ffde    00000002     
-                  0000ffde    00000002     rts430x_lc_rd_eabi.lib : int47.obj (.int47)
+                  0000ffde    00000002     g_DeviceUart.obj (.int47)
 
 DMA        0    0000ffe0    00000002     
                   0000ffe0    00000002     rts430x_lc_rd_eabi.lib : int48.obj (.int48)
@@ -257,7 +267,7 @@ USCI_B2    0    0000ffe8    00000002
                   0000ffe8    00000002     g_DeviceSpi.obj (.int52)
 
 USCI_A2    0    0000ffea    00000002     
-                  0000ffea    00000002     rts430x_lc_rd_eabi.lib : int53.obj (.int53)
+                  0000ffea    00000002     g_DeviceUart.obj (.int53)
 
 ADC10      0    0000ffec    00000002     
                   0000ffec    00000002     rts430x_lc_rd_eabi.lib : int54.obj (.int54)
@@ -266,7 +276,7 @@ USCI_B1    0    0000ffee    00000002
                   0000ffee    00000002     rts430x_lc_rd_eabi.lib : int55.obj (.int55)
 
 USCI_A1    0    0000fff0    00000002     
-                  0000fff0    00000002     rts430x_lc_rd_eabi.lib : int56.obj (.int56)
+                  0000fff0    00000002     g_DeviceUart.obj (.int56)
 
 WDT        0    0000fff2    00000002     
                   0000fff2    00000002     os_cpu_a.obj (.int57)
@@ -275,7 +285,7 @@ USCI_B0    0    0000fff4    00000002
                   0000fff4    00000002     rts430x_lc_rd_eabi.lib : int58.obj (.int58)
 
 USCI_A0    0    0000fff6    00000002     
-                  0000fff6    00000002     rts430x_lc_rd_eabi.lib : int59.obj (.int59)
+                  0000fff6    00000002     g_DeviceUart.obj (.int59)
 
 COMP_B     0    0000fff8    00000002     
                   0000fff8    00000002     rts430x_lc_rd_eabi.lib : int60.obj (.int60)
@@ -289,7 +299,7 @@ SYSNMI     0    0000fffc    00000002
 .reset     0    0000fffe    00000002     
                   0000fffe    00000002     rts430x_lc_rd_eabi.lib : boot.obj (.reset)
 
-.text      0    00010000    00002a8e     
+.text      0    00010000    00002ac8     
                   00010000    000001b2     g_DeviceSD.obj (.text:g_Device_SD_Init)
                   000101b2    00000168     os_core.obj (.text:OS_TCBInit)
                   0001031a    00000132     rts430x_lc_rd_eabi.lib : _printfi_min.obj (.text:_setfield)
@@ -345,94 +355,95 @@ SYSNMI     0    0000fffc    00000002
                   00011f74    00000050     os_tmr.obj (.text:OSTmr_InitTask)
                   00011fc4    00000050     os_core.obj (.text:OS_InitTaskStat)
                   00012014    00000050     os_core.obj (.text:OS_Sched)
-                  00012064    0000004e     os_core.obj (.text:OSEventNameSet)
-                  000120b2    0000004e     os_core.obj (.text:OS_InitTaskIdle)
-                  00012100    0000004c     rts430x_lc_rd_eabi.lib : trgdrv.obj (.text:HOSTclose)
-                  0001214c    0000004c                            : _printfi_min.obj (.text:_pproc_diouxp)
-                  00012198    0000004a                            : printf.obj (.text:printf)
-                  000121e2    00000048                            : _printfi_min.obj (.text:_pproc_str)
-                  0001222a    00000046                            : trgdrv.obj (.text:HOSTunlink)
-                  00012270    00000046     os_core.obj (.text:OS_EventTaskWait)
-                  000122b6    00000044     g_DeviceSpi.obj (.text:g_Device_SPI2_Init)
-                  000122fa    00000042     rts430x_lc_rd_eabi.lib : memory.obj (.text:minit)
-                  0001233c    0000003e                            : _printfi_min.obj (.text:_getarg_diouxp)
-                  0001237a    0000003e                            : lsl32.obj (.text:l_lsl_const)
-                  000123b8    0000003e                            : lsr32.obj (.text:l_lsr_const)
-                  000123f6    0000003e                            : lowlev.obj (.text:lseek)
-                  00012434    0000003c                            : lowlev.obj (.text:write)
-                  00012470    0000003a     os_core.obj (.text:OSStatInit)
-                  000124aa    00000038     os_core.obj (.text:OSSchedUnlock)
-                  000124e2    00000038     os_core.obj (.text:OS_InitMisc)
-                  0001251a    00000036     rts430x_lc_rd_eabi.lib : fopen.obj (.text:__TI_cleanup)
-                  00012550    00000036                            : trgmsg.obj (.text:__TI_writemsg)
-                  00012586    00000036     app.obj (.text:main)
-                  000125bc    00000032     os_core.obj (.text:OSInit)
-                  000125ee    00000032     rts430x_lc_rd_eabi.lib : trgmsg.obj (.text:__TI_readmsg)
-                  00012620    00000032                            : strncpy.obj (.text:strncpy)
-                  00012652    00000030                            : lowlev.obj (.text:unlink)
-                  00012682    0000002e     bsp.obj (.text:BSP_OSClockInit)
-                  000126b0    0000002e     rts430x_lc_rd_eabi.lib : exit.obj (.text:exit)
-                  000126de    0000002e                            : lowlev.obj (.text:finddevice)
-                  0001270c    0000002e     g_DeviceRTC.obj (.text:g_Device_RTC_Init)
-                  0001273a    0000002c     os_core.obj (.text:OSStart)
-                  00012766    0000002c     os_core.obj (.text:OS_EventTaskRemove)
-                  00012792    0000002c     os_core.obj (.text:OS_InitRdyList)
-                  000127be    00000024     app.obj (.text:AppTaskStart)
-                  000127e2    00000024     rts430x_lc_rd_eabi.lib : copy_zero_init.obj (.text:decompress:ZI:__TI_zero_init)
-                  00012806    00000022     os_task.obj (.text:OS_TaskStkClr)
-                  00012828    00000022     g_DeviceSpi.obj (.text:g_Device_SendNByte_SPI2)
-                  0001284a    00000022     rts430x_lc_rd_eabi.lib : mult32_f5hw.obj (.text)
-                  0001286c    00000020     os_core.obj (.text:OSSchedLock)
-                  0001288c    00000020     os_core.obj (.text:OS_SchedNew)
-                  000128ac    0000001e     rts430x_lc_rd_eabi.lib : memccpy.obj (.text:memccpy)
-                  000128ca    0000001c                            : strchr.obj (.text:strchr)
-                  000128e6    0000001c                            : strcmp.obj (.text:strcmp)
-                  00012902    0000001a     bsp.obj (.text:BSP_Init)
-                  0001291c    0000001a     os_core.obj (.text:OS_EventWaitListInit)
-                  00012936    0000001a     rts430x_lc_rd_eabi.lib : _printfi_min.obj (.text:_div)
-                  00012950    00000018     os_core.obj (.text:OS_TaskIdle)
-                  00012968    00000016     g_DeviceSpi.obj (.text:g_Device_SPI2_ReadWriteByte)
-                  0001297e    00000016     rts430x_lc_rd_eabi.lib : memchr.obj (.text:memchr)
-                  00012994    00000016                            : memset.obj (.text:memset)
-                  000129aa    00000016                            : div16u.obj (.text)
-                  000129c0    00000016                            : mult16_f5hw.obj (.text)
-                  000129d6    00000014                            : memcpy.obj (.text:memcpy)
-                  000129ea    00000012     os_core.obj (.text:OS_MemClr)
-                  000129fc    00000012     rts430x_lc_rd_eabi.lib : copy_decompress_none.obj (.text:decompress:none:__TI_decompress_none)
-                  00012a0e    00000012                            : strcpy.obj (.text:strcpy)
-                  00012a20    00000010                            : lsl32.obj (.text:l_lsl)
-                  00012a30    0000000e                            : strlen.obj (.text:strlen)
-                  00012a3e    0000000c     bsp.obj (.text:BSP_OSTickInit)
-                  00012a4a    0000000c     g_DeviceSpi.obj (.text:g_Device_SendByte_SPI2)
-                  00012a56    00000008     bsp.obj (.text:BSP_OSCloseWatchDog)
-                  00012a5e    00000006     bsp.obj (.text:Init)
-                  00012a64    00000006     rts430x_lc_rd_eabi.lib : printf.obj (.text:_outc)
-                  00012a6a    00000006                            : copy_decompress_rle.obj (.text:decompress:rle24:__TI_decompress_rle24)
-                  00012a70    00000004                            : printf.obj (.text:_outs)
-                  00012a74    00000004                            : pre_init.obj (.text:_system_pre_init)
-                  00012a78    00000004                            : exit.obj (.text:abort)
-                  00012a7c    00000002     os_cpu_c.obj (.text:OSInitHookBegin)
-                  00012a7e    00000002     os_cpu_c.obj (.text:OSInitHookEnd)
-                  00012a80    00000002     os_cpu_c.obj (.text:OSTCBInitHook)
-                  00012a82    00000002     os_cpu_c.obj (.text:OSTaskCreateHook)
-                  00012a84    00000002     os_cpu_c.obj (.text:OSTaskIdleHook)
-                  00012a86    00000002     os_cpu_c.obj (.text:OSTaskStatHook)
-                  00012a88    00000002     os_cpu_c.obj (.text:OSTaskSwHook)
-                  00012a8a    00000002     os_cpu_c.obj (.text:OSTimeTickHook)
-                  00012a8c    00000002     rts430x_lc_rd_eabi.lib : _lock.obj (.text:_nop)
+                  00012064    0000004e     hal_layer_api.obj (.text:Hal_ThreadCreate)
+                  000120b2    0000004e     os_core.obj (.text:OSEventNameSet)
+                  00012100    0000004e     os_core.obj (.text:OS_InitTaskIdle)
+                  0001214e    0000004c     rts430x_lc_rd_eabi.lib : trgdrv.obj (.text:HOSTclose)
+                  0001219a    0000004c                            : _printfi_min.obj (.text:_pproc_diouxp)
+                  000121e6    0000004a                            : printf.obj (.text:printf)
+                  00012230    00000048                            : _printfi_min.obj (.text:_pproc_str)
+                  00012278    00000046                            : trgdrv.obj (.text:HOSTunlink)
+                  000122be    00000046     os_core.obj (.text:OS_EventTaskWait)
+                  00012304    00000044     g_DeviceSpi.obj (.text:g_Device_SPI2_Init)
+                  00012348    00000042     rts430x_lc_rd_eabi.lib : memory.obj (.text:minit)
+                  0001238a    0000003e                            : _printfi_min.obj (.text:_getarg_diouxp)
+                  000123c8    0000003e                            : lsl32.obj (.text:l_lsl_const)
+                  00012406    0000003e                            : lsr32.obj (.text:l_lsr_const)
+                  00012444    0000003e                            : lowlev.obj (.text:lseek)
+                  00012482    0000003c                            : lowlev.obj (.text:write)
+                  000124be    0000003a     os_core.obj (.text:OSStatInit)
+                  000124f8    00000038     os_core.obj (.text:OSSchedUnlock)
+                  00012530    00000038     os_core.obj (.text:OS_InitMisc)
+                  00012568    00000036     rts430x_lc_rd_eabi.lib : fopen.obj (.text:__TI_cleanup)
+                  0001259e    00000036                            : trgmsg.obj (.text:__TI_writemsg)
+                  000125d4    00000032     os_core.obj (.text:OSInit)
+                  00012606    00000032     rts430x_lc_rd_eabi.lib : trgmsg.obj (.text:__TI_readmsg)
+                  00012638    00000032                            : strncpy.obj (.text:strncpy)
+                  0001266a    00000030                            : lowlev.obj (.text:unlink)
+                  0001269a    0000002e     bsp.obj (.text:BSP_OSClockInit)
+                  000126c8    0000002e     rts430x_lc_rd_eabi.lib : exit.obj (.text:exit)
+                  000126f6    0000002e                            : lowlev.obj (.text:finddevice)
+                  00012724    0000002e     g_DeviceRTC.obj (.text:g_Device_RTC_Init)
+                  00012752    0000002c     os_core.obj (.text:OSStart)
+                  0001277e    0000002c     os_core.obj (.text:OS_EventTaskRemove)
+                  000127aa    0000002c     os_core.obj (.text:OS_InitRdyList)
+                  000127d6    00000026     app.obj (.text:main)
+                  000127fc    00000024     rts430x_lc_rd_eabi.lib : copy_zero_init.obj (.text:decompress:ZI:__TI_zero_init)
+                  00012820    00000022     os_task.obj (.text:OS_TaskStkClr)
+                  00012842    00000022     g_DeviceSpi.obj (.text:g_Device_SendNByte_SPI2)
+                  00012864    00000022     rts430x_lc_rd_eabi.lib : mult32_f5hw.obj (.text)
+                  00012886    00000020     os_core.obj (.text:OSSchedLock)
+                  000128a6    00000020     os_core.obj (.text:OS_SchedNew)
+                  000128c6    00000020     app.obj (.text:ScadaTaskStart)
+                  000128e6    0000001e     rts430x_lc_rd_eabi.lib : memccpy.obj (.text:memccpy)
+                  00012904    0000001c                            : strchr.obj (.text:strchr)
+                  00012920    0000001c                            : strcmp.obj (.text:strcmp)
+                  0001293c    0000001a     bsp.obj (.text:BSP_Init)
+                  00012956    0000001a     os_core.obj (.text:OS_EventWaitListInit)
+                  00012970    0000001a     rts430x_lc_rd_eabi.lib : _printfi_min.obj (.text:_div)
+                  0001298a    00000018     os_core.obj (.text:OS_TaskIdle)
+                  000129a2    00000016     g_DeviceSpi.obj (.text:g_Device_SPI2_ReadWriteByte)
+                  000129b8    00000016     rts430x_lc_rd_eabi.lib : memchr.obj (.text:memchr)
+                  000129ce    00000016                            : memset.obj (.text:memset)
+                  000129e4    00000016                            : div16u.obj (.text)
+                  000129fa    00000016                            : mult16_f5hw.obj (.text)
+                  00012a10    00000014                            : memcpy.obj (.text:memcpy)
+                  00012a24    00000012     os_core.obj (.text:OS_MemClr)
+                  00012a36    00000012     rts430x_lc_rd_eabi.lib : copy_decompress_none.obj (.text:decompress:none:__TI_decompress_none)
+                  00012a48    00000012                            : strcpy.obj (.text:strcpy)
+                  00012a5a    00000010                            : lsl32.obj (.text:l_lsl)
+                  00012a6a    0000000e                            : strlen.obj (.text:strlen)
+                  00012a78    0000000c     bsp.obj (.text:BSP_OSTickInit)
+                  00012a84    0000000c     g_DeviceSpi.obj (.text:g_Device_SendByte_SPI2)
+                  00012a90    00000008     bsp.obj (.text:BSP_OSCloseWatchDog)
+                  00012a98    00000006     bsp.obj (.text:Init)
+                  00012a9e    00000006     rts430x_lc_rd_eabi.lib : printf.obj (.text:_outc)
+                  00012aa4    00000006                            : copy_decompress_rle.obj (.text:decompress:rle24:__TI_decompress_rle24)
+                  00012aaa    00000004                            : printf.obj (.text:_outs)
+                  00012aae    00000004                            : pre_init.obj (.text:_system_pre_init)
+                  00012ab2    00000004                            : exit.obj (.text:abort)
+                  00012ab6    00000002     os_cpu_c.obj (.text:OSInitHookBegin)
+                  00012ab8    00000002     os_cpu_c.obj (.text:OSInitHookEnd)
+                  00012aba    00000002     os_cpu_c.obj (.text:OSTCBInitHook)
+                  00012abc    00000002     os_cpu_c.obj (.text:OSTaskCreateHook)
+                  00012abe    00000002     os_cpu_c.obj (.text:OSTaskIdleHook)
+                  00012ac0    00000002     os_cpu_c.obj (.text:OSTaskStatHook)
+                  00012ac2    00000002     os_cpu_c.obj (.text:OSTaskSwHook)
+                  00012ac4    00000002     os_cpu_c.obj (.text:OSTimeTickHook)
+                  00012ac6    00000002     rts430x_lc_rd_eabi.lib : _lock.obj (.text:_nop)
 
 
 LINKER GENERATED COPY TABLES
 
-__TI_cinit_table @ 0000a684 records: 3, size/record: 8, table size: 24
-	.data: load addr=0000a608, load size=00000064 bytes, run addr=0000303c, run size=000001f2 bytes, compression=rle
-	.bss: load addr=0000a678, load size=00000006 bytes, run addr=00002400, run size=00000c3b bytes, compression=zero_init
-	.cio: load addr=0000a67e, load size=00000006 bytes, run addr=0000322e, run size=00000120 bytes, compression=zero_init
+__TI_cinit_table @ 0000a75e records: 3, size/record: 8, table size: 24
+	.data: load addr=0000a6e2, load size=00000064 bytes, run addr=000033d2, run size=00000200 bytes, compression=rle
+	.bss: load addr=0000a752, load size=00000006 bytes, run addr=00002400, run size=00000fd1 bytes, compression=zero_init
+	.cio: load addr=0000a758, load size=00000006 bytes, run addr=000035d2, run size=00000120 bytes, compression=zero_init
 
 
 LINKER GENERATED HANDLER TABLE
 
-__TI_handler_table @ 0000a66c records: 3, size/record: 4, table size: 12
+__TI_handler_table @ 0000a746 records: 3, size/record: 4, table size: 12
 	index: 0, handler: __TI_zero_init
 	index: 1, handler: __TI_decompress_rle24
 	index: 2, handler: __TI_decompress_none
@@ -472,9 +483,9 @@ address   name
 00000752  ADC10MEM0                  
 00000753  ADC10MEM0_H                
 00000752  ADC10MEM0_L                
-00012902  BSP_Init                   
-00012a78  C$$EXIT                    
-00012582  C$$IO$$                    
+0001293c  BSP_Init                   
+00012ab2  C$$EXIT                    
+000125d0  C$$IO$$                    
 000008c0  CBCTL0                     
 000008c1  CBCTL0_H                   
 000008c0  CBCTL0_L                   
@@ -551,6 +562,7 @@ address   name
 0000050e  DMAIV                      
 0000050f  DMAIV_H                    
 0000050e  DMAIV_L                    
+000035a8  Do_Flag_Uart3              
 00000140  FCTL1                      
 00000141  FCTL1_H                    
 00000140  FCTL1_L                    
@@ -560,13 +572,14 @@ address   name
 00000146  FCTL4                      
 00000147  FCTL4_H                    
 00000146  FCTL4_L                    
-00012100  HOSTclose                  
+0001214e  HOSTclose                  
 0001104a  HOSTlseek                  
 000118a6  HOSTopen                   
 00011ac2  HOSTread                   
 0001174e  HOSTrename                 
-0001222a  HOSTunlink                 
+00012278  HOSTunlink                 
 000119ee  HOSTwrite                  
+00012064  Hal_ThreadCreate           
 0001062a  Init_FLL                   
 000004c4  MAC                        
 000004da  MAC32H                     
@@ -616,97 +629,97 @@ address   name
 000004e0  OP2L_L                     
 000004c9  OP2_H                      
 000004c8  OP2_L                      
-0000317c  OSBsp                      
-00003030  OSCPUUsage                 
+00003512  OSBsp                      
+000033c6  OSCPUUsage                 
 000116fc  OSCtxSw                    
-00002fd6  OSCtxSwCtr                 
-00002fda  OSEventFreeList            
-00012064  OSEventNameSet             
-00002c08  OSEventTbl                 
-00002fde  OSFlagFreeList             
-00002f68  OSFlagTbl                  
-00002fe2  OSISRStkPtr                
-00002fe6  OSIdleCtr                  
-00002fea  OSIdleCtrMax               
-00002fee  OSIdleCtrRun               
-000125bc  OSInit                     
-00012a7c  OSInitHookBegin            
-00012a7e  OSInitHookEnd              
+0000336c  OSCtxSwCtr                 
+00003370  OSEventFreeList            
+000120b2  OSEventNameSet             
+00002f08  OSEventTbl                 
+00003374  OSFlagFreeList             
+000032cc  OSFlagTbl                  
+00003378  OSISRStkPtr                
+0000337c  OSIdleCtr                  
+00003380  OSIdleCtrMax               
+00003384  OSIdleCtrRun               
+000125d4  OSInit                     
+00012ab6  OSInitHookBegin            
+00012ab8  OSInitHookEnd              
 00011734  OSIntCtxSw                 
 00011c5c  OSIntExit                  
-00003031  OSIntNesting               
-00003032  OSLockNesting              
-00002ff2  OSMemFreeList              
-00002e90  OSMemTbl                   
-00003033  OSPrioCur                  
-00003034  OSPrioHighRdy              
-00002ff6  OSQFreeList                
-00002f08  OSQTbl                     
-00003035  OSRdyGrp                   
-00002ffa  OSRdyTbl                   
-00003036  OSRunning                  
-0001286c  OSSchedLock                
-000124aa  OSSchedUnlock              
+000033c7  OSIntNesting               
+000033c8  OSLockNesting              
+00003388  OSMemFreeList              
+00003190  OSMemTbl                   
+000033c9  OSPrioCur                  
+000033ca  OSPrioHighRdy              
+0000338c  OSQFreeList                
+0000326c  OSQTbl                     
+000033cb  OSRdyGrp                   
+00003390  OSRdyTbl                   
+000033cc  OSRunning                  
+00012886  OSSchedLock                
+000124f8  OSSchedUnlock              
 00011ed2  OSSemCreate                
 000107fa  OSSemPend                  
-0001273a  OSStart                    
+00012752  OSStart                    
 000116e6  OSStartHighRdy             
-00012470  OSStatInit                 
-00003037  OSStatRdy                  
-00002ffe  OSTCBCur                   
-00003002  OSTCBFreeList              
-00003006  OSTCBHighRdy               
-00012a80  OSTCBInitHook              
-0000300a  OSTCBList                  
-00002e10  OSTCBPrioTbl               
+000124be  OSStatInit                 
+000033cd  OSStatRdy                  
+00003394  OSTCBCur                   
+00003398  OSTCBFreeList              
+0000339c  OSTCBHighRdy               
+00012aba  OSTCBInitHook              
+000033a0  OSTCBList                  
+00003110  OSTCBPrioTbl               
 00002400  OSTCBTbl                   
 00010fa2  OSTaskCreate               
 000109ba  OSTaskCreateExt            
-00012a82  OSTaskCreateHook           
-00003038  OSTaskCtr                  
-00012a84  OSTaskIdleHook             
-00002908  OSTaskIdleStk              
+00012abc  OSTaskCreateHook           
+000033ce  OSTaskCtr                  
+00012abe  OSTaskIdleHook             
+00002c08  OSTaskIdleStk              
 00011560  OSTaskNameSet              
-00003039  OSTaskRegNextAvailID       
-00012a86  OSTaskStatHook             
-00002a08  OSTaskStatStk              
+000033cf  OSTaskRegNextAvailID       
+00012ac0  OSTaskStatHook             
+00002d08  OSTaskStatStk              
 00010e46  OSTaskStkChk               
 0001053c  OSTaskStkInit              
 000110e8  OSTaskSuspend              
-00012a88  OSTaskSwHook               
-0000a400  OSTickISR                  
-0000303a  OSTickStepState            
-0000300e  OSTime                     
+00012ac2  OSTaskSwHook               
+0000a442  OSTickISR                  
+000033d0  OSTickStepState            
+000033a4  OSTime                     
 00011f24  OSTimeDly                  
 00010c20  OSTimeDlyHMSM              
 00010d94  OSTimeTick                 
-00012a8a  OSTimeTickHook             
-0000302a  OSTmrFree                  
-00003012  OSTmrFreeList              
-00003016  OSTmrSem                   
-0000301a  OSTmrSemSignal             
-00002b08  OSTmrTaskStk               
-00002cbc  OSTmrTbl                   
-0000301e  OSTmrTime                  
-0000302c  OSTmrUsed                  
-00002fa4  OSTmrWheelTbl              
+00012ac4  OSTimeTickHook             
+000033c0  OSTmrFree                  
+000033a8  OSTmrFreeList              
+000033ac  OSTmrSem                   
+000033b0  OSTmrSemSignal             
+00002e08  OSTmrTaskStk               
+00002fbc  OSTmrTbl                   
+000033b4  OSTmrTime                  
+000033c2  OSTmrUsed                  
+0000333a  OSTmrWheelTbl              
 00010712  OSTmr_Init                 
-0000a482  OSUnMapTbl                 
+0000a52e  OSUnMapTbl                 
 000116e0  OS_CPU_SR_Restore          
 000116d8  OS_CPU_SR_Save             
-00012766  OS_EventTaskRemove         
-00012270  OS_EventTaskWait           
-0001291c  OS_EventWaitListInit       
+0001277e  OS_EventTaskRemove         
+000122be  OS_EventTaskWait           
+00012956  OS_EventWaitListInit       
 00011456  OS_FlagInit                
-000129ea  OS_MemClr                  
+00012a24  OS_MemClr                  
 0001165e  OS_MemInit                 
 000117c2  OS_QInit                   
 00012014  OS_Sched                   
 000101b2  OS_TCBInit                 
-00012950  OS_TaskIdle                
+0001298a  OS_TaskIdle                
 00010b64  OS_TaskStat                
 00011cbc  OS_TaskStatStkChk          
-00012806  OS_TaskStkClr              
+00012820  OS_TaskStkClr              
 0000020e  P1IV                       
 0000021e  P2IV                       
 000001e0  P4MAP01                    
@@ -907,11 +920,12 @@ address   name
 000004b6  RTCYEAR                    
 000004b7  RTCYEAR_H                  
 000004b6  RTCYEAR_L                  
-0000a480  RTC_ISR                    
+0000a52c  RTC_ISR                    
+000035a6  Rcv_TimeNum                
 00011e7e  SD_Idle_Sta                
 000114de  SD_SendCommand             
 00011b92  SD_SendCommand_NoDeassert  
-00003210  SD_Type                    
+000035b4  SD_Type                    
 00000100  SFRIE1                     
 00000101  SFRIE1_H                   
 00000100  SFRIE1_L                   
@@ -1018,6 +1032,7 @@ address   name
 000003e0  TB0EX0                     
 000003ee  TB0IV                      
 000003d0  TB0R                       
+000035a7  TimebuffNum                
 000005d0  UCA0ABCTL                  
 000005c6  UCA0BRW                    
 000005c7  UCA0BRW_H                  
@@ -1196,30 +1211,37 @@ address   name
 00000172  UCSCTL9                    
 00000173  UCSCTL9_H                  
 00000172  UCSCTL9_L                  
-0000a45e  USCI_B2_ISR                
-0000a46c  USCI_B3_ISR                
+0000a4de  USCI_A0_ISR                
+0000a4f6  USCI_A1_ISR                
+0000a400  USCI_A2_ISR                
+0000a484  USCI_A3_ISR                
+0000a50a  USCI_B2_ISR                
+0000a518  USCI_B3_ISR                
+000035a9  Uart_0_Flag                
+000035aa  Uart_1_Flag                
+000035ab  Uart_2_Flag                
 0000015c  WDTCTL                     
 0000015d  WDTCTL_H                   
 0000015c  WDTCTL_L                   
-0000322e  _CIOBUF_                   
+000035d2  _CIOBUF_                   
 0000a400  __STACK_END                
 000000a0  __STACK_SIZE               
 000000a0  __SYSMEM_SIZE              
-0000a684  __TI_CINIT_Base            
-0000a69c  __TI_CINIT_Limit           
-0000a66c  __TI_Handler_Table_Base    
-0000a678  __TI_Handler_Table_Limit   
+0000a75e  __TI_CINIT_Base            
+0000a776  __TI_CINIT_Limit           
+0000a746  __TI_Handler_Table_Base    
+0000a752  __TI_Handler_Table_Limit   
 UNDEFED   __TI_INITARRAY_Base        
 UNDEFED   __TI_INITARRAY_Limit       
-0000a47a  __TI_ISR_TRAP              
-0001251a  __TI_cleanup               
-00003218  __TI_cleanup_ptr           
+0000a526  __TI_ISR_TRAP              
+00012568  __TI_cleanup               
+000035bc  __TI_cleanup_ptr           
 00011836  __TI_closefile             
-000129fc  __TI_decompress_none       
-00012a6a  __TI_decompress_rle24      
+00012a36  __TI_decompress_none       
+00012aa4  __TI_decompress_rle24      
 00011bf8  __TI_doflush               
-0000321c  __TI_dtors_ptr             
-0000322a  __TI_ft_end                
+000035c0  __TI_dtors_ptr             
+000035ce  __TI_ft_end                
 0000ffc8  __TI_int36                 
 0000ffca  __TI_int37                 
 0000ffcc  __TI_int38                 
@@ -1247,96 +1269,102 @@ UNDEFED   __TI_INITARRAY_Limit
 0000fffa  __TI_int61                 
 0000fffc  __TI_int62                 
 00010a92  __TI_printfi_minimal       
-000125ee  __TI_readmsg               
-00002d70  __TI_tmpnams               
-00012550  __TI_writemsg              
+00012606  __TI_readmsg               
+00003070  __TI_tmpnams               
+0001259e  __TI_writemsg              
 000115e0  __TI_wrt_ok                
-000127e2  __TI_zero_init             
+000127fc  __TI_zero_init             
 ffffffff  __binit__                  
 ffffffff  __c_args__                 
-000129aa  __mspabi_divu              
+000129e4  __mspabi_divu              
 00011e26  __mspabi_divul             
-000129c0  __mspabi_mpyi_f5hw         
-0001284a  __mspabi_mpyl_f5hw         
-000129aa  __mspabi_remu              
+000129fa  __mspabi_mpyi_f5hw         
+00012864  __mspabi_mpyl_f5hw         
+000129e4  __mspabi_remu              
 00011e26  __mspabi_remul             
-00012a20  __mspabi_slll              
-000123b2  __mspabi_slll_1            
-0001238e  __mspabi_slll_10           
-0001238a  __mspabi_slll_11           
-00012386  __mspabi_slll_12           
-00012382  __mspabi_slll_13           
-0001237e  __mspabi_slll_14           
-0001237a  __mspabi_slll_15           
-000123ae  __mspabi_slll_2            
-000123aa  __mspabi_slll_3            
-000123a6  __mspabi_slll_4            
-000123a2  __mspabi_slll_5            
-0001239e  __mspabi_slll_6            
-0001239a  __mspabi_slll_7            
-00012396  __mspabi_slll_8            
-00012392  __mspabi_slll_9            
-000123f0  __mspabi_srll_1            
-000123cc  __mspabi_srll_10           
-000123c8  __mspabi_srll_11           
-000123c4  __mspabi_srll_12           
-000123c0  __mspabi_srll_13           
-000123bc  __mspabi_srll_14           
-000123b8  __mspabi_srll_15           
-000123ec  __mspabi_srll_2            
-000123e8  __mspabi_srll_3            
-000123e4  __mspabi_srll_4            
-000123e0  __mspabi_srll_5            
-000123dc  __mspabi_srll_6            
-000123d8  __mspabi_srll_7            
-000123d4  __mspabi_srll_8            
-000123d0  __mspabi_srll_9            
+00012a5a  __mspabi_slll              
+00012400  __mspabi_slll_1            
+000123dc  __mspabi_slll_10           
+000123d8  __mspabi_slll_11           
+000123d4  __mspabi_slll_12           
+000123d0  __mspabi_slll_13           
+000123cc  __mspabi_slll_14           
+000123c8  __mspabi_slll_15           
+000123fc  __mspabi_slll_2            
+000123f8  __mspabi_slll_3            
+000123f4  __mspabi_slll_4            
+000123f0  __mspabi_slll_5            
+000123ec  __mspabi_slll_6            
+000123e8  __mspabi_slll_7            
+000123e4  __mspabi_slll_8            
+000123e0  __mspabi_slll_9            
+0001243e  __mspabi_srll_1            
+0001241a  __mspabi_srll_10           
+00012416  __mspabi_srll_11           
+00012412  __mspabi_srll_12           
+0001240e  __mspabi_srll_13           
+0001240a  __mspabi_srll_14           
+00012406  __mspabi_srll_15           
+0001243a  __mspabi_srll_2            
+00012436  __mspabi_srll_3            
+00012432  __mspabi_srll_4            
+0001242e  __mspabi_srll_5            
+0001242a  __mspabi_srll_6            
+00012426  __mspabi_srll_7            
+00012422  __mspabi_srll_8            
+0001241e  __mspabi_srll_9            
 00011982  _auto_init_hold_wdt        
-0000a442  _c_int00_noargs            
-0000303c  _ftable                    
-00003220  _lock                      
-00012a8c  _nop                       
+0000a4c2  _c_int00_noargs            
+000033d2  _ftable                    
+000035c4  _lock                      
+00012ac6  _nop                       
 0000fffe  _reset_vector              
 0000a360  _stack                     
-00003350  _sys_memory                
-00012a74  _system_pre_init           
-00003224  _unlock                    
-00012a78  abort                      
+000036f4  _sys_memory                
+00012aae  _system_pre_init           
+000035c8  _unlock                    
+000035ac  aRxNum                     
+00012ab2  abort                      
+000035ad  bRxNum                     
 ffffffff  binit                      
-00003212  cardSize                   
+00003208  cRxBuff                    
+000035ae  cRxNum                     
+000035b6  cardSize                   
 00011d72  close                      
-000126b0  exit                       
+00003308  dRxBuff                    
+000035af  dRxNum                     
+000126c8  exit                       
 000112ac  fputc                      
 0001044c  fputs                      
 0001133c  free                       
 00011a58  fseek                      
-0001270c  g_Device_RTC_Init          
+00012724  g_Device_RTC_Init          
 00010000  g_Device_SD_Init           
-000122b6  g_Device_SPI2_Init         
-00012968  g_Device_SPI2_ReadWriteByte
-00012a4a  g_Device_SendByte_SPI2     
-00012828  g_Device_SendNByte_SPI2    
-000123f6  lseek                      
-00012586  main                       
+00012304  g_Device_SPI2_Init         
+000129a2  g_Device_SPI2_ReadWriteByte
+00012a84  g_Device_SendByte_SPI2     
+00012842  g_Device_SendNByte_SPI2    
+00012444  lseek                      
+000127d6  main                       
 00010cda  malloc                     
-000128ac  memccpy                    
-0001297e  memchr                     
-000129d6  memcpy                     
-00012994  memset                     
-000122fa  minit                      
-00012198  printf                     
+000128e6  memccpy                    
+000129b8  memchr                     
+00012a10  memcpy                     
+000129ce  memset                     
+00012348  minit                      
+000121e6  printf                     
 000112ac  putc                       
-00012652  remove                     
+0001266a  remove                     
 000108da  setvbuf                    
-00003216  status                     
-000128ca  strchr                     
-000128e6  strcmp                     
-00012a0e  strcpy                     
-00012a30  strlen                     
-00012620  strncpy                    
-00003217  timeout                    
-00012652  unlink                     
-00012434  write                      
+000035ba  status                     
+00012904  strchr                     
+00012920  strcmp                     
+00012a48  strcpy                     
+00012a6a  strlen                     
+00012638  strncpy                    
+000035bb  timeout                    
+0001266a  unlink                     
+00012482  write                      
 
 
 GLOBAL SYMBOLS: SORTED BY Symbol Address 
@@ -1996,75 +2024,91 @@ address   name
 000008cd  CBINT_H                    
 000008ce  CBIV                       
 00002400  OSTCBTbl                   
-00002908  OSTaskIdleStk              
-00002a08  OSTaskStatStk              
-00002b08  OSTmrTaskStk               
-00002c08  OSEventTbl                 
-00002cbc  OSTmrTbl                   
-00002d70  __TI_tmpnams               
-00002e10  OSTCBPrioTbl               
-00002e90  OSMemTbl                   
-00002f08  OSQTbl                     
-00002f68  OSFlagTbl                  
-00002fa4  OSTmrWheelTbl              
-00002fd6  OSCtxSwCtr                 
-00002fda  OSEventFreeList            
-00002fde  OSFlagFreeList             
-00002fe2  OSISRStkPtr                
-00002fe6  OSIdleCtr                  
-00002fea  OSIdleCtrMax               
-00002fee  OSIdleCtrRun               
-00002ff2  OSMemFreeList              
-00002ff6  OSQFreeList                
-00002ffa  OSRdyTbl                   
-00002ffe  OSTCBCur                   
-00003002  OSTCBFreeList              
-00003006  OSTCBHighRdy               
-0000300a  OSTCBList                  
-0000300e  OSTime                     
-00003012  OSTmrFreeList              
-00003016  OSTmrSem                   
-0000301a  OSTmrSemSignal             
-0000301e  OSTmrTime                  
-0000302a  OSTmrFree                  
-0000302c  OSTmrUsed                  
-00003030  OSCPUUsage                 
-00003031  OSIntNesting               
-00003032  OSLockNesting              
-00003033  OSPrioCur                  
-00003034  OSPrioHighRdy              
-00003035  OSRdyGrp                   
-00003036  OSRunning                  
-00003037  OSStatRdy                  
-00003038  OSTaskCtr                  
-00003039  OSTaskRegNextAvailID       
-0000303a  OSTickStepState            
-0000303c  _ftable                    
-0000317c  OSBsp                      
-00003210  SD_Type                    
-00003212  cardSize                   
-00003216  status                     
-00003217  timeout                    
-00003218  __TI_cleanup_ptr           
-0000321c  __TI_dtors_ptr             
-00003220  _lock                      
-00003224  _unlock                    
-0000322a  __TI_ft_end                
-0000322e  _CIOBUF_                   
-00003350  _sys_memory                
+00002c08  OSTaskIdleStk              
+00002d08  OSTaskStatStk              
+00002e08  OSTmrTaskStk               
+00002f08  OSEventTbl                 
+00002fbc  OSTmrTbl                   
+00003070  __TI_tmpnams               
+00003110  OSTCBPrioTbl               
+00003190  OSMemTbl                   
+00003208  cRxBuff                    
+0000326c  OSQTbl                     
+000032cc  OSFlagTbl                  
+00003308  dRxBuff                    
+0000333a  OSTmrWheelTbl              
+0000336c  OSCtxSwCtr                 
+00003370  OSEventFreeList            
+00003374  OSFlagFreeList             
+00003378  OSISRStkPtr                
+0000337c  OSIdleCtr                  
+00003380  OSIdleCtrMax               
+00003384  OSIdleCtrRun               
+00003388  OSMemFreeList              
+0000338c  OSQFreeList                
+00003390  OSRdyTbl                   
+00003394  OSTCBCur                   
+00003398  OSTCBFreeList              
+0000339c  OSTCBHighRdy               
+000033a0  OSTCBList                  
+000033a4  OSTime                     
+000033a8  OSTmrFreeList              
+000033ac  OSTmrSem                   
+000033b0  OSTmrSemSignal             
+000033b4  OSTmrTime                  
+000033c0  OSTmrFree                  
+000033c2  OSTmrUsed                  
+000033c6  OSCPUUsage                 
+000033c7  OSIntNesting               
+000033c8  OSLockNesting              
+000033c9  OSPrioCur                  
+000033ca  OSPrioHighRdy              
+000033cb  OSRdyGrp                   
+000033cc  OSRunning                  
+000033cd  OSStatRdy                  
+000033ce  OSTaskCtr                  
+000033cf  OSTaskRegNextAvailID       
+000033d0  OSTickStepState            
+000033d2  _ftable                    
+00003512  OSBsp                      
+000035a6  Rcv_TimeNum                
+000035a7  TimebuffNum                
+000035a8  Do_Flag_Uart3              
+000035a9  Uart_0_Flag                
+000035aa  Uart_1_Flag                
+000035ab  Uart_2_Flag                
+000035ac  aRxNum                     
+000035ad  bRxNum                     
+000035ae  cRxNum                     
+000035af  dRxNum                     
+000035b4  SD_Type                    
+000035b6  cardSize                   
+000035ba  status                     
+000035bb  timeout                    
+000035bc  __TI_cleanup_ptr           
+000035c0  __TI_dtors_ptr             
+000035c4  _lock                      
+000035c8  _unlock                    
+000035ce  __TI_ft_end                
+000035d2  _CIOBUF_                   
+000036f4  _sys_memory                
 0000a360  _stack                     
-0000a400  OSTickISR                  
+0000a400  USCI_A2_ISR                
 0000a400  __STACK_END                
-0000a442  _c_int00_noargs            
-0000a45e  USCI_B2_ISR                
-0000a46c  USCI_B3_ISR                
-0000a47a  __TI_ISR_TRAP              
-0000a480  RTC_ISR                    
-0000a482  OSUnMapTbl                 
-0000a66c  __TI_Handler_Table_Base    
-0000a678  __TI_Handler_Table_Limit   
-0000a684  __TI_CINIT_Base            
-0000a69c  __TI_CINIT_Limit           
+0000a442  OSTickISR                  
+0000a484  USCI_A3_ISR                
+0000a4c2  _c_int00_noargs            
+0000a4de  USCI_A0_ISR                
+0000a4f6  USCI_A1_ISR                
+0000a50a  USCI_B2_ISR                
+0000a518  USCI_B3_ISR                
+0000a526  __TI_ISR_TRAP              
+0000a52c  RTC_ISR                    
+0000a52e  OSUnMapTbl                 
+0000a746  __TI_Handler_Table_Base    
+0000a752  __TI_Handler_Table_Limit   
+0000a75e  __TI_CINIT_Base            
+0000a776  __TI_CINIT_Limit           
 0000ffc8  __TI_int36                 
 0000ffca  __TI_int37                 
 0000ffcc  __TI_int38                 
@@ -2142,101 +2186,102 @@ address   name
 00011ed2  OSSemCreate                
 00011f24  OSTimeDly                  
 00012014  OS_Sched                   
-00012064  OSEventNameSet             
-00012100  HOSTclose                  
-00012198  printf                     
-0001222a  HOSTunlink                 
-00012270  OS_EventTaskWait           
-000122b6  g_Device_SPI2_Init         
-000122fa  minit                      
-0001237a  __mspabi_slll_15           
-0001237e  __mspabi_slll_14           
-00012382  __mspabi_slll_13           
-00012386  __mspabi_slll_12           
-0001238a  __mspabi_slll_11           
-0001238e  __mspabi_slll_10           
-00012392  __mspabi_slll_9            
-00012396  __mspabi_slll_8            
-0001239a  __mspabi_slll_7            
-0001239e  __mspabi_slll_6            
-000123a2  __mspabi_slll_5            
-000123a6  __mspabi_slll_4            
-000123aa  __mspabi_slll_3            
-000123ae  __mspabi_slll_2            
-000123b2  __mspabi_slll_1            
-000123b8  __mspabi_srll_15           
-000123bc  __mspabi_srll_14           
-000123c0  __mspabi_srll_13           
-000123c4  __mspabi_srll_12           
-000123c8  __mspabi_srll_11           
-000123cc  __mspabi_srll_10           
-000123d0  __mspabi_srll_9            
-000123d4  __mspabi_srll_8            
-000123d8  __mspabi_srll_7            
-000123dc  __mspabi_srll_6            
-000123e0  __mspabi_srll_5            
-000123e4  __mspabi_srll_4            
-000123e8  __mspabi_srll_3            
-000123ec  __mspabi_srll_2            
-000123f0  __mspabi_srll_1            
-000123f6  lseek                      
-00012434  write                      
-00012470  OSStatInit                 
-000124aa  OSSchedUnlock              
-0001251a  __TI_cleanup               
-00012550  __TI_writemsg              
-00012582  C$$IO$$                    
-00012586  main                       
-000125bc  OSInit                     
-000125ee  __TI_readmsg               
-00012620  strncpy                    
-00012652  remove                     
-00012652  unlink                     
-000126b0  exit                       
-0001270c  g_Device_RTC_Init          
-0001273a  OSStart                    
-00012766  OS_EventTaskRemove         
-000127e2  __TI_zero_init             
-00012806  OS_TaskStkClr              
-00012828  g_Device_SendNByte_SPI2    
-0001284a  __mspabi_mpyl_f5hw         
-0001286c  OSSchedLock                
-000128ac  memccpy                    
-000128ca  strchr                     
-000128e6  strcmp                     
-00012902  BSP_Init                   
-0001291c  OS_EventWaitListInit       
-00012950  OS_TaskIdle                
-00012968  g_Device_SPI2_ReadWriteByte
-0001297e  memchr                     
-00012994  memset                     
-000129aa  __mspabi_divu              
-000129aa  __mspabi_remu              
-000129c0  __mspabi_mpyi_f5hw         
-000129d6  memcpy                     
-000129ea  OS_MemClr                  
-000129fc  __TI_decompress_none       
-00012a0e  strcpy                     
-00012a20  __mspabi_slll              
-00012a30  strlen                     
-00012a4a  g_Device_SendByte_SPI2     
-00012a6a  __TI_decompress_rle24      
-00012a74  _system_pre_init           
-00012a78  C$$EXIT                    
-00012a78  abort                      
-00012a7c  OSInitHookBegin            
-00012a7e  OSInitHookEnd              
-00012a80  OSTCBInitHook              
-00012a82  OSTaskCreateHook           
-00012a84  OSTaskIdleHook             
-00012a86  OSTaskStatHook             
-00012a88  OSTaskSwHook               
-00012a8a  OSTimeTickHook             
-00012a8c  _nop                       
+00012064  Hal_ThreadCreate           
+000120b2  OSEventNameSet             
+0001214e  HOSTclose                  
+000121e6  printf                     
+00012278  HOSTunlink                 
+000122be  OS_EventTaskWait           
+00012304  g_Device_SPI2_Init         
+00012348  minit                      
+000123c8  __mspabi_slll_15           
+000123cc  __mspabi_slll_14           
+000123d0  __mspabi_slll_13           
+000123d4  __mspabi_slll_12           
+000123d8  __mspabi_slll_11           
+000123dc  __mspabi_slll_10           
+000123e0  __mspabi_slll_9            
+000123e4  __mspabi_slll_8            
+000123e8  __mspabi_slll_7            
+000123ec  __mspabi_slll_6            
+000123f0  __mspabi_slll_5            
+000123f4  __mspabi_slll_4            
+000123f8  __mspabi_slll_3            
+000123fc  __mspabi_slll_2            
+00012400  __mspabi_slll_1            
+00012406  __mspabi_srll_15           
+0001240a  __mspabi_srll_14           
+0001240e  __mspabi_srll_13           
+00012412  __mspabi_srll_12           
+00012416  __mspabi_srll_11           
+0001241a  __mspabi_srll_10           
+0001241e  __mspabi_srll_9            
+00012422  __mspabi_srll_8            
+00012426  __mspabi_srll_7            
+0001242a  __mspabi_srll_6            
+0001242e  __mspabi_srll_5            
+00012432  __mspabi_srll_4            
+00012436  __mspabi_srll_3            
+0001243a  __mspabi_srll_2            
+0001243e  __mspabi_srll_1            
+00012444  lseek                      
+00012482  write                      
+000124be  OSStatInit                 
+000124f8  OSSchedUnlock              
+00012568  __TI_cleanup               
+0001259e  __TI_writemsg              
+000125d0  C$$IO$$                    
+000125d4  OSInit                     
+00012606  __TI_readmsg               
+00012638  strncpy                    
+0001266a  remove                     
+0001266a  unlink                     
+000126c8  exit                       
+00012724  g_Device_RTC_Init          
+00012752  OSStart                    
+0001277e  OS_EventTaskRemove         
+000127d6  main                       
+000127fc  __TI_zero_init             
+00012820  OS_TaskStkClr              
+00012842  g_Device_SendNByte_SPI2    
+00012864  __mspabi_mpyl_f5hw         
+00012886  OSSchedLock                
+000128e6  memccpy                    
+00012904  strchr                     
+00012920  strcmp                     
+0001293c  BSP_Init                   
+00012956  OS_EventWaitListInit       
+0001298a  OS_TaskIdle                
+000129a2  g_Device_SPI2_ReadWriteByte
+000129b8  memchr                     
+000129ce  memset                     
+000129e4  __mspabi_divu              
+000129e4  __mspabi_remu              
+000129fa  __mspabi_mpyi_f5hw         
+00012a10  memcpy                     
+00012a24  OS_MemClr                  
+00012a36  __TI_decompress_none       
+00012a48  strcpy                     
+00012a5a  __mspabi_slll              
+00012a6a  strlen                     
+00012a84  g_Device_SendByte_SPI2     
+00012aa4  __TI_decompress_rle24      
+00012aae  _system_pre_init           
+00012ab2  C$$EXIT                    
+00012ab2  abort                      
+00012ab6  OSInitHookBegin            
+00012ab8  OSInitHookEnd              
+00012aba  OSTCBInitHook              
+00012abc  OSTaskCreateHook           
+00012abe  OSTaskIdleHook             
+00012ac0  OSTaskStatHook             
+00012ac2  OSTaskSwHook               
+00012ac4  OSTimeTickHook             
+00012ac6  _nop                       
 ffffffff  __binit__                  
 ffffffff  __c_args__                 
 ffffffff  binit                      
 UNDEFED   __TI_INITARRAY_Base        
 UNDEFED   __TI_INITARRAY_Limit       
 
-[895 symbols]
+[912 symbols]

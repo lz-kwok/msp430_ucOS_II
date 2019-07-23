@@ -22,14 +22,14 @@
 
 /* cJSON */
 /* JSON parser in C. */
-#include "..\..\System\System.h"
+#include  <bsp.h>
 
 #include <float.h>
 #include <limits.h>
 #include <ctype.h>
 
-#include "..\..\System.Device.Drive.Lib\cJSON\cjson.h"
-//#include "..\..\System.Device.Drive.Lib\cJSON\malloc.h"
+#include "cjson.h"
+//#include "malloc.h"
 
 
 static const char *ep;
@@ -138,8 +138,8 @@ static char *print_number(cJSON *item)
               sprintf(str,"%e",d);
             else												
               sprintf(str,"%.3f",d);
-//			  sprintf(str,"%f",d);   //打印float类型的小数，不加说明表示默认为6位
-//  		      sprintf(str,"%lf",d);  //打印double类型的小数
+//			  sprintf(str,"%f",d);   //锟斤拷印float锟斤拷锟酵碉拷小锟斤拷锟斤拷锟斤拷锟斤拷说锟斤拷锟斤拷示默锟斤拷为6位
+//  		      sprintf(str,"%lf",d);  //锟斤拷印double锟斤拷锟酵碉拷小锟斤拷
         }
     }
     return str;

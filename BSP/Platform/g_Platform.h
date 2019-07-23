@@ -288,7 +288,7 @@ typedef struct
 #endif
     MeteorologyPlatform        MeteorologyData;
 	WaterPlatform			   WaterData;
-if (PRODUCT_TYPE == Soil_Station) 
+#if (PRODUCT_TYPE == Soil_Station) 
 	SoilPlatform               SoilData;
 #elif (PRODUCT_TYPE == Agriculture_Station) 
 	AgriculturePlatform        AgricultureData;

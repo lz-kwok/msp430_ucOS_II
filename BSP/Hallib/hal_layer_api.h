@@ -53,7 +53,7 @@ void *Hal_Malloc(int size);
 void *Hal_Calloc(int count, int size);
 void Hal_Free(void *ptr);
 
-int Hal_ThreadCreate(void *func, void *funcname,void *TaskStk, int stack_size,int priority);
+int Hal_ThreadCreate(void (*func)(void *p_arg), void *funcname,OS_STK *TaskStk, int priority);
 int Hal_ThreadDestory(int priority);
 Queue_t Hal_QueueCreate(void **start,int size);
 void Hal_QueueDestory(Queue_t queue);

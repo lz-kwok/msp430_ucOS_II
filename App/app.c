@@ -49,7 +49,7 @@
 *********************************************************************************************************
 */
 
-static OS_STK ScadaTaskStartStk[APP_START_TASK_STK_SIZE];
+static OS_STK ScadaTaskStartStk[DEFAULT_TASK_STK_SIZE];
 
 
 /*
@@ -81,9 +81,7 @@ void  main (void)
 
     Hal_ThreadCreate(ScadaTaskStart,
                     (void *)"ScadaTaskStart",
-                    &ScadaTaskStartStk,
-                    512,
-                    DEFAULT_TASK_STK_SIZE,
+                    &ScadaTaskStartStk[DEFAULT_TASK_STK_SIZE-1u],
                     SCADA_TASK_TASK_PRIO);
 
     OSStart();                               /* Start multitasking (i.e. give control to uC/OS-II)   */
