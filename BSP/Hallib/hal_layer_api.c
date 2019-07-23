@@ -234,3 +234,4 @@ int Hal_getProductName(char *proName)
 	return 0;
 #endif
 }
+//add test 190723
