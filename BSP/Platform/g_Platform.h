@@ -305,7 +305,7 @@ if (PRODUCT_TYPE == Soil_Station)
 	InputmodeWellPlatform      InputmodeWellData;
 
 	NoxiousGasPlatform         NoxiousGasData;
-	WetherSoilPlatform         WetherSoilData;
+	WetherSoilPlatform         WeatherSoilData;
 
 	PlantingPlatform           PlantingData;
 	LevelFlowratePlatform      LevelFlowrateData;

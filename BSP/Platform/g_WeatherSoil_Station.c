@@ -21,7 +21,7 @@
 *                                          MSP-EXP430F5259LP
 *                                          Evaluation Board
 *
-* Filename      : g_Dust_Station.c
+* Filename      : g_WeatherSoil_Station.c
 * Version       : V1.00
 * Programmer(s) : GLZ
 *********************************************************************************************************
@@ -29,28 +29,21 @@
 #include  <hal_layer_api.h>
 #include  <bsp.h>
 
-#if (PRODUCT_TYPE == Dust_Station)
+#if (PRODUCT_TYPE == WeatherSoil_Station)
 
-#define SensorNum			5 
-#define CMDLength        	8
+#define SensorNum		5 
+#define CMDLength       8
 
 AppStruct  App;
 DataStruct *AppDataPointer;
 
-uint8_t Inqure_WindSpeed[CMDLength]={0x01,0x03,0x00,0x00,0x00,0x01,0x84,0x0A};             //风速
-uint8_t Inqure_WindDirection[CMDLength]={0x02,0x03,0x00,0x00,0x00,0x02,0xC4,0x38};         //风向
-uint8_t Inqure_TempHumidity[CMDLength]={0x03,0x03,0x00,0x00,0x00,0x02,0xC5,0xE9};          //温湿度
-uint8_t Inqure_Noise[CMDLength]={0x04,0x03,0x00,0x00,0x00,0x01,0x84,0x5F};                 //噪音
-uint8_t Inqure_PM[CMDLength]={0x05,0x03,0x00,0x00,0x00,0x02,0xC5,0x8F};                    //PM
-// uint8_t Inqure_AirPressure[CMDLength]={0x06,0x03,0x00,0x00,0x00,0x01,0x85,0xBD};        //气压
-// uint8_t Inqure_Illumination[CMDLength]={0x07,0x03,0x00,0x00,0x00,0x02,0xC4,0x6D};       //光照
-// uint8_t Inqure_RainGauge[CMDLength]={0x08,0x03,0x00,0x00,0x00,0x01,0x84,0x93};          //雨量-XPH
-// uint8_t Inqure_Radiation[CMDLength]={0x09,0x03,0x00,0x00,0x00,0x01,0x85,0x42};          //总辐射-太阳辐射
-// uint8_t Inqure_HCD6816_YS[CMDLength]={0xFF,0x03,0x00,0x03,0x00,0x0C,0xA0,0x11};         //气象六要素传感器--YS
+
+uint8_t ScadaSoilTempHum_YS[Command_1Length]={0x0C,0x03,0x00,0x00,0x00,0x02,0xC5,0x16};       //土壤温湿度_YS 研盛
+uint8_t ScadaTempHumIllu_RK[Command_1Length]={0x03,0x03,0x00,0x00,0x00,0x04,0x45,0xEB};       //温湿度光照_RK
+uint8_t ScadaCO2_RK[Command_1Length]={0x0A,0x03,0x00,0x02,0x00,0x01,0x24,0xB1};               //CO2_RK
 
 uint32_t SensorCahe = 0;
 uint32_t sSensorCahe = 0;
-
 
 
 /*******************************************************************************
@@ -74,68 +67,64 @@ static void AnalyzeComand(uint8_t *data,uint8_t Len)
 			{
 				switch(data[0])
 				{
-					case 0x01:		//Wind_Speed
-						SensorCahe = (uint32_t)data[3]*256 + data[4];
-						AppDataPointer->DustData.WindSpeed = (float)SensorCahe/10;
-						SetBit(SensorStatus_L, 7);   //传感器状态位置1
-						Send_Buffer[11] = SensorCahe / 256;
-						Send_Buffer[12] = SensorCahe % 256;
-						break;
-					case 0x02:		//Wind_Direction
-						SensorCahe = (uint32_t)data[5]*256 + data[6];
-						AppDataPointer->DustData.WindDirection = SensorCahe;
-						SetBit(SensorStatus_L, 6);   //传感器状态位置1
-						Send_Buffer[13] = SensorCahe / 256;
-						Send_Buffer[14] = SensorCahe % 256;
-						break;
-					case 0x03:		//Temperature&Humidity,温湿度
+					case 0x03:		//温湿度,光照
 						/**************湿度**************/
 						SensorCahe = (uint32_t)data[3]*256 + data[4];
-						AppDataPointer->DustData.Humidity = (float)SensorCahe/10;
+						AppDataPointer->WetherSoilData.Humidity = (float)SensorCahe/10;
 						SetBit(SensorStatus_H, 0);   //传感器状态位置1
 						Send_Buffer[9] = SensorCahe / 256;
 						Send_Buffer[10] = SensorCahe % 256;
 						/**************温度**************/
-						if(data[5]>=0xF0) //土壤温度为负数
+						if(data[5]>=0xF0) //温度为负数
 						{
 							sSensorCahe = 0XFFFF-((uint32_t)data[5]*256 + data[6])+0X01;
-							AppDataPointer->DustData.Temperature = (float)sSensorCahe/10*(-1);
-							sSensorCahe = (uint32_t)data[5]*256 + data[6];//原始数据存放到发送字节中
+							AppDataPointer->WetherSoilData.Temperature = (float)sSensorCahe/10*(-1);
+							sSensorCahe = (uint32_t)data[5]*256 + data[6]; //原始数据存放到发送字节中
 						}
-						else              //土壤温度为正数
+						else              //温度为正数
 						{
 							sSensorCahe = (uint32_t)data[5]*256 + data[6];
-							AppDataPointer->DustData.Temperature = (float)sSensorCahe/10;
+							AppDataPointer->WetherSoilData.Temperature = (float)sSensorCahe/10;
 						}
 						SetBit(SensorStatus_H, 1);   //传感器状态位置1
 						Send_Buffer[7] = sSensorCahe / 256;
 						Send_Buffer[8] = sSensorCahe % 256;
+						//**************光照度**************//
+						SensorCahe = (uint32_t)data[7]*16777216 + data[8]*65536 + data[9]*256 + data[10];
+						AppDataPointer->WetherSoilData.Illumination = SensorCahe;
+						SetBit(SensorStatus_L, 7);   //传感器状态位置1
+						SetBit(SensorStatus_L, 6);   //传感器状态位置1
+						Send_Buffer[11] = data[7];
+						Send_Buffer[12] = data[8];
+						Send_Buffer[13] = data[9];
+						Send_Buffer[14] = data[10];
 						break;
-					case 0x04:      //噪音
+					case 0x0C:		//土壤温湿度
+						//+++++++土壤温湿度电导率_YS+++++++++++//
+						/**************土壤温度**************/
+						SensorCahe = (uint32_t)data[5]*256 + data[6];
+						AppDataPointer->WetherSoilData.SoilTemp = (float)SensorCahe/100-20;
+						SetBit(SensorStatus_L, 5);   //传感器状态位置1
+						SensorCahe = SensorCahe - 2000;
+						Send_Buffer[15] = SensorCahe / 256;
+						Send_Buffer[16] = SensorCahe % 256;
+						/**************土壤湿度**************/
 						SensorCahe = (uint32_t)data[3]*256 + data[4];
-						AppDataPointer->DustData.Noise = (float)SensorCahe/10;
+						AppDataPointer->WetherSoilData.SoilHum = (float)SensorCahe/10;
+						SetBit(SensorStatus_L, 4);   //传感器状态位置1
+						Send_Buffer[17] = SensorCahe / 256;
+						Send_Buffer[18] = SensorCahe % 256;
+						break;
+					case 0x0A:		//CO2
+						SensorCahe = (uint32_t)data[3]*256 + data[4];
+						AppDataPointer->WetherSoilData.CO2 = SensorCahe;
 						SetBit(SensorStatus_L, 3);   //传感器状态位置1
 						Send_Buffer[19] = SensorCahe / 256;
 						Send_Buffer[20] = SensorCahe % 256;
 						break;
-					case 0x05:	    //PM2.5 ,PM10
-						/**************PM10**************/
-						SensorCahe = (uint32_t)data[3]*256 + data[4];
-						AppDataPointer->DustData.PM10 = SensorCahe;
-						SetBit(SensorStatus_L, 4);   //传感器状态位置1
-						Send_Buffer[17] = SensorCahe / 256;
-						Send_Buffer[18] = SensorCahe % 256;
-						/**************PM2.5**************/
-						sSensorCahe = (uint32_t)data[5]*256 + data[6];
-						AppDataPointer->DustData.PM25 = sSensorCahe;
-						SetBit(SensorStatus_L, 5);   //传感器状态位置1
-						Send_Buffer[15] = sSensorCahe / 256;
-						Send_Buffer[16] = sSensorCahe % 256;
-						break;
 					default:
 						break;
-				}//switch(data[0]) END
-				
+				}//switch(data[0]) END	
 			} //(data[1]==0x03)  END
  		} //CRC  END
 
@@ -165,24 +154,18 @@ void InqureSensor(void)
 		switch(scadaIndex)
 		{
 			case 1:
-				// OSBsp.Device.Usart3.WriteNData(Inqure_TempHumidity,CMDLength);
+				SendNByteToUart3(ScadaTempHumIllu_RK,Command_1Length);   //温湿度光照_RK
 				break;
 			case 2:
-				// OSBsp.Device.Usart3.WriteNData(Inqure_WindSpeed,CMDLength);
+				SendNByteToUart3(ScadaSoilTempHum_YS,Command_1Length);   //土壤温湿度_YS
 				break;
 			case 3:
-				OSBsp.Device.Usart3.WriteNData(Inqure_WindDirection,CMDLength);
-				break;
-			case 4:
-				OSBsp.Device.Usart3.WriteNData(Inqure_PM,CMDLength);
-				break;
-			case 5:
-				OSBsp.Device.Usart3.WriteNData(Inqure_Noise,CMDLength);
+				SendNByteToUart3(ScadaCO2_RK,Command_1Length);           //CO2_RK
 				break;
 			default:
 				break;
 		}
-		hal_Delay_ms(10);//高波特率降低延时为1-2ms，否则容易丢包；低波特率增加延时，如4800延时10ms，否则容易丢包
+		hal_Delay_ms(2);//高波特率降低延时为1-2ms，否则容易丢包；低波特率增加延时，如4800延时10ms，否则容易丢包
 		Recive_485_Enable;
 		hal_Delay_sec(1);
 		LED_ON;

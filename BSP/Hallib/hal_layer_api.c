@@ -178,8 +178,8 @@ int Hal_getProductName(char *proName)
 #elif (PRODUCT_TYPE == WRain_Station) 
 	strncpy(proName, "WRainData", PRODUCT_NAMES_LEN-1);
 	return 0;
-#elif (PRODUCT_TYPE == Wether_Station) 
-	strncpy(proName, "WetherData", PRODUCT_NAMES_LEN-1);
+#elif (PRODUCT_TYPE == Weather_Station) 
+	strncpy(proName, "WeatherData", PRODUCT_NAMES_LEN-1);
 	return 0;
 #elif (PRODUCT_TYPE == Soil_Station) 
 	strncpy(proName, "SoilData", PRODUCT_NAMES_LEN-1);
@@ -208,8 +208,8 @@ int Hal_getProductName(char *proName)
 #elif (PRODUCT_TYPE == NoxiousGas_Station) 
 	strncpy(proName, "NoxiousGasData", PRODUCT_NAMES_LEN-1);
 	return 0;	
-#elif (PRODUCT_TYPE == WetherSoil_Station) 
-	strncpy(proName, "WetherSoilData", PRODUCT_NAMES_LEN-1);
+#elif (PRODUCT_TYPE == WeatherSoil_Station) 
+	strncpy(proName, "WeatherSoilData", PRODUCT_NAMES_LEN-1);
 	return 0;
 #elif (PRODUCT_TYPE == Planting_Station) 
 	strncpy(proName, "PlantingData", PRODUCT_NAMES_LEN-1);
