@@ -4,14 +4,6 @@
 #include <stdint.h>
 #include <hal_device.h>
 
-//**************485控制预定义***************************//
-#define Send_485_Enable		    P2OUT |= BIT5	    //485发送使能
-#define Recive_485_Enable	    P2OUT &=~BIT5	    //485接收使能
-
-//**************LED控制预定义***************************//
-#define LED_OFF                 P2OUT &=~ BIT1    //关闭单片机工作状态指示LED
-#define LED_ON	                P2OUT |= BIT1;    //打开单片机工作状态指示LED
-
 
 typedef struct
 {
@@ -337,7 +329,7 @@ extern uint32_t sSensorCahe;
 
 void InqureSensor(void);
 char *MakeJsonBodyData(DataStruct *DataPointer);
-
+void InitScadaData();
 
 
 #endif

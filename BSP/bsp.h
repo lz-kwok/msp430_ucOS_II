@@ -59,9 +59,10 @@
 #include <utils_md5.h>
 #include <utils_sha1.h>
 
-
+#include <g_DeviceIO.h>
 #include <g_DeviceUart.h>
 #include <g_DeviceRTC.h>
+#include <g_DeviceADC.h>
 #include <g_DeviceSpi.h>
 #include <g_DeviceSD.h>
 #include <g_DeviceSDMMC.h>
@@ -148,6 +149,18 @@ typedef struct
         	void (*innerFLASHWrite)(uint8_t *data_ptr,uint8_t *flashAddr,uint16_t count);
         	void (*FlashRsvWrite)(uint8_t *data_ptr,uint8_t index,uint32_t infostartaddr,uint8_t num);
         }InnerFlash;
+
+        struct IOControl
+        {
+            void (*SensorPowerOn)(bool onoff);
+            void (*MainBoardPowerOn)(bool onoff);
+        }IOControl;
+
+        struct IOControl
+        {
+            void (*ReadExtTime)(void);
+            void (*ConfigExtTime)(void);
+        }RTC;
     }Device;
 
 

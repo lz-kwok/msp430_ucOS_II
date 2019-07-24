@@ -50,7 +50,7 @@
 extern unsigned long cardSize;  //SD卡容量
 extern unsigned char status;    //状态
 
-void TestSDCard(void);
+void g_Device_SDCard_Check(void);
 void SDsizeDisplay(unsigned long Capacity);
 //函数申明区 
 uint8_t SD_GetResponse(uint8_t Response);
