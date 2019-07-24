@@ -28,7 +28,7 @@
 */
 #include  <bsp.h>
 
-#ifdef HAVE_GPRS_CONFIG
+#if (TRANSMIT_TYPE == GPRS_Mode)
 
 uint8_t GprsInitStatus = 0;
 uint8_t WirelessStatus = (enum GprsStatus)PowerOff;
@@ -179,5 +179,5 @@ void g_Device_http_post(DataStruct *DataPointer)
 
 
 
-#endif
+#endif //(TRANSMIT_TYPE == GPRS_Mode)
 

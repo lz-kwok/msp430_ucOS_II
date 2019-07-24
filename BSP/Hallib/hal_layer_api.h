@@ -34,6 +34,12 @@ typedef union
 	float Data;
 }Hex2Float;
 
+typedef union
+{
+	uint8_t Hex[8];
+	float Data;
+}Hex2Double;
+
 /*Bit Operation Function*/
 #define hal_SetBit(data, offset)      data |= 1 << offset      //置位某位为1
 #define hal_ResetBit(data, offset)    data &= ~(1 << offset)   //复位某位为0
@@ -47,7 +53,7 @@ typedef union
 
 
 #define PRODUCT_NAMES_LEN             (32)
-
+#define PRODUCT_KEY_LEN               (64)
 uint16_t Crc16(uint8_t *bufferpoint,int16_t sum);
 void *Hal_Malloc(int size);
 void *Hal_Calloc(int count, int size);
@@ -65,7 +71,14 @@ void Hal_MutexLock(Mutex_t mutex);
 void Hal_MutexUnlock(Mutex_t mutex);
 
 int Hal_getProductName(char *proName);
-
+uint32_t Hal_getDeviceID(void);
+uint32_t Hal_getManufactureDate(void);
+uint32_t Hal_getFirmwareVersion(void);
+uint32_t Hal_getSerialNumber(void);
+uint32_t Hal_getTransmitPeriod(void);
+#ifdef AIR202
+int Hal_getProductKey(char *produckey);
+#endif
 
 
 

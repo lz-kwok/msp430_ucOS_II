@@ -276,12 +276,12 @@ char *MakeJsonBodyData(DataStruct *DataPointer)
 
 
 /*******************************************************************************
-* 函数名		: InitScadaData
+* 函数名		: ScadaData_base_Init
 * 描述	    	: 初始化采集的数据大小
 * 输入参数  	: 无
 * 返回参数  	: 无
 *******************************************************************************/
-void InitScadaData(void)
+void ScadaData_base_Init(void)
 {
 //	static uint32_t dataH = 0,dataM = 0,dataL = 0;
 

@@ -329,7 +329,7 @@ extern uint32_t sSensorCahe;
 
 void InqureSensor(void);
 char *MakeJsonBodyData(DataStruct *DataPointer);
-void InitScadaData();
+void ScadaData_base_Init();
 
 
 #endif

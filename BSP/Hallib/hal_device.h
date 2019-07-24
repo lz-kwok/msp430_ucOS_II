@@ -45,21 +45,6 @@
 #endif
 
 /*------------------------ Nothing Below This Line --------------------------*/
-// 无线模组为GPRS
-#define HAVE_GPRS_CONFIG 
-#ifdef HAVE_GPRS_CONFIG
-//这俩预定义只能选一个
-	#define SIM800C
-//	#define AIR202
-//这俩预定义只能选一个
-	#define ReportToAliOnly
-	//#define ReportTo30000IoT
-//这俩预定义只能选一个
-#endif
-// 无线模组为LoRa
-#define HAVE_LORA_CONFIG 
-// 无线模组为NB-IoT
-#define HAVE_NB_CONFIG 
 // 定义是否具备GPS功能
 #define HAVE_GPS_SERVICE
 // 定义是否具备蓝牙功能
@@ -106,13 +91,23 @@
 #define LoRa_S78S_Mode		  		0x05
 #define LoRa_OM402_Mode		  		0x06
 #define GPRS_AIR202_Mode      		0x07
-#define CommunicationIndex 			GPRS_Mode
+#define TRANSMIT_TYPE 			    NBIoT_BC95_Mode
+
+#if (TRANSMIT_TYPE == GPRS_Mode)
+	//这俩预定义只能选一个
+	#define SIM800C
+	// #define AIR202
+	//这俩预定义只能选一个
+	#define ReportToAliOnly
+	// #define ReportTo30000IoT
+#endif
+
 //*****************配件方式*********************//
 #define GPS_Mode		      		0x01     //GPS配件
 #define RS485_Mode		      		0x02     //485配件
 #define RS232_Mode		      		0x03     //232配件
 #define None_Mode	          		0xFF     //无配件
-#define AccessoryIndex              GPS_Mode
+#define ACCESSORY_TYPR              None_Mode
 
 
 

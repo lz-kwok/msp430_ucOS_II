@@ -113,7 +113,7 @@ void  BSP_Init(void)
 #endif
 
     Recive_485_Enable;
-    InitScadaData();
+    ScadaData_base_Init();
     hal_Delay_ms(100);
 }
 

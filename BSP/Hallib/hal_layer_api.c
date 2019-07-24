@@ -300,3 +300,81 @@ int Hal_getProductName(char *proName)
 	return 0;
 #endif
 }
+
+
+uint32_t Hal_getDeviceID(void)
+{
+    uint32_t temp =0;
+    temp = OSBsp.Device.InnerFlash.innerFLASHRead(0,infor_ChargeAddr);
+	temp = temp<<8;
+	temp += OSBsp.Device.InnerFlash.innerFLASHRead(1,infor_ChargeAddr);
+    APP_TRACE_INFO(("%s %d\n",__func__,temp));
+    return temp;
+}
+
+uint32_t Hal_getManufactureDate(void)
+{
+    uint32_t temp =0;
+    temp = System.Device.InnerFlash.innerFLASHRead(4,infor_ChargeAddr);
+	temp = temp*100;
+	temp += System.Device.InnerFlash.innerFLASHRead(5,infor_ChargeAddr);
+	temp = temp*100;
+	temp += System.Device.InnerFlash.innerFLASHRead(6,infor_ChargeAddr);
+    APP_TRACE_INFO(("%s %d\n",__func__,temp));
+    return temp;
+}
+
+uint32_t Hal_getFirmwareVersion(void)
+{
+    uint32_t temp =0;
+    temp = System.Device.InnerFlash.innerFLASHRead(1,infor_BootAddr);
+    APP_TRACE_INFO(("%s %d\n",__func__,temp));
+    return temp;
+}
+
+uint32_t Hal_getSerialNumber(void)
+{
+    uint32_t temp =0;
+    temp = OSBsp.Device.InnerFlash.innerFLASHRead(2,infor_ChargeAddr);
+	temp = temp<<8;
+	temp += OSBsp.Device.InnerFlash.innerFLASHRead(3,infor_ChargeAddr);
+    APP_TRACE_INFO(("%s %d\n",__func__,temp));
+    return temp;
+}
+
+uint32_t Hal_getTransmitPeriod(void)
+{
+    uint32_t temp =0;
+    temp = OSBsp.Device.InnerFlash.innerFLASHRead(11,infor_ChargeAddr);
+    if(temp>=120 && temp<=5){
+        temp = 15;           
+    }
+        
+    APP_TRACE_INFO(("%s %d\n",__func__,temp));
+    return temp;
+}
+
+#ifdef AIR202
+int Hal_getProductKey(char *produckey)
+{
+    uint32_t temp =0;
+    temp = OSBsp.Device.InnerFlash.innerFLASHRead(13,infor_ChargeAddr);
+	if(temp == 0xff){
+        APP_TRACE_INFO(("please set aliIot ProductKey first\n"));
+		return -1;
+	}
+    char midTem[PRODUCT_KEY_LEN];
+    int i = 0;
+	memset(App.Data.TerminalInfoData.ProductKey,0x0,32);
+	memset(midTem,0x0,PRODUCT_KEY_LEN);
+	for(i=0;i<temp;i++)
+		midTem[i] = OSBsp.Device.InnerFlash.innerFLASHRead(14+i,infor_ChargeAddr);
+    
+    strncpy(produckey, midTem, temp);
+    
+    return 0;
+}
+
+
+
+#endif
