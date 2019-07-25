@@ -58,6 +58,7 @@ typedef union
 #define DEVICE_SECRET_LEN             (70)
 
 uint16_t Crc16(uint8_t *bufferpoint,int16_t sum);
+char Hal_CheckString(char *dst ,char *src);
 void *Hal_Malloc(int size);
 void *Hal_Calloc(int count, int size);
 void Hal_Free(void *ptr);
@@ -87,6 +88,7 @@ int Hal_getDeviceSecret(char *devSecret);
 
 void Hal_EnterLowPower_Mode(void);
 void Hal_ExitLowPower_Mode(void);
+char Hal_getCurrent_work_Mode(void);
 
 
 #endif /* __hal_UCS */

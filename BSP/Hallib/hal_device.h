@@ -80,7 +80,7 @@
 #define Custom_Station	      		0x55	 //定制需求监测站
 
 
-#define PRODUCT_TYPE                Voc_Station
+#define PRODUCT_TYPE                Dust_Station
 
 
 //*****************通信方式*********************//
@@ -91,12 +91,12 @@
 #define LoRa_S78S_Mode		  		0x05
 #define LoRa_OM402_Mode		  		0x06
 #define GPRS_AIR202_Mode      		0x07
-#define TRANSMIT_TYPE 			    NBIoT_BC95_Mode
+#define TRANSMIT_TYPE 			    GPRS_Mode
 
 #if (TRANSMIT_TYPE == GPRS_Mode)
 	//这俩预定义只能选一个
-	#define SIM800C
-	// #define AIR202
+	//#define SIM800C
+	#define AIR202
 	//这俩预定义只能选一个
 	#define ReportToAliOnly
 	// #define ReportTo30000IoT

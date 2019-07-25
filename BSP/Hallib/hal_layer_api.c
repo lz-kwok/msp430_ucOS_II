@@ -24,6 +24,7 @@
 * Programmer(s) : GLZ
 *********************************************************************************************************
 */
+#include  <stdbool.h>
 #include  <hal_layer_api.h>
 
 /*******************************************************************************
@@ -68,8 +69,7 @@ const uint8_t CrcLowBlock[256] = {
 };
 
 typedef struct {
-    char product_name[PRODUCT_NAMES_LEN]; 
-    bool systemLowpower;
+    char systemLowpower;
 }gHal_Device_Manager;
 
 static gHal_Device_Manager gManager;
@@ -97,6 +97,14 @@ uint16_t Crc16(uint8_t *bufferpoint,int16_t sum)
     UshortToByte0(Result) = High;
 
     return(Result);
+}
+
+char Hal_CheckString(char *dst ,char *src)
+{
+    if(strstr((const char *)dst,(const char *)src) != null)
+        return 1;
+	else
+	    return 0;
 }
 
 void *Hal_Malloc(int size)
@@ -428,7 +436,7 @@ void Hal_EnterLowPower_Mode(void)
     OSBsp.Device.IOControl.PowerSet(SDCARD_Power_Off);
     OSBsp.Device.IOControl.PowerSet(GPS_Power_Off);
 
-    gManager.systemLowpower = true;
+    gManager.systemLowpower = 1;
     UCSCTL8 = 0x00;
     LED_OFF;
     __bis_SR_register(LPM0_bits + GIE);
@@ -438,7 +446,12 @@ void Hal_ExitLowPower_Mode(void)
 {
     APP_TRACE_INFO(("Exit Low Power!\r\n"));
     __bic_SR_register_on_exit(LPM0_bits);
-    gManager.systemLowpower = false;
+    gManager.systemLowpower = 0;
 
     OSBsp.Device.IOControl.PowerSet(SenSor_Power_On);
+}
+
+char Hal_getCurrent_work_Mode(void)
+{
+    return gManager.systemLowpower;
 }

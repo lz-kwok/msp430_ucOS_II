@@ -197,7 +197,6 @@ void Terminal_Para_Init(void)
 //	Send_Buffer[3] = 0x7D;
 	/************************出厂编号******************************************/
 	App.Data.TerminalInfoData.SerialNumber = Hal_getSerialNumber();
-	//--------------------//
 //	App.Data.TerminalInfoData.SerialNumber = 91005;
 	/************************生产日期******************************************/
 	App.Data.TerminalInfoData.PD = Hal_getManufactureDate();
@@ -226,51 +225,38 @@ void Terminal_Para_Init(void)
 	if(Hal_getProductKey(App.Data.TerminalInfoData.ProductKey) != 0){
 		return ;
 	}
-	System.Device.Usart2.WriteString("ProductKey: ");
-	System.Device.Usart2.WriteString(App.Data.TerminalInfoData.ProductKey);
-	System.Device.Usart2.WriteString("\r\n");
+	OSBsp.Device.Usart2.WriteString("ProductKey: ");
+	OSBsp.Device.Usart2.WriteString(App.Data.TerminalInfoData.ProductKey);
+	OSBsp.Device.Usart2.WriteString("\r\n");
 
-	temp = System.Device.InnerFlash.innerFLASHRead(32,infor_ChargeAddr);
-	if(temp == 0xff){
-		System.Device.Usart2.WriteString("please set aliIot DeviceName first\n");
-		return;
+	if(Hal_getDeviceName(App.Data.TerminalInfoData.DeviceName) != 0){
+		return ;
 	}
-	memset(App.Data.TerminalInfoData.DeviceName,0x0,32);
-	memset(midTem,0x0,64);
-	for(i=0;i<temp;i++)
-		midTem[i] = System.Device.InnerFlash.innerFLASHRead(33+i,infor_ChargeAddr);
-	memcpy(App.Data.TerminalInfoData.DeviceName,midTem,temp);
-	System.Device.Usart2.WriteString("DeviceName: ");
-	System.Device.Usart2.WriteString(App.Data.TerminalInfoData.DeviceName);
-	System.Device.Usart2.WriteString("\r\n");
+	OSBsp.Device.Usart2.WriteString("DeviceName: ");
+	OSBsp.Device.Usart2.WriteString(App.Data.TerminalInfoData.DeviceName);
+	OSBsp.Device.Usart2.WriteString("\r\n");
 
-	temp = System.Device.InnerFlash.innerFLASHRead(64,infor_ChargeAddr);
-	if(temp == 0xff){
-		System.Device.Usart2.WriteString("please set aliIot DeviceSecret first\n");
-		return;
+	if(Hal_getDeviceSecret(App.Data.TerminalInfoData.DeviceSecret) != 0){
+		return ;
 	}
-	memset(App.Data.TerminalInfoData.DeviceSecret,0x0,64);
-	memset(midTem,0x0,64);
-	for(i=0;i<temp;i++)
-		midTem[i] = System.Device.InnerFlash.innerFLASHRead(65+i,infor_ChargeAddr);
-	memcpy(App.Data.TerminalInfoData.DeviceSecret,midTem,temp);
-	System.Device.Usart2.WriteString("DeviceSecret: ");
-	System.Device.Usart2.WriteString(App.Data.TerminalInfoData.DeviceSecret);
-	System.Device.Usart2.WriteString("\r\n");
+	OSBsp.Device.Usart2.WriteString("DeviceSecret: ");
+	OSBsp.Device.Usart2.WriteString(App.Data.TerminalInfoData.DeviceSecret);
+	OSBsp.Device.Usart2.WriteString("\r\n");
+
 	HashValueSet();
-	InitUsart0(9600);        //根据所选通信方式选择初始化波特率
+	g_Device_Usart0_Init(9600);        //根据所选通信方式选择初始化波特率
 	AppDataPointer->TransMethodData.GPRSStatus = GPRS_Waitfor_SMSReady;
 	#endif
 #elif (TRANSMIT_TYPE == NBIoT_BC95_Mode)
-	Socket_3V_ON;	         			// PowerON-P4.3 //传输板上插LoRa模块时供电
+	Socket_3V_ON;	         				// PowerON-P4.3 //传输板上插LoRa模块时供电
 	hal_Delay_ms(100);			 			//wj20180511
-	ResetCommunication();    			//模块复位管脚复位
-	g_Device_Usart0_Init(9600);	     	//根据所选通信方式选择初始化波特率   NBIOT
+	ResetCommunication();    				//模块复位管脚复位
+	g_Device_Usart0_Init(9600);	     		//根据所选通信方式选择初始化波特率   NBIOT
 	Init_NB();
 #elif (TRANSMIT_TYPE == LoRa_F8L10D_Mode)
-	Socket_3V_ON;	         //LoRa  PowerON-P4.3 //传输板上插LoRa模块时供电
-	hal_Delay_ms(100);			 //wj20180511
-	ResetCommunication();    //模块复位管脚复位
+	Socket_3V_ON;	         		//LoRa  PowerON-P4.3 //传输板上插LoRa模块时供电
+	hal_Delay_ms(100);			 	//wj20180511
+	OSBsp.Device.IOControl.ResetWirelesModule();    //模块复位管脚复位
 #if LoRa_QunDeng
 	g_Device_Usart0_Init(115200);      //根据所选通信方式选择初始化波特率   LoRa
 	LoRaDevEui = System.Device.InnerFlash.innerFLASHRead(9,infor_ChargeAddr);
@@ -286,18 +272,20 @@ void Terminal_Para_Init(void)
 #elif (TRANSMIT_TYPE == LoRa_OM402_Mode)
 	Socket_3V_ON;	         //LoRa  PowerON-P4.3 //传输板上插LoRa模块时供电
 	hal_Delay_ms(100);			 //wj20180511
-	ResetCommunication();    //模块复位管脚复位
+	OSBsp.Device.IOControl.ResetWirelesModule();    //模块复位管脚复位
 	g_Device_Usart0_Init(9600);        //根据所选通信方式选择初始化波特率   LoRa
 	InitLoRa_OM402();        //初始化门思LoRa模块
 #endif
-	switch(CommunicationIndex)
-	{
-		case GPRS_AIR202_Mode:
 
-			break;
-		default:
-			break;
-	}
+#if (ACCESSORY_TYPR == None_Mode)
+	GPS_3V_OFF;
+#elif (ACCESSORY_TYPR == ELCD_Mode)
+	GPS_3V_ON;
+	g_Device_Usart1_Init(115200); 
+#elif (ACCESSORY_TYPR == GPS_Mode)
+	GPS_3V_ON;
+	g_Device_Usart1_Init(9600);
+#endif
 }
 
 

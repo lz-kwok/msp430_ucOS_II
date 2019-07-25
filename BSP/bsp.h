@@ -152,11 +152,12 @@ typedef struct
 
         struct IOControl
         {
-            void (*SensorPowerOn)(bool onoff);
-            void (*MainBoardPowerOn)(bool onoff);
+            void (*PowerSet)(ControlPower src);
+            void (*ResetWirelesModule)(void);
+
         }IOControl;
 
-        struct IOControl
+        struct RTC
         {
             void (*ReadExtTime)(void);
             void (*ConfigExtTime)(void);

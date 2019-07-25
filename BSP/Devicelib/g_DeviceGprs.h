@@ -4,11 +4,10 @@
 #include <hal_layer_api.h>
 #include <g_Platform.h>
 
+#if (TRANSMIT_TYPE == GPRS_Mode)
 
 extern uint8_t GprsInitStatus;
 extern uint8_t WirelessStatus;
-
-
 
 enum GprsStatus
 {
@@ -20,12 +19,38 @@ enum GprsStatus
 	DisConnect   = 5
 };
 
+enum GPRS_STATUS {
+	GPRS_Waitfor_SMSReady = 0,
+	GPRS_Preinit = 1,
+	GPRS_Init_Done,
+	GPRS_Mqtt_Preinit,
+	GPRS_Mqtt_Init_Done,
+	GPRS_Http_Preinit,
+	GPRS_Http_Init_Done,
+	GPRS_Waitfor_OK,
+	GPRS_Waitfor_Download,
+	GPRS_Waitfor_Token,
+	GPRS_Get_Token,
+	GPRS_Get_OK,
+	GPRS_Waitfor_Connect,
+	GPRS_Connect_OK,
+	GPRS_Waitfor_Connack,
+	GPRS_Connack_OK,
+	GPRS_Waitfor_Suback,
+	GPRS_MQTT_Alive,
+	GPRS_MQTT_Enable_Pulish,
+	GPRS_Waitfor_GetIP,
+	GPRS_Get_HTTPACT,
+};
 
 
 void g_Device_GPRS_Init(void);
-void g_Device_Establish_TCP_Connection(void);
-void g_Device_http_post(DataStruct *DataPointer);
-
-
+void g_Device_Establish_TCP_Connection(const char *ip,uint32_t port);
+int g_Device_http_post(const char *host,const char* path,const char *apikey,const char *data,
+                      char *response,int timeout);
+void g_Device_check_Response(char *res);
 
 #endif
+
+#endif
+

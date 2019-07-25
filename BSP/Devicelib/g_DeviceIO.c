@@ -83,6 +83,85 @@ static void SetMainBoardPowerOn(bool onoff)
 	}
 }
 
+static void Power(ControlPower type)
+{
+	switch(type){
+		case BaseBoard_Power_On:
+			P5OUT |= BIT1;	//打开主板上5V电压 //FP6717控制管脚使能,VBUS-->5V转换
+		break;
+		case BaseBoard_Power_Off:
+			P5OUT &=~BIT1;	//关闭主板上5V电压 //FP6717控制管脚失能,VBUS-->5V关闭
+		break;
+		case LPModule_Power_On:
+			P4OUT |= BIT3;	//打开Socket_3V3 //传输板上插LoRa，NB模块时供电
+		break;
+		case LPModule_Power_Off:
+			P4OUT &=~BIT3;	//关闭Socket_3V3 //传输板上插LoRa，NB模块时掉电
+		break;
+		case GPRS_Power_On:
+			P5OUT |= BIT0;	//打开Socket_5V //传输板上插GPRS模块时供电
+		break;
+		case GPRS_Power_Off:
+			P5OUT &=~BIT0;	//关闭Socket_5V //传输板上插GPRS模块时掉电
+		break;
+		case SDCARD_Power_On:
+			P4OUT |= BIT0;	    //打开sd卡_3V3
+		break;
+		case SDCARD_Power_Off:
+			P4OUT &=~BIT0;	    //关闭sd卡_3V3
+		break;
+		case GPS_Power_On:
+			P4OUT |= BIT1;
+		break;
+		case GPS_Power_Off:
+			P4OUT &=~BIT1;	    //关闭sd卡_3V3
+		break;
+		case SenSor_Power_On:
+			P4OUT |= BIT2;      //打开Sensor_3V3         //485芯片上电
+			P3OUT |= BIT2;	    //打开传感板上5V总电压 //传感器接口5V总电压上电
+			P6OUT |= BIT2;	    //打开传感板上12V总电压 //传感器接口12V总电压上电
+			P1OUT |= BIT4;	    //打开传感板上12V_1 //1,2传感器接口12V上电
+			P1OUT |= BIT5;	    //打开传感板上12V_2 //3,4传感器接口12V上电
+			P6OUT |= BIT6;	    //打开传感板上12V_3 //5,6传感器接口12V上电
+			P1OUT |= BIT3;	    //打开传感板上5V_1 //1,2传感器接口5V上电
+			P6OUT |= BIT4;	    //打开传感板上5V_2 //3,4传感器接口5V上电
+			P6OUT |= BIT5;	    //打开传感板上5V_3 //5,6传感器接口5V上电	  
+		break;
+		case SenSor_Power_Off:
+			P4OUT &=~BIT2;      //关闭Sensor_3V3         //485芯片掉电
+			P3OUT &=~BIT2;	 	//关闭传感板上5V总电压 //传感器接口5V总电压掉电
+			P6OUT &=~BIT2;	 	//关闭传感板上12V总电压 //传感器接口12V总电压掉电
+			P1OUT &=~BIT4; 		//关闭传感板上12V_1 //1,2传感器接口12V掉电
+			P1OUT &=~BIT5; 		//关闭传感板上12V_2 //3,4传感器接口12V掉电
+			P6OUT &=~BIT6; 		//关闭传感板上12V_3 //5,6传感器接口12V掉电
+			P1OUT &=~BIT3; 		//关闭传感板上5V_1 //1,2传感器接口5V掉电
+			P6OUT &=~BIT4; 		//关闭传感板上5V_2 //3,4传感器接口5V掉电
+			P6OUT &=~BIT5; 		//关闭传感板上5V_3 //5,6传感器接口5V掉电
+		break;
+		case Motor_Power_On:
+			P6OUT |= BIT3;	    //打开传感板上电机 //传感器接口电机上电
+		break;
+		case Motor_Power_Off:
+			P6OUT &=~BIT3;	 	//关闭传感板上电机 //传感器接口电机掉电
+		break;
+		case AIR202_Power_On:
+			P2OUT |= BIT4;	    //打开传感板上电机 //传感器接口电机上电
+		break;
+		case AIR202_Power_Off:
+			P2OUT &=~BIT4; 		//关闭传感板上电机 //传感器接口电机掉电
+		break;
+	}
+}
+
+static void ResetWirelesModule(void)
+{
+	/***********reset模块复位脚*******************/
+	P2OUT &=~BIT4;  //复位管脚  IO_0管脚，接模块的NRST管脚
+	hal_Delay_ms(100);hal_Delay_ms(100);hal_Delay_ms(100);
+	P2OUT |= BIT4;
+	hal_Delay_ms(100);hal_Delay_ms(100);hal_Delay_ms(100);
+}
+
 /*******************************************************************************
 * 函数名      	: g_DeviceIO_Init
 * 描述	  		: GPIO口初始化
@@ -115,27 +194,20 @@ void g_DeviceIO_Init(void)
 
     /*********************关掉无用的电源*******************/
 	//*******主板电源******//
-	Socket_3V_OFF;	        //关闭Socket_3V3        //传输板上插LoRa，NB模块时掉电
-	Socket_5V_OFF;      	//关闭Socket_5V         //传输板上插GPRS模块时掉电
-	SD_3V_OFF;	            //关闭sd卡_3V3
-	GPS_3V_OFF;          	//关闭GPS_3V3
+	Power(LPModule_Power_Off);	        //关闭Socket_3V3        //传输板上插LoRa，NB模块时掉电
+	Power(GPRS_Power_Off);      		//关闭Socket_5V         //传输板上插GPRS模块时掉电
+	Power(SDCARD_Power_Off);	        //关闭sd卡_3V3
+	Power(GPS_Power_Off);          		//关闭GPS_3V3
 	//******传感板电源*****//
-	SetAllSensorPowerOn(false);    //关闭所有传感器电源
-	Motor_Power_OFF;      	//关闭传感板上电机                       //传感器接口电机掉电
+	Power(SenSor_Power_Off);    		//关闭所有传感器电源
+	Power(Motor_Power_Off);      		//关闭传感板上电机                       //传感器接口电机掉电
+	Power(AIR202_Power_Off);
 	/*********************打开需要用到的电源****************/
-	//********主板电源*******//
-//	Socket_3V_ON;        	//打开Socket_3V3        //传输板上插LoRa，NB模块时供电
-//	Socket_5V_ON;        	//打开Socket_5V         //传输板上插GPRS模块时供电
-	SD_3V_ON;            	//打开sd卡_3V3
-//	GPS_3V_ON;          	//打开GPS_3V3
-	//******传感板电源*******//
-//	SenSor_3V_ON;        	//打开Sensor_3V3        //485芯片上电
-//	SetAllSensorPowerOn(true);     //打开所有传感器电源
-//	Motor_Power_ON;        	//启动传感板上电机                       //传感器接口电机上电
-	AIR202_Power_OFF;
+	Power(SDCARD_Power_On);            	//打开sd卡_3V3
+	
 
-	OSBsp.Device.IOControl.SensorPowerOn = SetAllSensorPowerOn;
-	OSBsp.Device.IOControl.MainBoardPowerOn = SetMainBoardPowerOn;
+	OSBsp.Device.IOControl.PowerSet = Power;
+	OSBsp.Device.IOControl.ResetWirelesModule = ResetWirelesModule;
 }
 
 

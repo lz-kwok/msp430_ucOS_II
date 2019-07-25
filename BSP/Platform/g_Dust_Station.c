@@ -291,5 +291,132 @@ void ScadaData_base_Init(void)
 	//只初始化要用到的数据
 }
 
+/*******************************************************************************
+* 函数名		: Terminal_Para_Init
+* 描述	    	: 根据Flash储存信息初始化终端参数
+* 输入参数  	: 无
+* 返回参数 		: 无
+*******************************************************************************/
+void Terminal_Para_Init(void)
+{
+	int i = 0;
+	Hex2Double TransferData;
+	/************************地理信息******************************************/
+	for(i=0;i<8;i++){
+		TransferData.Hex[i] = OSBsp.Device.InnerFlash.innerFLASHRead(i+100,infor_ChargeAddr);
+	}
+	App.Data.TerminalInfoData.Longitude = TransferData.Data;
+	for(i=0;i<8;i++){
+		TransferData.Hex[i] = OSBsp.Device.InnerFlash.innerFLASHRead(i+108,infor_ChargeAddr);
+	}
+	App.Data.TerminalInfoData.Latitude = TransferData.Data;
+	for(i=0;i<8;i++){
+		TransferData.Hex[i] = OSBsp.Device.InnerFlash.innerFLASHRead(i+116,infor_ChargeAddr);
+	}
+	App.Data.TerminalInfoData.Altitude = TransferData.Data;
+
+
+	/************************DeviceID******************************************/
+	App.Data.TerminalInfoData.DeviceID = Hal_getDeviceID();
+	Send_Buffer[2] = App.Data.TerminalInfoData.DeviceID/256;
+	Send_Buffer[3] = App.Data.TerminalInfoData.DeviceID%256;
+	//---------------------//
+//	App.Data.TerminalInfoData.DeviceID = 91005;
+//	Send_Buffer[1] = 0x01;
+//	Send_Buffer[2] = 0x63;
+//	Send_Buffer[3] = 0x7D;
+	/************************出厂编号******************************************/
+	App.Data.TerminalInfoData.SerialNumber = Hal_getSerialNumber();
+//	App.Data.TerminalInfoData.SerialNumber = 91005;
+	/************************生产日期******************************************/
+	App.Data.TerminalInfoData.PD = Hal_getManufactureDate();
+	/************************Version******************************************/
+	App.Data.TerminalInfoData.Version = Hal_getFirmwareVersion();       //软件版本
+	/************************SendPeriod******************************************/
+	App.Data.TerminalInfoData.SendPeriod = Hal_getTransmitPeriod();		//发送周期
+	/************************TerminalIndex 终端类型******************************************/
+	App.Data.TerminalInfoData.DeviceType = PRODUCT_TYPE;
+
+#if (TRANSMIT_TYPE == GPRS_Mode)
+	#ifdef SIM800C
+	// Socket_5V_ON;            //GPRS  PowerON-P5.0 //传输板上插GPRS模块时供电
+	// delay_sec(5); 			 //wj20180511  为了稳定5V电源一段时间
+	// ResetCommunication();    //模块复位管脚复位,对于GPRS模块电压需要达到5V,单片输出管脚电压只有3.3V
+	g_Device_Usart0_Init(9600);	     //根据所选通信方式选择初始化波特率  GPRS
+	// InitSim800C();           //初始化GPRS
+	#endif
+	#ifdef AIR202
+	// Socket_5V_ON;            //GPRS  PowerON-P5.0 //传输板上插GPRS模块时供电
+	// Socket_3V_ON;
+	// delay_sec(2);
+	// AIR202_Power_ON;
+	// delay_sec(2);
+	// AIR202_Power_OFF;
+	if(Hal_getProductKey(App.Data.TerminalInfoData.ProductKey) != 0){
+		return ;
+	}
+	OSBsp.Device.Usart2.WriteString("ProductKey: ");
+	OSBsp.Device.Usart2.WriteString(App.Data.TerminalInfoData.ProductKey);
+	OSBsp.Device.Usart2.WriteString("\r\n");
+
+	if(Hal_getDeviceName(App.Data.TerminalInfoData.DeviceName) != 0){
+		return ;
+	}
+	OSBsp.Device.Usart2.WriteString("DeviceName: ");
+	OSBsp.Device.Usart2.WriteString(App.Data.TerminalInfoData.DeviceName);
+	OSBsp.Device.Usart2.WriteString("\r\n");
+
+	if(Hal_getDeviceSecret(App.Data.TerminalInfoData.DeviceSecret) != 0){
+		return ;
+	}
+	OSBsp.Device.Usart2.WriteString("DeviceSecret: ");
+	OSBsp.Device.Usart2.WriteString(App.Data.TerminalInfoData.DeviceSecret);
+	OSBsp.Device.Usart2.WriteString("\r\n");
+
+	HashValueSet();
+	g_Device_Usart0_Init(9600);        //根据所选通信方式选择初始化波特率
+	AppDataPointer->TransMethodData.GPRSStatus = GPRS_Waitfor_SMSReady;
+	#endif
+#elif (TRANSMIT_TYPE == NBIoT_BC95_Mode)
+	Socket_3V_ON;	         			// PowerON-P4.3 //传输板上插LoRa模块时供电
+	hal_Delay_ms(100);			 			//wj20180511
+	ResetCommunication();    			//模块复位管脚复位
+	g_Device_Usart0_Init(9600);	     	//根据所选通信方式选择初始化波特率   NBIOT
+	Init_NB();
+#elif (TRANSMIT_TYPE == LoRa_F8L10D_Mode)
+	Socket_3V_ON;	         //LoRa  PowerON-P4.3 //传输板上插LoRa模块时供电
+	hal_Delay_ms(100);			 //wj20180511
+	OSBsp.Device.IOControl.ResetWirelesModule();    //模块复位管脚复位
+#if LoRa_QunDeng
+	g_Device_Usart0_Init(115200);      //根据所选通信方式选择初始化波特率   LoRa
+	LoRaDevEui = System.Device.InnerFlash.innerFLASHRead(9,infor_ChargeAddr);
+	LoRaDevEui=LoRaDevEui<<8;
+	LoRaDevEui += System.Device.InnerFlash.innerFLASHRead(10,infor_ChargeAddr);
+	LoRa_Deveui[27]= LoRaDevEui/1000 + 0x30;
+	LoRa_Deveui[28]= LoRaDevEui%1000/100 + 0x30;
+	LoRa_Deveui[29]= LoRaDevEui%100/10 + 0x30;
+	LoRa_Deveui[30]= LoRaDevEui%10 + 0x30;
+#endif
+	g_Device_Usart0_Init(115200);      //根据所选通信方式选择初始化波特率   LoRa
+	InitLoRa_F8L10D();        //初始化LoRa
+#elif (TRANSMIT_TYPE == LoRa_OM402_Mode)
+	Socket_3V_ON;	         //LoRa  PowerON-P4.3 //传输板上插LoRa模块时供电
+	hal_Delay_ms(100);			 //wj20180511
+	OSBsp.Device.IOControl.ResetWirelesModule();    //模块复位管脚复位
+	g_Device_Usart0_Init(9600);        //根据所选通信方式选择初始化波特率   LoRa
+	InitLoRa_OM402();        //初始化门思LoRa模块
+#endif
+
+#if (ACCESSORY_TYPR == None_Mode)
+	GPS_3V_OFF;
+#elif (ACCESSORY_TYPR == ELCD_Mode)
+	GPS_3V_ON;
+	g_Device_Usart1_Init(115200); 
+#elif (ACCESSORY_TYPR == GPS_Mode)
+	GPS_3V_ON;
+	g_Device_Usart1_Init(9600);
+#endif
+}
+
 #endif //(PRODUCT_TYPE == Dust_Station)
 
