@@ -17,7 +17,7 @@ extern uint8_t Uart_2_Flag;
 #define cRxLength 100		//UART2 buff length
 #define dRxLength 50		//UART3 buff length
 
-extern uint8_t aRxBuff[];
+extern char aRxBuff[];
 extern uint8_t aRxNum;
 extern uint8_t bRxBuff[];
 extern uint8_t bRxNum;

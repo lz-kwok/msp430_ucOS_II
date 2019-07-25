@@ -67,6 +67,8 @@ static void AnalyzeComand(uint8_t *data,uint8_t Len)
 {
 	if(Len != 0)
 	{
+		uint16_t CalcuResult = 0;
+		uint8_t CRC_Result[2];
 		hal_Delay_ms(50);
 
 		CalcuResult = Crc16(data,Len-2);
@@ -81,14 +83,14 @@ static void AnalyzeComand(uint8_t *data,uint8_t Len)
 					case 0x01:		//Wind_Speed
 						SensorCahe = (uint32_t)data[3]*256 + data[4];
 						AppDataPointer->DustData.WindSpeed = (float)SensorCahe/10;
-						SetBit(SensorStatus_L, 7);   //传感器状态位置1
+						hal_SetBit(SensorStatus_L, 7);   //传感器状态位置1
 						Send_Buffer[11] = SensorCahe / 256;
 						Send_Buffer[12] = SensorCahe % 256;
 						break;
 					case 0x02:		//Wind_Direction
 						SensorCahe = (uint32_t)data[5]*256 + data[6];
 						AppDataPointer->DustData.WindDirection = SensorCahe;
-						SetBit(SensorStatus_L, 6);   //传感器状态位置1
+						hal_SetBit(SensorStatus_L, 6);   //传感器状态位置1
 						Send_Buffer[13] = SensorCahe / 256;
 						Send_Buffer[14] = SensorCahe % 256;
 						break;
@@ -96,7 +98,7 @@ static void AnalyzeComand(uint8_t *data,uint8_t Len)
 						/**************湿度**************/
 						SensorCahe = (uint32_t)data[3]*256 + data[4];
 						AppDataPointer->DustData.Humidity = (float)SensorCahe/10;
-						SetBit(SensorStatus_H, 0);   //传感器状态位置1
+						hal_SetBit(SensorStatus_H, 0);   //传感器状态位置1
 						Send_Buffer[9] = SensorCahe / 256;
 						Send_Buffer[10] = SensorCahe % 256;
 						/**************温度**************/
@@ -111,14 +113,14 @@ static void AnalyzeComand(uint8_t *data,uint8_t Len)
 							sSensorCahe = (uint32_t)data[5]*256 + data[6];
 							AppDataPointer->DustData.Temperature = (float)sSensorCahe/10;
 						}
-						SetBit(SensorStatus_H, 1);   //传感器状态位置1
+						hal_SetBit(SensorStatus_H, 1);   //传感器状态位置1
 						Send_Buffer[7] = sSensorCahe / 256;
 						Send_Buffer[8] = sSensorCahe % 256;
 						break;
 					case 0x04:      //噪音
 						SensorCahe = (uint32_t)data[3]*256 + data[4];
 						AppDataPointer->DustData.Noise = (float)SensorCahe/10;
-						SetBit(SensorStatus_L, 3);   //传感器状态位置1
+						hal_SetBit(SensorStatus_L, 3);   //传感器状态位置1
 						Send_Buffer[19] = SensorCahe / 256;
 						Send_Buffer[20] = SensorCahe % 256;
 						break;
@@ -126,13 +128,13 @@ static void AnalyzeComand(uint8_t *data,uint8_t Len)
 						/**************PM10**************/
 						SensorCahe = (uint32_t)data[3]*256 + data[4];
 						AppDataPointer->DustData.PM10 = SensorCahe;
-						SetBit(SensorStatus_L, 4);   //传感器状态位置1
+						hal_SetBit(SensorStatus_L, 4);   //传感器状态位置1
 						Send_Buffer[17] = SensorCahe / 256;
 						Send_Buffer[18] = SensorCahe % 256;
 						/**************PM2.5**************/
 						sSensorCahe = (uint32_t)data[5]*256 + data[6];
 						AppDataPointer->DustData.PM25 = sSensorCahe;
-						SetBit(SensorStatus_L, 5);   //传感器状态位置1
+						hal_SetBit(SensorStatus_L, 5);   //传感器状态位置1
 						Send_Buffer[15] = sSensorCahe / 256;
 						Send_Buffer[16] = sSensorCahe % 256;
 						break;
@@ -227,25 +229,25 @@ char *MakeJsonBodyData(DataStruct *DataPointer)
       return NULL;
     }
 
-	if(GetBit(SensorStatus_H, 1)) {
+	if(hal_GetBit(SensorStatus_H, 1)) {
 		cJSON_AddNumberToObject(pSubJson, "温度",DataPointer->DustData.Temperature);
 	}
-	if(GetBit(SensorStatus_H, 0)) {
+	if(hal_GetBit(SensorStatus_H, 0)) {
 		cJSON_AddNumberToObject(pSubJson, "湿度",DataPointer->DustData.Humidity);
 	}
-	if(GetBit(SensorStatus_L, 7)) {
+	if(hal_GetBit(SensorStatus_L, 7)) {
 		cJSON_AddNumberToObject(pSubJson, "风速",DataPointer->DustData.WindSpeed);
 	}
-	if(GetBit(SensorStatus_L, 6)) {
+	if(hal_GetBit(SensorStatus_L, 6)) {
 		cJSON_AddNumberToObject(pSubJson, "风向",DataPointer->DustData.WindDirection);
 	}
-	if(GetBit(SensorStatus_L, 5)) {
+	if(hal_GetBit(SensorStatus_L, 5)) {
 		cJSON_AddNumberToObject(pSubJson, "PM2.5",DataPointer->DustData.PM25);
 	}
-	if(GetBit(SensorStatus_L, 4)) {
+	if(hal_GetBit(SensorStatus_L, 4)) {
 		cJSON_AddNumberToObject(pSubJson, "PM10",DataPointer->DustData.PM10);
 	}
-	if(GetBit(SensorStatus_L, 3)) {
+	if(hal_GetBit(SensorStatus_L, 3)) {
 		cJSON_AddNumberToObject(pSubJson, "噪音",DataPointer->DustData.Noise);
 	}
 	cJSON_AddItemToObject(pJsonRoot, "DustData", pSubJson);
@@ -373,7 +375,7 @@ void Terminal_Para_Init(void)
 	OSBsp.Device.Usart2.WriteString(App.Data.TerminalInfoData.DeviceSecret);
 	OSBsp.Device.Usart2.WriteString("\r\n");
 
-	HashValueSet();
+	// HashValueSet();
 	g_Device_Usart0_Init(9600);        //根据所选通信方式选择初始化波特率
 	AppDataPointer->TransMethodData.GPRSStatus = GPRS_Waitfor_SMSReady;
 	#endif
@@ -400,7 +402,7 @@ void Terminal_Para_Init(void)
 	g_Device_Usart0_Init(115200);      //根据所选通信方式选择初始化波特率   LoRa
 	InitLoRa_F8L10D();        //初始化LoRa
 #elif (TRANSMIT_TYPE == LoRa_OM402_Mode)
-	Socket_3V_ON;	         //LoRa  PowerON-P4.3 //传输板上插LoRa模块时供电
+	OSBsp.Device.IOControl.PowerSet(LPModule_Power_On);;	         //LoRa  PowerON-P4.3 //传输板上插LoRa模块时供电
 	hal_Delay_ms(100);			 //wj20180511
 	OSBsp.Device.IOControl.ResetWirelesModule();    //模块复位管脚复位
 	g_Device_Usart0_Init(9600);        //根据所选通信方式选择初始化波特率   LoRa
@@ -408,12 +410,12 @@ void Terminal_Para_Init(void)
 #endif
 
 #if (ACCESSORY_TYPR == None_Mode)
-	GPS_3V_OFF;
+	OSBsp.Device.IOControl.PowerSet(GPS_Power_Off);
 #elif (ACCESSORY_TYPR == ELCD_Mode)
-	GPS_3V_ON;
+	OSBsp.Device.IOControl.PowerSet(GPS_Power_On);
 	g_Device_Usart1_Init(115200); 
 #elif (ACCESSORY_TYPR == GPS_Mode)
-	GPS_3V_ON;
+	OSBsp.Device.IOControl.PowerSet(GPS_Power_On);
 	g_Device_Usart1_Init(9600);
 #endif
 }

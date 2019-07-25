@@ -45,7 +45,7 @@ uint8_t Uart_1_Flag=0;		//涓插彛鎺ュ彈瀹岋紝鍦ㄦ帴鍙椾腑鏂細
 uint8_t Uart_2_Flag=0;		//涓插彛鎺ュ彈瀹岋紝鍦ㄦ帴鍙椾腑鏂細缃�锛屾帴鍙楀畬1s鍚庡畾鏃跺唴缃�
 
 
-uint8_t aRxBuff[aRxLength];		//UART0 receive data buff
+char aRxBuff[aRxLength];		//UART0 receive data buff
 uint8_t aRxNum=0;		        //UART0 receive data num
 
 uint8_t bRxBuff[bRxLength];		//UART1 receive data buff
@@ -416,47 +416,40 @@ __interrupt void USCI_A1_ISR(void)
 	        __bic_SR_register_on_exit(LPM0_bits);	//閫�嚭浣庡姛鑰�
 			while(!(UCA1IFG&UCTXIFG));            // USCI_A1 TX buffer ready?
 			{
-			    switch(AccessoryIndex)   //閰嶄欢绫诲瀷
-			    {
-			    	case GPS_Mode:
-						// TA1R=0;
-						// GPSRxBuff = UCA1RXBUF;
-						// if(GPSRxBuff == '$')
-						// {
-						// 	bRxNum = 0;
-						// }
-						// bRxBuff[bRxNum++] = GPSRxBuff;
-						// if( (bRxBuff[0] == '$')&&(bRxBuff[3] == 'G')&&(bRxBuff[4] == 'L')&&(bRxBuff[5] == 'L') )
-						// {
-						// 	if(GPSRxBuff == '\n')
-						// 	{
-						// 		//淇濆瓨鏁版嵁
-						// 		for(GPSRxNum=0;GPSRxNum<bRxNum;GPSRxNum++)
-						// 		{
-						// 			GPSLngLat_data[GPSRxNum] = bRxBuff[GPSRxNum];
-						// 		}
-						// 		//
-						// 		bRxNum = 0;
-						// 		Uart_1_Flag=1;
-						// 	}
-						// }
-						break;
-			    	case RS485_Mode:
-			    	case RS232_Mode:
-						// TA1R=0;
-						// Uart_1_Flag=1;		//涓插彛鎺ュ彈瀹屾爣蹇楃疆0锛屾帴鍙楀畬1s鍚庡畾鏃跺唴缃�
-						// if(bRxNum<bRxLength)
-						// {
-						//   bRxBuff[bRxNum++] = UCA1RXBUF;
-						// }
-						// else
-						// {
-						//   bRxNum=0;
-						// }
-						break;
-					default:
-						break;
-			    }
+#if (ACCESSORY_TYPR == GPS_Mode)
+				// TA1R=0;
+				// GPSRxBuff = UCA1RXBUF;
+				// if(GPSRxBuff == '$')
+				// {
+				// 	bRxNum = 0;
+				// }
+				// bRxBuff[bRxNum++] = GPSRxBuff;
+				// if( (bRxBuff[0] == '$')&&(bRxBuff[3] == 'G')&&(bRxBuff[4] == 'L')&&(bRxBuff[5] == 'L') )
+				// {
+				// 	if(GPSRxBuff == '\n')
+				// 	{
+				// 		//淇濆瓨鏁版嵁
+				// 		for(GPSRxNum=0;GPSRxNum<bRxNum;GPSRxNum++)
+				// 		{
+				// 			GPSLngLat_data[GPSRxNum] = bRxBuff[GPSRxNum];
+				// 		}
+				// 		//
+				// 		bRxNum = 0;
+				// 		Uart_1_Flag=1;
+				// 	}
+				// }
+#elif ((ACCESSORY_TYPR == RS485_Mode)||(ACCESSORY_TYPR == RS232_Mode))
+				// TA1R=0;
+				// Uart_1_Flag=1;		
+				// if(bRxNum<bRxLength)
+				// {
+				//   bRxBuff[bRxNum++] = UCA1RXBUF;
+				// }
+				// else
+				// {
+				//   bRxNum=0;
+				// }
+#endif
 			}
 			break;
 		case 4:break;                            // Vector 4 - TXIFG

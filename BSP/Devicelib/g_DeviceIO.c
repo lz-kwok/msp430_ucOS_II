@@ -70,18 +70,6 @@ static void SetAllSensorPowerOn(bool onoff)
 	}
 }
 
-static void SetMainBoardPowerOn(bool onoff)
-{
-	if(onoff == true){
-		Socket_5V_ON;      		//关闭Socket_5V         //传输板上插GPRS模块时掉电
-		Socket_3V_ON;	        //关闭Socket_3V3        //传输板上插LoRa，NB模块时掉电
-		SD_3V_ON;	            //关闭sd卡_3V3
-	}else{
-		Socket_3V_ON;        	//打开Socket_3V3        //传输板上插LoRa，NB模块时供电
-		Socket_5V_ON;        	//打开Socket_5V         //传输板上插GPRS模块时供电
-		SD_3V_ON;            	//打开sd卡_3V3
-	}
-}
 
 static void Power(ControlPower type)
 {

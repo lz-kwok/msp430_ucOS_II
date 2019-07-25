@@ -325,11 +325,11 @@ uint32_t Hal_getDeviceID(void)
 uint32_t Hal_getManufactureDate(void)
 {
     uint32_t temp =0;
-    temp = System.Device.InnerFlash.innerFLASHRead(4,infor_ChargeAddr);
+    temp = OSBsp.Device.InnerFlash.innerFLASHRead(4,infor_ChargeAddr);
 	temp = temp*100;
-	temp += System.Device.InnerFlash.innerFLASHRead(5,infor_ChargeAddr);
+	temp += OSBsp.Device.InnerFlash.innerFLASHRead(5,infor_ChargeAddr);
 	temp = temp*100;
-	temp += System.Device.InnerFlash.innerFLASHRead(6,infor_ChargeAddr);
+	temp += OSBsp.Device.InnerFlash.innerFLASHRead(6,infor_ChargeAddr);
     APP_TRACE_INFO(("%s %d\n",__func__,temp));
     return temp;
 }
@@ -337,7 +337,7 @@ uint32_t Hal_getManufactureDate(void)
 uint32_t Hal_getFirmwareVersion(void)
 {
     uint32_t temp =0;
-    temp = System.Device.InnerFlash.innerFLASHRead(1,infor_BootAddr);
+    temp = OSBsp.Device.InnerFlash.innerFLASHRead(1,infor_BootAddr);
     APP_TRACE_INFO(("%s %d\n",__func__,temp));
     return temp;
 }
@@ -418,7 +418,7 @@ int Hal_getDeviceSecret(char *devSecret)
 	memset(devSecret,0x0,sizeof(devSecret));
 	memset(midTem,0x0,DEVICE_SECRET_LEN);
 	for(i=0;i<SecretLen;i++)
-		midTem[i] = System.Device.InnerFlash.innerFLASHRead(65+i,infor_ChargeAddr);
+		midTem[i] = OSBsp.Device.InnerFlash.innerFLASHRead(65+i,infor_ChargeAddr);
     
     strncpy(devSecret, midTem, SecretLen);
     
@@ -445,7 +445,7 @@ void Hal_EnterLowPower_Mode(void)
 void Hal_ExitLowPower_Mode(void)
 {
     APP_TRACE_INFO(("Exit Low Power!\r\n"));
-    __bic_SR_register_on_exit(LPM0_bits);
+//    __bic_SR_register_on_exit(LPM0_bits);
     gManager.systemLowpower = 0;
 
     OSBsp.Device.IOControl.PowerSet(SenSor_Power_On);

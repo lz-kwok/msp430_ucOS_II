@@ -66,6 +66,7 @@
 #include <g_DeviceSpi.h>
 #include <g_DeviceSD.h>
 #include <g_DeviceSDMMC.h>
+#include <g_DeviceFlash.h>
 #include <g_DeviceGprs.h>
 #include <g_DevicePrintf.h>
 

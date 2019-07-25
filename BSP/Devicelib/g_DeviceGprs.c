@@ -161,7 +161,7 @@ int g_Device_http_post(const char *host,const char* path,const char *apikey,cons
 #endif
 
 #ifdef AIR202
-	static char postTick = 0;  
+	static char PostTick = 0;  
 	uint32_t datalen = 0;
 
 	if(PostTick == 0){      //设置Http会话参数
@@ -201,7 +201,7 @@ int g_Device_http_post(const char *host,const char* path,const char *apikey,cons
 			hal_Delay_sec(2);
 		}else{
 			PostTick = 0;
-			HttpStart = 0;
+			// HttpStart = 0;
 			AppDataPointer->TransMethodData.GPRSATStatus = GPRS_Waitfor_OK;
 			AppDataPointer->TransMethodData.GPRSStatus = GPRS_Init_Done;
 		}
@@ -223,7 +223,7 @@ void g_Device_check_Response(char *res)
 		// App.Data.GprsSendStatus = 1;
 		OSBsp.Device.Usart2.WriteString("Send OK\r\n");
 	} else if(Hal_CheckString(response,"CLOSED")){
-		System.Device.Usart2.WriteString("Web Closed\r\n");
+		OSBsp.Device.Usart2.WriteString("Web Closed\r\n");
 		// AllowSend=0;
 		// GPRSReset;
 		// Ctr_GPRS_OFF;  //鍏抽棴GPRS
@@ -263,11 +263,11 @@ void g_Device_check_Response(char *res)
 		{
 			if (Hal_CheckString(response,"0"))
 			{
-				System.Device.Usart2.WriteString("Attached Faild!\r\n");
+				OSBsp.Device.Usart2.WriteString("Attached Faild!\r\n");
 				AppDataPointer->TransMethodData.GPRSAttached = 0;
 			}else
 			{
-				System.Device.Usart2.WriteString("Attached OK!\r\n");
+				OSBsp.Device.Usart2.WriteString("Attached OK!\r\n");
 				AppDataPointer->TransMethodData.GPRSAttached = 1;
 			}
 		}
@@ -278,12 +278,12 @@ void g_Device_check_Response(char *res)
 			AppDataPointer->TransMethodData.GPRSATStatus = GPRS_Waitfor_Token;
 			memset(response,0x0,256);
 		}else if(Hal_CheckString(response,"iotToken")){
-			memcpy(iotTokenBuf,response,strlen(response));
+			// memcpy(iotTokenBuf,response,strlen(response));
 			AppDataPointer->TransMethodData.GPRSATStatus = GPRS_Get_OK;
 		}
 	}
 	else if((AppDataPointer->TransMethodData.GPRSStatus == GPRS_Mqtt_Preinit)
-	||(AppDataPointer->TransMethodData.GPRSStatus == GPRS_Hqtt_Preinit)||(AppDataPointer->TransMethodData.GPRSStatus == GPRS_Hqtt_Init_Done)){
+	||(AppDataPointer->TransMethodData.GPRSStatus == GPRS_Http_Preinit)||(AppDataPointer->TransMethodData.GPRSStatus == GPRS_Http_Init_Done)){
 		if(Hal_CheckString(response,"CONNECT OK")){
 			AppDataPointer->TransMethodData.GPRSATStatus = GPRS_Connect_OK;
 		}else if(Hal_CheckString(response,"CONNACK OK")){
@@ -311,8 +311,8 @@ void g_Device_check_Response(char *res)
 		if(Hal_CheckString(response,"PUBACK")){
 			AppDataPointer->TransMethodData.GPRSATStatus = GPRS_MQTT_Enable_Pulish;
 		}else if(Hal_CheckString(response,"+MSUB: ")){
-			memset(mqttbuf,0x0,512);
-			memcpy(mqttbuf,response,strlen(response));
+			// memset(mqttbuf,0x0,512);
+			// memcpy(mqttbuf,response,strlen(response));
 		}
 	}
 #endif

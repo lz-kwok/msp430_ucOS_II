@@ -38,13 +38,13 @@ typedef struct
 
 	uint16_t SensorStatus;              //传感器状态
 
-	unsigned char ProductKey[32];
-	unsigned char DeviceName[32];
-	unsigned char DeviceSecret[64];
-	unsigned hmacmd5Val[64];
-	unsigned hmacsha1[64];
-	unsigned AliiotToken[64];
-	unsigned AliiotID[64];
+	char ProductKey[32];
+	char DeviceName[32];
+	char DeviceSecret[64];
+	unsigned char hmacmd5Val[64];
+	unsigned char hmacsha1[64];
+	unsigned char AliiotToken[64];
+	unsigned char AliiotID[64];
 }TerminalPlatform;
 
 typedef struct
