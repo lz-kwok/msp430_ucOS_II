@@ -50,7 +50,7 @@
 */
 
 static OS_STK ScadaTaskStartStk[DEFAULT_TASK_STK_SIZE];
-
+static OS_STK TransmitTaskStartStk[TRANSMIT_TASK_STK_SIZE];
 
 /*
 *********************************************************************************************************
@@ -58,7 +58,7 @@ static OS_STK ScadaTaskStartStk[DEFAULT_TASK_STK_SIZE];
 *********************************************************************************************************
 */
 static  void  ScadaTaskStart(void *p_arg);
-
+static  void  TransmitTaskStart (void *p_arg);
 
 /*
 *********************************************************************************************************
@@ -84,35 +84,43 @@ void  main (void)
                     &ScadaTaskStartStk[DEFAULT_TASK_STK_SIZE-1u],
                     SCADA_TASK_TASK_PRIO);
 
+    Hal_ThreadCreate(TransmitTaskStart,
+                    (void *)"TransmitTaskStart",
+                    &TransmitTaskStartStk[TRANSMIT_TASK_STK_SIZE-1u],
+                    TRANSMIT_TASK_TASK_PRIO);
+
     OSStart();                               /* Start multitasking (i.e. give control to uC/OS-II)   */
 }
 
 
-/*
-*********************************************************************************************************
-*                                               AppTaskStart()
-*
-* Description : This is an example of a startup task.  As mentioned in the book's text, you MUST
-*               initialize the ticker only once multitasking has started.
-*
-* Arguments   : p_arg   is the argument passed to 'AppStartTask()' by 'OSTaskCreate()'.
-*
-* Note(s)     : 1) The first line of code is used to prevent a compiler warning because 'p_arg' is not
-*                  used.  The compiler should not generate any code for this statement.
-*               2) Interrupts are enabled once the task start because the I-bit of the CCR register was
-*                  set to 0 by 'OSTaskCreate()'.
-*********************************************************************************************************
-*/
 
 static  void  ScadaTaskStart (void *p_arg)
 {
     (void)p_arg;                   
-
-    while (DEF_TRUE) {                                          /* Task body, always written as an infinite loop.       */
-        APP_TRACE_INFO(("Hello, world!\n"));
-        OSTimeDlyHMSM(0u, 0u, 1u, 0u);
+    Terminal_Para_Init();
+    while (DEF_TRUE) {               /* Task body, always written as an infinite loop.       */
+        if(Hal_getCurrent_work_Mode() == 0){
+            OSTimeDlyHMSM(0u, 0u, 1u, 0u);  
+            APP_TRACE_INFO(("%s ... ...\n",__func__));
+            InqureSensor();
+        }
     }
 }
 
-
+static  void  TransmitTaskStart (void *p_arg)
+{
+    (void)p_arg;                   
+    Terminal_Para_Init();
+    while (DEF_TRUE) {               /* Task body, always written as an infinite loop.       */
+        if(Hal_getCurrent_work_Mode() == 0){
+            OSTimeDlyHMSM(0u, 0u, 1u, 0u);  
+            APP_TRACE_INFO(("%s ... ...\n",__func__));
+            if(AppDataPointer->TransMethodData.GPRSStatus == GPRS_Http_Preinit){
+                g_Device_GPRS_Init();
+            }else if(AppDataPointer->TransMethodData.GPRSStatus == GPRS_Http_Init_Done){
+            
+            }
+        }
+    }
+}
 
