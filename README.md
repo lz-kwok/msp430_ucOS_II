@@ -44,3 +44,8 @@ Obtain the right to use semaphores
 ### 2.0. Mutex_t Hal_MutexUnlock(Mutex_t mutex) ###
 Release semaphore usage rights
 
+### 2.1. void Hal_EnterLowPower_Mode(void) ###
+Enter Low Power Mode
+
+### 2.2. void Hal_ExitLowPower_Mode(void) ###
+Exit Low Power Mode
