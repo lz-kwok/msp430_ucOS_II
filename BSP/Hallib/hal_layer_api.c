@@ -69,8 +69,10 @@ const uint8_t CrcLowBlock[256] = {
 
 typedef struct {
     char product_name[PRODUCT_NAMES_LEN]; 
+    bool systemLowpower;
 }gHal_Device_Manager;
 
+static gHal_Device_Manager gManager;
 
 /*******************************************************************************
 * Function Name  : Crc16(uint8_t *bufferpoint,int16_t sum)
@@ -357,24 +359,86 @@ uint32_t Hal_getTransmitPeriod(void)
 #ifdef AIR202
 int Hal_getProductKey(char *produckey)
 {
-    uint32_t temp =0;
-    temp = OSBsp.Device.InnerFlash.innerFLASHRead(13,infor_ChargeAddr);
-	if(temp == 0xff){
+    uint32_t keyLen =0;
+    keyLen = OSBsp.Device.InnerFlash.innerFLASHRead(13,infor_ChargeAddr);
+	if(keyLen == 0xff){
         APP_TRACE_INFO(("please set aliIot ProductKey first\n"));
 		return -1;
 	}
     char midTem[PRODUCT_KEY_LEN];
     int i = 0;
-	memset(App.Data.TerminalInfoData.ProductKey,0x0,32);
+	memset(produckey,0x0,sizeof(produckey));
 	memset(midTem,0x0,PRODUCT_KEY_LEN);
-	for(i=0;i<temp;i++)
+	for(i=0;i<keyLen;i++)
 		midTem[i] = OSBsp.Device.InnerFlash.innerFLASHRead(14+i,infor_ChargeAddr);
     
-    strncpy(produckey, midTem, temp);
+    strncpy(produckey, midTem, keyLen);
     
     return 0;
 }
 
+int Hal_getDeviceName(char *devName)
+{
+    uint32_t nameLen =0;
+    nameLen = OSBsp.Device.InnerFlash.innerFLASHRead(32,infor_ChargeAddr);
+	if(nameLen == 0xff){
+        APP_TRACE_INFO(("please set aliIot DeviceName first\n"));
+		return -1;
+	}
+    char midTem[DEVICE_NAME_LEN];
+    int i = 0;
+	memset(devName,0x0,sizeof(devName));
+	memset(midTem,0x0,DEVICE_NAME_LEN);
+	for(i=0;i<nameLen;i++)
+		midTem[i] = OSBsp.Device.InnerFlash.innerFLASHRead(33+i,infor_ChargeAddr);
+    
+    strncpy(devName, midTem, nameLen);
+    
+    return 0;
+}
 
+int Hal_getDeviceSecret(char *devSecret)
+{
+    uint32_t SecretLen =0;
+    SecretLen = OSBsp.Device.InnerFlash.innerFLASHRead(64,infor_ChargeAddr);
+	if(SecretLen == 0xff){
+        APP_TRACE_INFO(("please set aliIot DeviceSecret first\n"));
+		return -1;
+	}
+    char midTem[DEVICE_SECRET_LEN];
+    int i = 0;
+	memset(devSecret,0x0,sizeof(devSecret));
+	memset(midTem,0x0,DEVICE_SECRET_LEN);
+	for(i=0;i<SecretLen;i++)
+		midTem[i] = System.Device.InnerFlash.innerFLASHRead(65+i,infor_ChargeAddr);
+    
+    strncpy(devSecret, midTem, SecretLen);
+    
+    return 0;
+}
 
 #endif
+
+void Hal_EnterLowPower_Mode(void)
+{
+    APP_TRACE_INFO(("Enter Low Power!\r\n"));
+    hal_Delay_ms(100);
+    OSBsp.Device.IOControl.PowerSet(LPModule_Power_Off);
+    OSBsp.Device.IOControl.PowerSet(GPRS_Power_Off);
+    OSBsp.Device.IOControl.PowerSet(SDCARD_Power_Off);
+    OSBsp.Device.IOControl.PowerSet(GPS_Power_Off);
+
+    gManager.systemLowpower = true;
+    UCSCTL8 = 0x00;
+    LED_OFF;
+    __bis_SR_register(LPM0_bits + GIE);
+}
+
+void Hal_ExitLowPower_Mode(void)
+{
+    APP_TRACE_INFO(("Exit Low Power!\r\n"));
+    __bic_SR_register_on_exit(LPM0_bits);
+    gManager.systemLowpower = false;
+
+    OSBsp.Device.IOControl.PowerSet(SenSor_Power_On);
+}

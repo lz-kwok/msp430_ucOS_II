@@ -54,6 +54,9 @@ typedef union
 
 #define PRODUCT_NAMES_LEN             (32)
 #define PRODUCT_KEY_LEN               (64)
+#define DEVICE_NAME_LEN               (64)
+#define DEVICE_SECRET_LEN             (70)
+
 uint16_t Crc16(uint8_t *bufferpoint,int16_t sum);
 void *Hal_Malloc(int size);
 void *Hal_Calloc(int count, int size);
@@ -78,8 +81,12 @@ uint32_t Hal_getSerialNumber(void);
 uint32_t Hal_getTransmitPeriod(void);
 #ifdef AIR202
 int Hal_getProductKey(char *produckey);
+int Hal_getDeviceName(char *devName);
+int Hal_getDeviceSecret(char *devSecret);
 #endif
 
+void Hal_EnterLowPower_Mode(void);
+void Hal_ExitLowPower_Mode(void);
 
 
 #endif /* __hal_UCS */
