@@ -240,6 +240,8 @@ void Hal_MutexUnlock(Mutex_t mutex)
     err = OSMutexPost(mutex);
 }
 
+void 
+
 int Hal_getProductName(char *proName)
 {
 #if (PRODUCT_TYPE == Air_Station) 

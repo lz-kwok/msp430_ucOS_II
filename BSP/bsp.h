@@ -69,6 +69,7 @@
 #include <g_DeviceFlash.h>
 #include <g_DeviceGprs.h>
 #include <g_DevicePrintf.h>
+#include <g_DeviceConfig.h>
 
 #include <g_Platform.h>
 
@@ -160,8 +161,8 @@ typedef struct
 
         struct RTC
         {
-            void (*ReadExtTime)(void);
-            void (*ConfigExtTime)(void);
+            void (*ReadExtTime)(uint8_t *data,uint8_t dataType);
+            void (*ConfigExtTime)(uint8_t *data,uint8_t dataType);
         }RTC;
     }Device;
 

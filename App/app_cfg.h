@@ -54,6 +54,8 @@
 #define  OS_TASK_TMR_PRIO            (OS_LOWEST_PRIO - 4)
 #define  SCADA_TASK_TASK_PRIO         5
 #define  TRANSMIT_TASK_TASK_PRIO      6
+#define  MANAGER_TASK_TASK_PRIO       7
+
 /*
 *********************************************************************************************************
 *                                            TASK STACK SIZES

@@ -161,7 +161,7 @@ void GetADCValue(void)
 		for(i=0;i<5;i++)
 		{
 			ADCRead1000Routine();  //查询ADC
-			hal_Delay_ms(20);
+			OSTimeDlyHMSM(0u, 0u, 0u, 40);  
 		}
 	}
 	App.Data.TerminalInfoData.PowerQuantity = PowerQuantity;      			 //电量    3.4 10% 3.5 20% ———— 4.0 70%  4.2 90%

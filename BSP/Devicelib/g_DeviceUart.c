@@ -24,7 +24,7 @@
 * Programmer(s) : GLZ
 *********************************************************************************************************
 */
-#include <bsp.h>
+#include <g_DeviceUart.h>
 
 
 const uint8_t USCIModulation[16] = {0x00,0x10,0x20,0x30,0x40,0x50,0x60,0x70,0x80,0x90,
@@ -48,11 +48,11 @@ uint8_t Uart_2_Flag=0;		//涓插彛鎺ュ彈瀹岋紝鍦ㄦ帴鍙椾腑鏂細
 char aRxBuff[aRxLength];		//UART0 receive data buff
 uint8_t aRxNum=0;		        //UART0 receive data num
 
-uint8_t bRxBuff[bRxLength];		//UART1 receive data buff
-uint8_t bRxNum=0;		        //UART1 receive data num
+g_Device_Config_CMD bRxBuff;
+g_Device_Config_CMD cRxBuff;
 
-uint8_t cRxBuff[cRxLength];		//UART2 receive data buff
-uint8_t cRxNum=0;		        //UART2 receive data num
+// uint8_t cRxBuff[cRxLength];		//UART2 receive data buff
+// uint8_t cRxNum=0;		        //UART2 receive data num
 
 uint8_t dRxBuff[dRxLength];		//UART3 receive data buff
 uint8_t dRxNum=0;		        //UART3 receive data num
@@ -222,6 +222,8 @@ void g_Device_Usart1_Init(uint32_t BaudRate)
     OSBsp.Device.Usart1.WriteData   = g_Device_SendByte_Uart1;
 	OSBsp.Device.Usart1.WriteNData  = g_Device_SendNByte_Uart1;
 	OSBsp.Device.Usart1.WriteString = g_Device_SendString_Uart1;
+
+	memset(bRxBuff,0x0,sizeof(g_Device_Config_CMD));
 }
 /*******************************************************************************
 * Function Name  : g_Device_SendByte_Uart2
@@ -378,6 +380,13 @@ void g_Device_Usart3_Init(uint32_t BaudRate)
 
 
 
+void g_Device_Usart_Rxbuff_Copy(g_Device_Config_CMD dst)
+{
+	dst = bRxBuff;
+	memset(bRxBuff,0x0,size(g_Device_Config_CMD));
+}
+
+
 
 //------USCI_A0涓柇鏈嶅姟鏈嶅姟鍑芥暟-------------------------------------------------+
 #pragma vector=USCI_A0_VECTOR
@@ -413,42 +422,38 @@ __interrupt void USCI_A1_ISR(void)
 	{
 		case 0:break;                             // Vector 0 - no interrupt
 		case 2:                                   // Vector 2 - RXIFG
-	        __bic_SR_register_on_exit(LPM0_bits);	//閫�嚭浣庡姛鑰�
+	        __bic_SR_register_on_exit(LPM0_bits);	
 			while(!(UCA1IFG&UCTXIFG));            // USCI_A1 TX buffer ready?
 			{
 #if (ACCESSORY_TYPR == GPS_Mode)
-				// TA1R=0;
-				// GPSRxBuff = UCA1RXBUF;
-				// if(GPSRxBuff == '$')
-				// {
-				// 	bRxNum = 0;
-				// }
-				// bRxBuff[bRxNum++] = GPSRxBuff;
-				// if( (bRxBuff[0] == '$')&&(bRxBuff[3] == 'G')&&(bRxBuff[4] == 'L')&&(bRxBuff[5] == 'L') )
-				// {
-				// 	if(GPSRxBuff == '\n')
-				// 	{
-				// 		//淇濆瓨鏁版嵁
-				// 		for(GPSRxNum=0;GPSRxNum<bRxNum;GPSRxNum++)
-				// 		{
-				// 			GPSLngLat_data[GPSRxNum] = bRxBuff[GPSRxNum];
-				// 		}
-				// 		//
-				// 		bRxNum = 0;
-				// 		Uart_1_Flag=1;
-				// 	}
-				// }
-#elif ((ACCESSORY_TYPR == RS485_Mode)||(ACCESSORY_TYPR == RS232_Mode))
-				// TA1R=0;
-				// Uart_1_Flag=1;		
-				// if(bRxNum<bRxLength)
-				// {
-				//   bRxBuff[bRxNum++] = UCA1RXBUF;
-				// }
-				// else
-				// {
-				//   bRxNum=0;
-				// }
+				if(UCA1RXBUF == '$'){
+					memset(bRxBuff,0x0,sizeof(g_Device_Config_CMD));
+				}
+				bRxBuff.strcmd[bRxBuff.cmdLenth++] = UCA1RXBUF;
+				if( (bRxBuff[0] == '$')&&(bRxBuff[3] == 'G')&&(bRxBuff[4] == 'L')&&(bRxBuff[5] == 'L') )
+				{
+					if(UCA1RXBUF == '\n')
+					{
+						for(GPSRxNum=0;GPSRxNum<bRxNum;GPSRxNum++)
+						{
+							GPSLngLat_data[GPSRxNum] = bRxBuff[GPSRxNum];
+						}
+						OSIntEnter();
+						g_Device_Config_QueuePost(G_WIRELESS_UPLAOD,(void *)"GPS_Info");	
+						OSIntExit();
+					}
+				}
+#else 	
+				if(bRxBuff.cmdLenth<bRxLength){
+					bRxBuff.hexcmd[bRxBuff.cmdLenth++] = UCA1RXBUF;
+				  	if(bRxBuff.cmdLenth == 1){
+					  OSIntEnter();
+					  g_Device_Config_QueuePost(G_WIRELESS_UPLAOD,(void *)"SerialBus");	
+					  OSIntExit();
+				 	}		
+				}else{
+				  	bRxBuff.cmdLenth = 0;
+				}
 #endif
 			}
 			break;
@@ -464,19 +469,19 @@ __interrupt void USCI_A2_ISR(void)
   {
   case 0:break;                             // Vector 0 - no interrupt
   case 2:                                   // Vector 2 - RXIFG
-	  __bic_SR_register_on_exit(LPM0_bits);	//閫�嚭浣庡姛鑰�
+	  __bic_SR_register_on_exit(LPM0_bits);	
       while(!(UCA2IFG&UCTXIFG));            // USCI_A1 TX buffer ready?
 	  {
-    	  TA1R=0;
-    	  Uart_2_Flag=1;		//涓插彛鎺ュ彈瀹屾爣蹇楃疆0锛屾帴鍙楀畬1s鍚庡畾鏃跺唴缃�
-    	  if(cRxNum<cRxLength)
-    	  {
-    		  cRxBuff[cRxNum++] = UCA2RXBUF;
-    	  }
-    	  else
-    	  {
-    		  cRxNum=0;
-    	  }
+		if(cRxBuff.cmdLenth < cRxLength){
+			cRxBuff.hexcmd[cRxBuff.cmdLenth++] = UCA2RXBUF;
+			if(bRxBuff.cmdLenth == 1){
+				OSIntEnter();
+				g_Device_Config_QueuePost(G_CLIENT_CMD,(void *)"ClientCMD");	
+				OSIntExit();
+			}	
+		}else{
+			cRxBuff.cmdLenth = 0;
+		}
 	  }
       break;
   case 4:break;                             // Vector 4 - TXIFG

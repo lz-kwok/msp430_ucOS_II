@@ -27,13 +27,8 @@
 #include <bsp.h>
 
 
-/*�����ʼʱ�䣬BCD���ʽ������ʱ��2018-03-15��15:20:50��������*/
-uint8_t time_buf[8] = {0x20,0x18,0x03,0x15,0x20,0x50,0x00,0x04};
-/*�����ʼʱ��string��ʽ*/
 uint8_t time_string_buf[16] = {};
 /*��������ʱ��**************************************************/
-uint8_t clock_buf[2] = {0x09,0x02};
-uint8_t ds1302_ram[1] = {0};
 uint8_t clock_flag;
 
 //***********************************************************************
@@ -126,40 +121,63 @@ static uint8_t DS1302_read_byte(uint8_t addr)
 //***********************************************************************
 //                   向DS302写入时钟数据
 //***********************************************************************
-void DS1302_write_time(void)
+void DS1302_write_time(uint8_t *data,uint8_t dataType)
 {
-  DS1302_write_byte(DS1302_control_add,0x00);		//关闭写保护 
-  DS1302_write_byte(DS1302_sec_add,0x80);	        //暂停 
-  //DS1302_write_byte(DS1302_charger_add,0xa9);		//涓流充电 
-  DS1302_write_byte(DS1302_year_add,time_buf[1]);	//年 
-  DS1302_write_byte(DS1302_month_add,time_buf[2]);	//月
-  DS1302_write_byte(DS1302_date_add,time_buf[3]);	//日
-  DS1302_write_byte(DS1302_hr_add,time_buf[4]);		//时
-  DS1302_write_byte(DS1302_min_add,time_buf[5]);	//分
-  DS1302_write_byte(DS1302_sec_add,time_buf[6]);	//秒
-  DS1302_write_byte(DS1302_day_add,time_buf[7]);	//周
-//  DS1302_write_byte(DS1302_clock_hr_add,clock_buf[0]);	//闹钟时
-//  DS1302_write_byte(DS1302_clock_min_add,clock_buf[1]);	//闹钟分
-//  DS1302_write_byte(DS1302_FLASH,ds1302_ram[0]);
-  DS1302_write_byte(DS1302_control_add,0x80);		//打开写保护
+	DS1302_write_byte(DS1302_control_add,0x00);		//关闭写保护 
+	DS1302_write_byte(DS1302_sec_add,0x80);	        //暂停 
+	//DS1302_write_byte(DS1302_charger_add,0xa9);		//涓流充电 
+	switch(dataType){
+		case RealTime:{
+			DS1302_write_byte(DS1302_year_add,time[1]);	//年 
+			DS1302_write_byte(DS1302_month_add,time[2]);	//月
+			DS1302_write_byte(DS1302_date_add,time[3]);	//日
+			DS1302_write_byte(DS1302_hr_add,time[4]);		//时
+			DS1302_write_byte(DS1302_min_add,time[5]);	//分
+			DS1302_write_byte(DS1302_sec_add,time[6]);	//秒
+			DS1302_write_byte(DS1302_day_add,time[7]);	//周
+		}
+		break;
+		case AlarmData:{
+			DS1302_write_byte(DS1302_clock_hr_add,alarm[0]);	//闹钟时
+			DS1302_write_byte(DS1302_clock_min_add,alarm[1]);	//闹钟分
+		}
+		break;
+		case InnerFlash:{
+			DS1302_write_byte(DS1302_FLASH,innerram[0]);
+		}
+		break;
+	}
+
+	DS1302_write_byte(DS1302_control_add,0x80);		//打开写保护
 }
 
 //***********************************************************************
 //                     从DS302读出时钟数据
 //***********************************************************************
 
-void DS1302_read_time(void)  
+void DS1302_read_time(uint8_t *data,uint8_t dataType)
 { 
-  time_buf[1]=DS1302_read_byte(DS1302_year_add);	    //年
-  time_buf[2]=DS1302_read_byte(DS1302_month_add);	    //月
-  time_buf[3]=DS1302_read_byte(DS1302_date_add);	    //日
-  time_buf[4]=DS1302_read_byte(DS1302_hr_add);		    //时
-  time_buf[5]=DS1302_read_byte(DS1302_min_add);		    //分
-  time_buf[6]=(DS1302_read_byte(DS1302_sec_add))&0x7F;  //秒
-  time_buf[7]=DS1302_read_byte(DS1302_day_add);		    //周
-  ds1302_ram[0]=DS1302_read_byte(DS1302_FLASH);
-  clock_buf[0]=DS1302_read_byte(DS1302_clock_hr_add);	//clock时
-  clock_buf[1]=DS1302_read_byte(DS1302_clock_min_add);	//clock分
+	switch(dataType){
+		case RealTime:{
+			data[1]=DS1302_read_byte(DS1302_year_add);	    //年
+			data[2]=DS1302_read_byte(DS1302_month_add);	    //月
+			data[3]=DS1302_read_byte(DS1302_date_add);	    //日
+			data[4]=DS1302_read_byte(DS1302_hr_add);		    //时
+			data[5]=DS1302_read_byte(DS1302_min_add);		    //分
+			data[6]=(DS1302_read_byte(DS1302_sec_add))&0x7F;  //秒
+			data[7]=DS1302_read_byte(DS1302_day_add);		    //周
+		}
+		break;
+		case AlarmData:{
+			data[0]=DS1302_read_byte(DS1302_clock_hr_add);	//clock时
+			data[1]=DS1302_read_byte(DS1302_clock_min_add);	//clock分
+		}
+		break;
+		case InnerFlash:{
+			data[0]=DS1302_read_byte(DS1302_FLASH);
+		}
+		break;
+	}
 }
 
 //***********************************************************************
@@ -174,6 +192,7 @@ void g_Device_ExtRTC_Init(void)
 	DS1302_write_byte(DS1302_sec_add,0x00);	    //启动
 
 	OSBsp.Device.RTC.ReadExtTime = DS1302_read_time;
+	OSBsp.Device.RTC.ConfigExtTime = DS1302_write_time;
 }
 
 //***********************************************************************

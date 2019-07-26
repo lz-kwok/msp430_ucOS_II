@@ -35,14 +35,16 @@
 #define DS1302_charger_add	    0x90
 #define DS1302_clkburst_add	    0xbe
 
+enum EXT_RTC_DATA_TYPE {
+	RealTime = 0,
+    AlarmData = 1,
+    InnerRam
+};
 
-extern uint8_t time_buf[8];
 extern uint8_t time_string_buf[16];
-extern uint8_t clock_buf[2];
 extern uint8_t clock_flag;
 
 
-void DS1302_write_time(void);
 void DS1302_read_time(void);
 void g_Device_ExtRTC_Init(void);
 void Create_TimeData(uint8_t *p1,uint8_t *p2);

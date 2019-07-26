@@ -107,7 +107,7 @@
 #define RS485_Mode		      		0x02     //485配件
 #define RS232_Mode		      		0x03     //232配件
 #define None_Mode	          		0xFF     //无配件
-#define ACCESSORY_TYPR              None_Mode
+#define ACCESSORY_TYPR              GPS_Mode
 
 
 

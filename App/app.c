@@ -51,6 +51,7 @@
 
 static OS_STK ScadaTaskStartStk[DEFAULT_TASK_STK_SIZE];
 static OS_STK TransmitTaskStartStk[TRANSMIT_TASK_STK_SIZE];
+static OS_STK ManagerTaskStartStk[DEFAULT_TASK_STK_SIZE];
 
 /*
 *********************************************************************************************************
@@ -89,6 +90,11 @@ void  main (void)
                     &TransmitTaskStartStk[TRANSMIT_TASK_STK_SIZE-1u],
                     TRANSMIT_TASK_TASK_PRIO);
 
+    Hal_ThreadCreate(ManagerTaskStart,
+                    (void *)"ManagerTaskStart",
+                    &ManagerTaskStartStk[DEFAULT_TASK_STK_SIZE-1u],
+                    MANAGER_TASK_TASK_PRIO);
+
     OSStart();                               /* Start multitasking (i.e. give control to uC/OS-II)   */
 }
 
@@ -109,8 +115,8 @@ static  void  ScadaTaskStart (void *p_arg)
 
 static  void  TransmitTaskStart (void *p_arg)
 {
-    (void)p_arg;                   
-    Terminal_Para_Init();
+    (void)p_arg;   
+    OSTimeDlyHMSM(0u, 0u, 0u, 100u);                 
     while (DEF_TRUE) {               /* Task body, always written as an infinite loop.       */
         if(Hal_getCurrent_work_Mode() == 0){
             OSTimeDlyHMSM(0u, 0u, 1u, 0u);  
