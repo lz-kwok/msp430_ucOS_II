@@ -23,7 +23,7 @@ typedef void                          (*message_free_cb)(void* content);
 
 
 struct hal_message{
-	int 	what;			/*msg type*/
+	uint32_t 	 what;			/*msg type*/
 	void* 	content;		/*msg content*/
 	message_free_cb freecb; /* free content func */
 };

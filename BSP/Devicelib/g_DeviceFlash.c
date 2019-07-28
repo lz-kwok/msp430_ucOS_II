@@ -29,9 +29,7 @@
 #include  <bsp.h>
 #include "MSP430F5xx_6xx\flashctl.h"
 
-static uint8_t cacheBuf[14];
-uint8_t BootFlag[1] = {0x01};
-uint8_t Terminal_Info[14]={0xFF};
+
 
 
 /*******************************************************************************
@@ -126,77 +124,6 @@ void g_Device_InnerFlash_Init(void)
 
 //	OSBsp.Device.InnerFlash.innerFLASHWrite(&TerminalNum,(uint8_t *)infor_ChargeAddr,1);
 }
-/*******************************************************************************
-* 函数名      	: InforOperate
-* 描述	  		: 内部Flash参数配置既读取
-* 输入参数  	: data--指令标志位
-* 返回参数  	: 无
-*******************************************************************************/
-void InforOperate(uint8_t data)
-{
-	static uint8_t i;
-	switch(data)
-	{
-		case 0xFE:         //设置出厂信息（出厂日期、SN、ID）
-			cacheBuf[0] = cRxBuff[5];
-			cacheBuf[1] = cRxBuff[6];
-			cacheBuf[2] = cRxBuff[7];
-			cacheBuf[3] = cRxBuff[8];
-			cacheBuf[4] = cRxBuff[2];
-			cacheBuf[5] = cRxBuff[3];
-			cacheBuf[6] = cRxBuff[4];
 
-			FlashRsvWrite(cacheBuf,7,infor_ChargeAddr,0);
-			cRxNum=0;
-			break;
-		case 0xFD:			//软件复位
-			hal_Reboot();
-			break;
-		case 0xFA:         //设置终端类型
-			cacheBuf[0] = cRxBuff[2];
-			cacheBuf[1] = cRxBuff[3];
-			cacheBuf[2] = cRxBuff[4];
-			cacheBuf[3] = cRxBuff[5];
-			cacheBuf[4] = cRxBuff[6];
-			cacheBuf[5] = cRxBuff[7];
-			cacheBuf[6] = cRxBuff[8];
-			FlashRsvWrite(cacheBuf,7,infor_ChargeAddr,7);
-			cRxNum=0;
-			break;
-		case 0xEF:         //请求升级，进入BootLoader
-			{
-			loop1:
-				FlashRsvWrite(BootFlag,1,infor_BootAddr,0);
-				hal_Delay_ms(10);
-				if(infoFLASH_read(0,infor_BootAddr) == BootFlag[0])
-					hal_Reboot();
-				else
-					goto loop1;
-			}
-			break;
-		case 0xF0:			//终端信息查询指令
-			{
-				Terminal_Info[1] = infoFLASH_read(1,infor_BootAddr);
-				for(i = 0; i < 11; i ++)
-				{
-					Terminal_Info[i+2] = infoFLASH_read(i,infor_ChargeAddr);
-				}
-				Terminal_Info[13]=0xFF;
-				OSBsp.Device.Usart2.WriteNData(Terminal_Info,14);
-			}
-			cRxNum=0;
-			break;
-		case 0xF5:			//同步时间
-			for(i = 1; i < 8; i++)
-			{
-				time_buf[i]=cRxBuff[i+1];//存“年月日时分秒周”
-				cRxBuff[i]=0;
-			}
-			DS1302_write_time();
-			OSBsp.Device.Usart2.WriteString("Time Set Done!\r\n");
-			cRxNum=0;
-			break;
-	}
-}
 
 

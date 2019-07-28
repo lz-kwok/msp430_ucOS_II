@@ -96,20 +96,19 @@ void  BSP_Init(void)
     g_Device_Usart3_Init(9600);      
     g_Device_ADC_Init(); 
     g_Device_SD_Init();
-    g_Device_SPI2_Init();
+    // g_Device_SPI2_Init();
+    g_Device_SPI3_Init();
     g_Device_InnerFlash_Init();
     hal_Delay_ms(100);
-    OSBsp.Device.Usart2.WriteString("BSP init over\r\n");
+    g_Printf_info("BSP init over\r\n");
     g_Device_ExtRTC_Init();
-    hal_Delay_ms(50);
-    OSBsp.Device.RTC.ReadExtTime();
     hal_Delay_ms(100);
-    OSBsp.Device.Usart2.WriteString("RTC init over\r\n");
+    g_Printf_info("RTC init over\r\n");
 
 #ifdef SDCard
     g_Device_SDCard_Check();               
     hal_Delay_ms(100);
-    OSBsp.Device.Usart2.WriteString("SD init over\r\n");
+    g_Printf_info("SD init over\r\n");
 #endif
 
     Recive_485_Enable;

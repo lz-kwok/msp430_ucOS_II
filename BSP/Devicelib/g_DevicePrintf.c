@@ -1064,7 +1064,6 @@ am_util_stdio_sprintf(char *pcBuf, char *pcFmt, ...)
 //! @return uint32_t representing the number of characters printed.
 //
 // *****************************************************************************
-//ʹ���Զ��崮��ģ�����Printf��ӡ
 uint32_t User_Printf(char *pcFmt, ...)
 {
     uint32_t ui32NumChars;
@@ -1075,5 +1074,31 @@ uint32_t User_Printf(char *pcFmt, ...)
     va_end(pArgs);
     g_pfnCharPrint(g_prfbuf);
 
+    return ui32NumChars;
+}
+
+uint32_t g_Printf_info(char *pcFmt, ...)
+{
+    uint32_t ui32NumChars;
+    if(APP_CFG_TRACE_LEVEL >= TRACE_LEVEL_INFO){
+        va_list pArgs;
+        va_start(pArgs, pcFmt);
+        ui32NumChars = am_util_stdio_vsprintf(g_prfbuf, pcFmt, pArgs);
+        va_end(pArgs);
+        OSBsp.Device.Usart2.WriteString(g_prfbuf);
+    }
+    return ui32NumChars;
+}
+
+uint32_t g_Printf_dbg(char *pcFmt, ...)
+{
+    uint32_t ui32NumChars;
+    if(APP_CFG_TRACE_LEVEL >= TRACE_LEVEL_DBG){
+        va_list pArgs;
+        va_start(pArgs, pcFmt);
+        ui32NumChars = am_util_stdio_vsprintf(g_prfbuf, pcFmt, pArgs);
+        va_end(pArgs);
+        OSBsp.Device.Usart2.WriteString(g_prfbuf);
+    }
     return ui32NumChars;
 }

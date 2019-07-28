@@ -136,7 +136,7 @@ int Hal_ThreadCreate(void (*func)(void *p_arg), void *funcname,OS_STK *TaskStk, 
 #endif
     
     if (err != OS_ERR_NONE){
-        APP_TRACE_INFO(("%s failed\n",__func__));
+        g_Printf_info("%s failed\n",__func__);
 		return -1;
 	}
 
@@ -152,7 +152,7 @@ int Hal_ThreadDestory(int priority)
         //De-allocate any dynamic memory;
         err = OSTaskDel(priority);
         if (err != OS_ERR_NONE){
-            APP_TRACE_DBG(("%s failed\n",__func__));
+            g_Printf_dbg("%s failed\n",__func__);
             return -1;
 	    }
 
@@ -174,7 +174,7 @@ void Hal_QueueDestory(Queue_t queue)
     Queue_t queasw;
     queasw = OSQDel(queue,OS_DEL_ALWAYS,&err);
     if(queasw != (OS_EVENT *)0){
-        APP_TRACE_DBG(("%s failed\n",__func__));
+        g_Printf_dbg("%s failed\n",__func__);
     }
 }
 
@@ -185,26 +185,27 @@ int Hal_QueueSend(Queue_t queue, struct hal_message* msg, int timeout)
 	if(pMsg == null){
         return -1;
     }
-	err = OSQPost (queue,pMsg);
+	err = OSQPost (queue,msg);
     if(err != OS_ERR_NONE){
-        APP_TRACE_DBG(("%s failed\n",__func__));
+        g_Printf_dbg("%s failed\n",__func__);
         return -1;
     }
     
 	return err;
 }
 
-int Hal_QueueRecv(Queue_t queue, struct hal_message* msg, int timeout)
-{
-    uint8_t err;
-    void* pMsg = OSQPend(queue, timeout, &err);
-    if (OS_ERR_NONE == err){
-        memcpy(msg, pMsg, sizeof(struct hal_message));
-        return err;
-    }
+ int Hal_QueueRecv(Queue_t queue, struct hal_message* msg, int timeout)
+ {
+     uint8_t err;
+     void *pMsg;
+     pMsg = OSQPend(queue, timeout, &err);
+     if (OS_ERR_NONE == err){
+         memcpy(msg, pMsg, sizeof(struct hal_message));
+         return err;
+     }
 
-    return -1;
-}
+     return -1;
+ }
 
 Mutex_t Hal_MutexCreate(int priority)
 {
@@ -212,7 +213,7 @@ Mutex_t Hal_MutexCreate(int priority)
     uint8_t err;
     pmutex = OSMutexCreate (priority, &err);
     if(pmutex == null){
-    	APP_TRACE_DBG(("%s failed\n",__func__));
+    	g_Printf_dbg("%s failed\n",__func__);
     }
 
     return pmutex;
@@ -224,7 +225,7 @@ void Hal_MutexDestory(Mutex_t mutex)
     uint8_t err;
     pmutex = OSMutexDel (mutex,OS_DEL_ALWAYS,&err);
     if(pmutex != (OS_EVENT *)0){
-    	APP_TRACE_DBG(("%s failed\n",__func__));
+    	g_Printf_dbg("%s failed\n",__func__);
     }
 }
 
@@ -240,7 +241,6 @@ void Hal_MutexUnlock(Mutex_t mutex)
     err = OSMutexPost(mutex);
 }
 
-void 
 
 int Hal_getProductName(char *proName)
 {
@@ -320,7 +320,7 @@ uint32_t Hal_getDeviceID(void)
     temp = OSBsp.Device.InnerFlash.innerFLASHRead(0,infor_ChargeAddr);
 	temp = temp<<8;
 	temp += OSBsp.Device.InnerFlash.innerFLASHRead(1,infor_ChargeAddr);
-    APP_TRACE_INFO(("%s %d\n",__func__,temp));
+    g_Printf_info("%s %d\n",__func__,temp);
     return temp;
 }
 
@@ -332,7 +332,7 @@ uint32_t Hal_getManufactureDate(void)
 	temp += OSBsp.Device.InnerFlash.innerFLASHRead(5,infor_ChargeAddr);
 	temp = temp*100;
 	temp += OSBsp.Device.InnerFlash.innerFLASHRead(6,infor_ChargeAddr);
-    APP_TRACE_INFO(("%s %d\n",__func__,temp));
+    g_Printf_info("%s %d\n",__func__,temp);
     return temp;
 }
 
@@ -340,7 +340,7 @@ uint32_t Hal_getFirmwareVersion(void)
 {
     uint32_t temp =0;
     temp = OSBsp.Device.InnerFlash.innerFLASHRead(1,infor_BootAddr);
-    APP_TRACE_INFO(("%s %d\n",__func__,temp));
+    g_Printf_info("%s %d\n",__func__,temp);
     return temp;
 }
 
@@ -350,7 +350,7 @@ uint32_t Hal_getSerialNumber(void)
     temp = OSBsp.Device.InnerFlash.innerFLASHRead(2,infor_ChargeAddr);
 	temp = temp<<8;
 	temp += OSBsp.Device.InnerFlash.innerFLASHRead(3,infor_ChargeAddr);
-    APP_TRACE_INFO(("%s %d\n",__func__,temp));
+    g_Printf_info("%s %d\n",__func__,temp);
     return temp;
 }
 
@@ -362,7 +362,7 @@ uint32_t Hal_getTransmitPeriod(void)
         temp = 15;           
     }
         
-    APP_TRACE_INFO(("%s %d\n",__func__,temp));
+    g_Printf_info("%s %d\n",__func__,temp);
     return temp;
 }
 
@@ -372,7 +372,7 @@ int Hal_getProductKey(char *produckey)
     uint32_t keyLen =0;
     keyLen = OSBsp.Device.InnerFlash.innerFLASHRead(13,infor_ChargeAddr);
 	if(keyLen == 0xff){
-        APP_TRACE_INFO(("please set aliIot ProductKey first\n"));
+        g_Printf_info(("please set aliIot ProductKey first\n"));
 		return -1;
 	}
     char midTem[PRODUCT_KEY_LEN];
@@ -392,7 +392,7 @@ int Hal_getDeviceName(char *devName)
     uint32_t nameLen =0;
     nameLen = OSBsp.Device.InnerFlash.innerFLASHRead(32,infor_ChargeAddr);
 	if(nameLen == 0xff){
-        APP_TRACE_INFO(("please set aliIot DeviceName first\n"));
+        g_Printf_info("please set aliIot DeviceName first\n");
 		return -1;
 	}
     char midTem[DEVICE_NAME_LEN];
@@ -412,7 +412,7 @@ int Hal_getDeviceSecret(char *devSecret)
     uint32_t SecretLen =0;
     SecretLen = OSBsp.Device.InnerFlash.innerFLASHRead(64,infor_ChargeAddr);
 	if(SecretLen == 0xff){
-        APP_TRACE_INFO(("please set aliIot DeviceSecret first\n"));
+        g_Printf_info("please set aliIot DeviceSecret first\n");
 		return -1;
 	}
     char midTem[DEVICE_SECRET_LEN];
@@ -431,7 +431,7 @@ int Hal_getDeviceSecret(char *devSecret)
 
 void Hal_EnterLowPower_Mode(void)
 {
-    APP_TRACE_INFO(("Enter Low Power!\r\n"));
+    g_Printf_info("Enter Low Power!\r\n");
     hal_Delay_ms(100);
     OSBsp.Device.IOControl.PowerSet(LPModule_Power_Off);
     OSBsp.Device.IOControl.PowerSet(GPRS_Power_Off);
@@ -446,7 +446,7 @@ void Hal_EnterLowPower_Mode(void)
 
 void Hal_ExitLowPower_Mode(void)
 {
-    APP_TRACE_INFO(("Exit Low Power!\r\n"));
+    g_Printf_info("Exit Low Power!\r\n");
 //    __bic_SR_register_on_exit(LPM0_bits);
     gManager.systemLowpower = 0;
 

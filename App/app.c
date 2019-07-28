@@ -71,20 +71,16 @@ static  void  TransmitTaskStart (void *p_arg);
 * Arguments   : none
 *********************************************************************************************************
 */
-
 void  main (void)
 {
     OSInit();                                /* Initialize "uC/OS-II, The Real-Time Kernel"          */
     OSBsp.Init();                            /* Initialize BSP functions                             */
-#if (OS_TASK_STAT_EN > 0)
-    OSStatInit();                            /* Determine CPU capacity                               */
-#endif
 
     Hal_ThreadCreate(ScadaTaskStart,
                     (void *)"ScadaTaskStart",
                     &ScadaTaskStartStk[DEFAULT_TASK_STK_SIZE-1u],
                     SCADA_TASK_TASK_PRIO);
-
+                    
     Hal_ThreadCreate(TransmitTaskStart,
                     (void *)"TransmitTaskStart",
                     &TransmitTaskStartStk[TRANSMIT_TASK_STK_SIZE-1u],
@@ -95,6 +91,7 @@ void  main (void)
                     &ManagerTaskStartStk[DEFAULT_TASK_STK_SIZE-1u],
                     MANAGER_TASK_TASK_PRIO);
 
+
     OSStart();                               /* Start multitasking (i.e. give control to uC/OS-II)   */
 }
 
@@ -102,13 +99,17 @@ void  main (void)
 
 static  void  ScadaTaskStart (void *p_arg)
 {
-    (void)p_arg;                   
+    (void)p_arg;
+#if (OS_TASK_STAT_EN > 0)
+    OSStatInit();                            /* Determine CPU capacity                               */
+#endif
     Terminal_Para_Init();
+
     while (DEF_TRUE) {               /* Task body, always written as an infinite loop.       */
         if(Hal_getCurrent_work_Mode() == 0){
-            OSTimeDlyHMSM(0u, 0u, 1u, 0u);  
-            APP_TRACE_INFO(("%s ... ...\n",__func__));
+            g_Printf_info("%s ... ...\n",__func__);
             InqureSensor();
+            OSTimeDlyHMSM(0u, 0u, 1u, 0u);  
         }
     }
 }
@@ -116,11 +117,11 @@ static  void  ScadaTaskStart (void *p_arg)
 static  void  TransmitTaskStart (void *p_arg)
 {
     (void)p_arg;   
-    OSTimeDlyHMSM(0u, 0u, 0u, 100u);                 
+    OSTimeDlyHMSM(0u, 0u, 0u, 100u);      
+    g_Printf_info("%s ... ...\n",__func__);           
     while (DEF_TRUE) {               /* Task body, always written as an infinite loop.       */
         if(Hal_getCurrent_work_Mode() == 0){
             OSTimeDlyHMSM(0u, 0u, 1u, 0u);  
-            APP_TRACE_INFO(("%s ... ...\n",__func__));
             if(AppDataPointer->TransMethodData.GPRSStatus == GPRS_Http_Preinit){
                 g_Device_GPRS_Init();
             }else if(AppDataPointer->TransMethodData.GPRSStatus == GPRS_Http_Init_Done){

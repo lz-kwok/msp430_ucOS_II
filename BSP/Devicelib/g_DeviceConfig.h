@@ -16,7 +16,7 @@ enum G_CONFIG_TYPE{
 };
 
 void ManagerTaskStart(void *p_arg);
-int g_Device_Config_QueuePost(int type,void *state);
+int g_Device_Config_QueuePost(uint32_t type,void *state);
 
 
 

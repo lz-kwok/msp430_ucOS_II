@@ -63,7 +63,7 @@ static uint8_t  SensorStatusBuff[2];       //传感器状态数组
 * 输入参数  	: 无
 * 返回参数  	: 无
 *******************************************************************************/
-static void AnalyzeComand(uint8_t *data,uint8_t Len)
+static int AnalyzeComand(uint8_t *data,uint8_t Len)
 {
 	if(Len != 0)
 	{
@@ -143,7 +143,9 @@ static void AnalyzeComand(uint8_t *data,uint8_t Len)
 				}//switch(data[0]) END
 				
 			} //(data[1]==0x03)  END
- 		} //CRC  END
+ 		}else{
+			 return 0;
+		}
 
 		SensorStatusBuff[1] = SensorStatus_L;
 		SensorStatusBuff[0] = SensorStatus_H;
@@ -152,6 +154,10 @@ static void AnalyzeComand(uint8_t *data,uint8_t Len)
 
 		Clear_CMD_Buffer(dRxBuff,dRxNum);
 		dRxNum=0;
+
+		return 1;
+	}else{
+		return -1;
 	}
 }
 
@@ -190,9 +196,15 @@ void InqureSensor(void)
 		}
 		hal_Delay_ms(10);//高波特率降低延时为1-2ms，否则容易丢包；低波特率增加延时，如4800延时10ms，否则容易丢包
 		Recive_485_Enable;
-		hal_Delay_sec(1);
+		OSTimeDly(500);
 		LED_ON;
-		AnalyzeComand(dRxBuff,dRxNum);
+		int ret = AnalyzeComand(dRxBuff,dRxNum);
+		uint32_t times = scadaIndex;
+		if(ret == 0){
+			g_Printf_dbg("%s.AnalyzeComand.CRC check failed\r\n",__func__);
+		}else if(ret == -1){
+			g_Printf_dbg("%s.AnalyzeComand.Sensor has no answer %d times\r\n",__func__,times);
+		}
 		LED_OFF;
 	}
 }

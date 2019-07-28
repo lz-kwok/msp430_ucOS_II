@@ -24,8 +24,9 @@
 * Programmer(s) : GLZ
 *********************************************************************************************************
 */
-#include <g_DeviceUart.h>
+#include <bsp.h>
 
+#define ComData_MiniSize			4           //"AT\r\n"
 
 const uint8_t USCIModulation[16] = {0x00,0x10,0x20,0x30,0x40,0x50,0x60,0x70,0x80,0x90,
 		                          0xA0,0xB0,0xC0,0xD0,0xE0,0xF0};
@@ -39,21 +40,13 @@ uint8_t TimebuffNum = 0;
 uint8_t TimeBuff_Hex[8] = {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00}; //16杩涘埗鐨勬椂闂碆uffer  2018骞�鏈�5鍙�20鏃�0鍒�0绉�鏄熸湡4
 
 
-uint8_t Do_Flag_Uart3=0;
-uint8_t Uart_0_Flag=0;		//涓插彛鎺ュ彈瀹岋紝鍦ㄦ帴鍙椾腑鏂細缃�锛屾帴鍙楀畬1s鍚庡畾鏃跺唴缃�
-uint8_t Uart_1_Flag=0;		//涓插彛鎺ュ彈瀹岋紝鍦ㄦ帴鍙椾腑鏂細缃�锛屾帴鍙楀畬1s鍚庡畾鏃跺唴缃�
-uint8_t Uart_2_Flag=0;		//涓插彛鎺ュ彈瀹岋紝鍦ㄦ帴鍙椾腑鏂細缃�锛屾帴鍙楀畬1s鍚庡畾鏃跺唴缃�
-
-
 char aRxBuff[aRxLength];		//UART0 receive data buff
 uint8_t aRxNum=0;		        //UART0 receive data num
 
 g_Device_Config_CMD bRxBuff;
-g_Device_Config_CMD cRxBuff;
-
-// uint8_t cRxBuff[cRxLength];		//UART2 receive data buff
-// uint8_t cRxNum=0;		        //UART2 receive data num
-
+// g_Device_Config_CMD cRxBuff;
+uint8_t cRxBuff[cRxLength];
+uint8_t cRxNum = 0;
 uint8_t dRxBuff[dRxLength];		//UART3 receive data buff
 uint8_t dRxNum=0;		        //UART3 receive data num
 
@@ -223,7 +216,7 @@ void g_Device_Usart1_Init(uint32_t BaudRate)
 	OSBsp.Device.Usart1.WriteNData  = g_Device_SendNByte_Uart1;
 	OSBsp.Device.Usart1.WriteString = g_Device_SendString_Uart1;
 
-	memset(bRxBuff,0x0,sizeof(g_Device_Config_CMD));
+	memset(&bRxBuff,0x0,sizeof(g_Device_Config_CMD));
 }
 /*******************************************************************************
 * Function Name  : g_Device_SendByte_Uart2
@@ -383,9 +376,26 @@ void g_Device_Usart3_Init(uint32_t BaudRate)
 void g_Device_Usart_Rxbuff_Copy(g_Device_Config_CMD dst)
 {
 	dst = bRxBuff;
-	memset(bRxBuff,0x0,size(g_Device_Config_CMD));
+	memset(&bRxBuff,0x0,sizeof(g_Device_Config_CMD));
 }
 
+g_Device_Config_CMD g_Device_Usart_UserCmd_Copy(void)
+{
+	g_Device_Config_CMD dst;
+	memset(&dst,0x0,sizeof(g_Device_Config_CMD));
+	static int m = 0;
+	g_Printf_info("%s len:%d data:",__func__,cRxNum);
+	for(m=0;m<cRxNum;m++){
+		dst.hexcmd[m] = cRxBuff[m];
+		g_Printf_info("%02x ",dst.hexcmd[m]);
+	}
+	g_Printf_info("\r\n");
+	dst.cmdLenth = cRxNum;
+	cRxNum = 0;
+	memset(cRxBuff,0x0,cRxLength);
+
+	return dst;
+}
 
 
 //------USCI_A0涓柇鏈嶅姟鏈嶅姟鍑芥暟-------------------------------------------------+
@@ -427,17 +437,14 @@ __interrupt void USCI_A1_ISR(void)
 			{
 #if (ACCESSORY_TYPR == GPS_Mode)
 				if(UCA1RXBUF == '$'){
-					memset(bRxBuff,0x0,sizeof(g_Device_Config_CMD));
+					memset(&bRxBuff,0x0,sizeof(g_Device_Config_CMD));
 				}
 				bRxBuff.strcmd[bRxBuff.cmdLenth++] = UCA1RXBUF;
-				if( (bRxBuff[0] == '$')&&(bRxBuff[3] == 'G')&&(bRxBuff[4] == 'L')&&(bRxBuff[5] == 'L') )
+				if( (bRxBuff.strcmd[0] == '$')&&(bRxBuff.strcmd[3] == 'G')&&
+						(bRxBuff.strcmd[4] == 'L')&&(bRxBuff.strcmd[5] == 'L') )
 				{
 					if(UCA1RXBUF == '\n')
 					{
-						for(GPSRxNum=0;GPSRxNum<bRxNum;GPSRxNum++)
-						{
-							GPSLngLat_data[GPSRxNum] = bRxBuff[GPSRxNum];
-						}
 						OSIntEnter();
 						g_Device_Config_QueuePost(G_WIRELESS_UPLAOD,(void *)"GPS_Info");	
 						OSIntExit();
@@ -465,28 +472,28 @@ __interrupt void USCI_A1_ISR(void)
 #pragma vector=USCI_A2_VECTOR
 __interrupt void USCI_A2_ISR(void)
 {
-  switch(__even_in_range(UCA2IV,4))
-  {
-  case 0:break;                             // Vector 0 - no interrupt
-  case 2:                                   // Vector 2 - RXIFG
-	  __bic_SR_register_on_exit(LPM0_bits);	
-      while(!(UCA2IFG&UCTXIFG));            // USCI_A1 TX buffer ready?
-	  {
-		if(cRxBuff.cmdLenth < cRxLength){
-			cRxBuff.hexcmd[cRxBuff.cmdLenth++] = UCA2RXBUF;
-			if(bRxBuff.cmdLenth == 1){
-				OSIntEnter();
-				g_Device_Config_QueuePost(G_CLIENT_CMD,(void *)"ClientCMD");	
-				OSIntExit();
-			}	
-		}else{
-			cRxBuff.cmdLenth = 0;
-		}
-	  }
-      break;
-  case 4:break;                             // Vector 4 - TXIFG
-  default: break;
-  }
+	switch(__even_in_range(UCA2IV,4))
+	{
+		case 0:break;                             // Vector 0 - no interrupt
+		case 2:                                   // Vector 2 - RXIFG
+			__bic_SR_register_on_exit(LPM0_bits);	
+			while(!(UCA2IFG&UCTXIFG));            // USCI_A1 TX buffer ready?
+			{
+				if(cRxNum < cRxLength){
+					cRxBuff[cRxNum++] = UCA2RXBUF;
+					if(cRxNum == ComData_MiniSize){
+						OSIntEnter();
+						g_Device_Config_QueuePost(G_CLIENT_CMD,(void *)"ClientCMD");
+						OSIntExit();	
+					}	
+				}else{
+					cRxNum = 0;
+				}
+			}
+		break;
+		case 4:break;                             // Vector 4 - TXIFG
+		default: break;
+	}
 }
 //------USCI_A3涓柇鏈嶅姟鏈嶅姟鍑芥暟-------------------------------------------------+
 #pragma vector=USCI_A3_VECTOR

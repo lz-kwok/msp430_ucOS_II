@@ -50,6 +50,7 @@ BSP/cJSON/cjson.obj: G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/BSP/utils/ut
 BSP/cJSON/cjson.obj: G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/BSP/utils/utils_sha1.h
 BSP/cJSON/cjson.obj: G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/BSP/Devicelib/g_DeviceIO.h
 BSP/cJSON/cjson.obj: G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/BSP/Devicelib/g_DeviceUart.h
+BSP/cJSON/cjson.obj: G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/BSP/Devicelib/g_DeviceConfig.h
 BSP/cJSON/cjson.obj: G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/BSP/Devicelib/g_DeviceRTC.h
 BSP/cJSON/cjson.obj: G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/BSP/Devicelib/g_DeviceADC.h
 BSP/cJSON/cjson.obj: G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/BSP/Devicelib/g_DeviceSpi.h
@@ -117,6 +118,7 @@ G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/BSP/utils/utils_md5.h:
 G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/BSP/utils/utils_sha1.h: 
 G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/BSP/Devicelib/g_DeviceIO.h: 
 G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/BSP/Devicelib/g_DeviceUart.h: 
+G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/BSP/Devicelib/g_DeviceConfig.h: 
 G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/BSP/Devicelib/g_DeviceRTC.h: 
 G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/BSP/Devicelib/g_DeviceADC.h: 
 G:/04\ \ MyDesign/04\ \ CCS/glz_msp430_ucOS_II/BSP/Devicelib/g_DeviceSpi.h: 

@@ -45,7 +45,6 @@ extern uint8_t time_string_buf[16];
 extern uint8_t clock_flag;
 
 
-void DS1302_read_time(void);
 void g_Device_ExtRTC_Init(void);
 void Create_TimeData(uint8_t *p1,uint8_t *p2);
 void Create_TimeString(uint8_t *p1,uint8_t *p2);

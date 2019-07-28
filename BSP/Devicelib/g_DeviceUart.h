@@ -6,13 +6,11 @@
 #ifndef G_DEVICEUART_H
 #define G_DEVICEUART_H
 
-#include <bsp.h>
-
+#include <stdint.h>
+#include <g_DeviceConfig.h>
 
 extern uint8_t Do_Flag_Uart3;
 extern uint8_t Uart_0_Flag;
-extern uint8_t Uart_1_Flag;
-extern uint8_t Uart_2_Flag;
 
 
 #define aRxLength 256		//UART0 buff length
@@ -22,6 +20,7 @@ extern uint8_t Uart_2_Flag;
 
 extern char aRxBuff[];
 extern uint8_t aRxNum;
+// extern g_Device_Config_CMD cRxBuff;
 extern uint8_t dRxBuff[];
 extern uint8_t dRxNum;
 
@@ -32,6 +31,8 @@ void g_Device_Usart1_Init(uint32_t BaudRate);     //GPS
 void g_Device_Usart2_Init(uint32_t BaudRate);     //Debug
 void g_Device_Usart3_Init(uint32_t BaudRate);     //485
 void g_Device_Usart_Rxbuff_Copy(g_Device_Config_CMD dst);
+g_Device_Config_CMD g_Device_Usart_UserCmd_Copy(void);
+
 
 
 

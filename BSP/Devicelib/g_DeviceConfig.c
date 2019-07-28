@@ -37,11 +37,6 @@ void *QConfiMsgTb[QConfigMsgTb_Size];
 
 static void g_Device_WirelessUpload_Config(g_Device_Config_CMD uploadCmd)   //通信模块无线指令下发配置(串口1)
 {
-	uint16_t Temp_SendPeriod;
-	uint8_t Flash_Tmp[14];  //flash操作中间变量
-	uint8_t TimebuffNum=0;
-	uint8_t TimeBuff_Hex[8] = {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00}; //16进制的时间Buffer  2018年3月15号 20时50分00秒 星期4
-
 	if(uploadCmd.cmdLenth != 0)
 	{
 #if (TRANSMIT_TYPE == GPRS_Mode)
@@ -93,6 +88,7 @@ static void g_Device_WirelessUpload_Config(g_Device_Config_CMD uploadCmd)   //�
 			}
 			if(Hal_CheckString(uploadCmd.strcmd,"FF0208")) //同步设备时间
 			{
+				uint8_t TimeBuff_Hex[8] = {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00}; //16进制的时间Buffer  2018年3月15号 20时50分00秒 星期4
 				OSBsp.Device.Usart2.WriteString("Time Set Done!\r\n");
 				Uart0_RxBuff = strstr(aRxBuploadCmd.strcmduff,"FF0208");         //判断接收到的数据是否有效
 				while(*(Uart0_RxBuff+6) != ',')
@@ -374,6 +370,7 @@ static int FirmCMD_Receive(uint8_t *RxBuff, uint8_t RxNum)
 	if((RxNum==10)&& (RxBuff[0]==0x0D) && (RxBuff[RxNum-1]==0x0D)){
 		if(RxBuff[1] == 0xEF){	//固件升级请求指令
 			hal_Delay_ms(10);
+			g_Printf_info("Enter %s and System will goto bootloader\r\n",__func__);
 			loop5:
 				hal_Delay_ms(10);
 				Flash_Tmp[0] = 0x01;
@@ -387,6 +384,7 @@ static int FirmCMD_Receive(uint8_t *RxBuff, uint8_t RxNum)
 			return 0;	
 		}else if(RxBuff[1] == 0xF0){		//终端信息查询指令
 			hal_Delay_ms(10);
+			g_Printf_info("Enter %s and Check device Info now\r\n",__func__);
 			Send_Tmp[0] = 0xFF;
 			Send_Tmp[1] = OSBsp.Device.InnerFlash.innerFLASHRead(1, infor_BootAddr);//固件版本号
 			for(i=2;i<14;i++){
@@ -396,17 +394,18 @@ static int FirmCMD_Receive(uint8_t *RxBuff, uint8_t RxNum)
 			OSBsp.Device.Usart2.WriteNData(Send_Tmp, 15);
 			return 0;
 		}else if(RxBuff[1] == 0xF5){	//时钟同步
+			hal_Delay_ms(10);
 			uint8_t time_buf[8];
 			for(i = 1; i < 8; i++){
 				time_buf[i]=RxBuff[i+1];	//存“年月日时分秒周”
 			}
 			OSBsp.Device.RTC.ConfigExtTime(time_buf,RealTime);
-			OSBsp.Device.Usart2.WriteString("Time Set Done!\r\n");
-
+			g_Printf_info("Enter %s and Time config done\r\n",__func__);
 			return 0;
 		}else if(RxBuff[1] == 0xFA){		//设置终端信息
 			loop6:
 				hal_Delay_ms(10);
+				g_Printf_info("Enter %s and Set device type\r\n",__func__);
 				for(i=0;i<7;i++){
 					Flash_Tmp[i] = OSBsp.Device.InnerFlash.innerFLASHRead(i,infor_ChargeAddr);
 				}
@@ -418,18 +417,17 @@ static int FirmCMD_Receive(uint8_t *RxBuff, uint8_t RxNum)
 				OSBsp.Device.InnerFlash.FlashRsvWrite(Flash_Tmp, 12, infor_ChargeAddr, 0);//把终端信息写入FLASH
 				hal_Delay_ms(10);
 				if(OSBsp.Device.InnerFlash.innerFLASHRead(7, infor_ChargeAddr) == RxBuff[2] && 
-				OSBsp.Device.InnerFlash.innerFLASHRead(8, infor_ChargeAddr) == RxBuff[3] && 
-				OSBsp.Device.InnerFlash.innerFLASHRead(9, infor_ChargeAddr) == RxBuff[4] && 
-				OSBsp.Device.InnerFlash.innerFLASHRead(10, infor_ChargeAddr) == RxBuff[5] && 
-				OSBsp.Device.InnerFlash.innerFLASHRead(11, infor_ChargeAddr) == RxBuff[6]){
+					OSBsp.Device.InnerFlash.innerFLASHRead(8, infor_ChargeAddr) == RxBuff[3] && 
+					OSBsp.Device.InnerFlash.innerFLASHRead(9, infor_ChargeAddr) == RxBuff[4] && 
+					OSBsp.Device.InnerFlash.innerFLASHRead(10, infor_ChargeAddr) == RxBuff[5] && 
+					OSBsp.Device.InnerFlash.innerFLASHRead(11, infor_ChargeAddr) == RxBuff[6]){
 					return 0;
 				}else
 					goto loop6;
-
-			return 0;
 		}else if(RxBuff[1] == 0xFE){	//设置出厂信息
 			loop7:
 				hal_Delay_ms(10);
+				g_Printf_info("Enter %s and Set device product date\r\n",__func__);
 				Flash_Tmp[0] = RxBuff[5];//设备编号高八位
 				Flash_Tmp[1] = RxBuff[6];//设备编号低八位
 				Flash_Tmp[2] = RxBuff[7];//出厂编号高八位
@@ -449,16 +447,15 @@ static int FirmCMD_Receive(uint8_t *RxBuff, uint8_t RxNum)
 					return 0;
 				}else
 					goto loop7;
-
-			return 0;
 		}else if(RxBuff[1] == 0xFD){	//复位终端
-			OSBsp.Device.Usart2.WriteString("Reset Device Done!\r\n");
-			hal_Delay_ms(100);
+			hal_Delay_ms(10);
+			g_Printf_info("Enter %s and System will reboot\r\n",__func__);
 			hal_Delay_ms(100);
 			hal_Reboot();
 			return 0;
 		}
 	}else if((RxNum > 10)&&(RxNum == (RxBuff[2]+4))&&(RxBuff[RxNum-1]==0x0D)){
+		hal_Delay_ms(10);
 		if(RxBuff[1] == 0x01){
 			OSBsp.Device.InnerFlash.FlashRsvWrite(&RxBuff[2], RxBuff[2]+1, infor_ChargeAddr, 13);//把终端信息写入FLASH
 		}else if(RxBuff[1] == 0x02){
@@ -466,11 +463,12 @@ static int FirmCMD_Receive(uint8_t *RxBuff, uint8_t RxNum)
 		}else if(RxBuff[1] == 0x03){
 			OSBsp.Device.InnerFlash.FlashRsvWrite(&RxBuff[2], RxBuff[2]+1, infor_ChargeAddr, 64);//把终端信息写入FLASH
 		}
-
+		g_Printf_info("Enter %s Set OK\r\n",__func__);
 		return 0;
 	}else if((RxNum == 27)&&(RxBuff[1] == 0xD1)&&(RxBuff[RxNum-1]==0x0D)){
+		hal_Delay_ms(10);
 		OSBsp.Device.InnerFlash.FlashRsvWrite(&RxBuff[2], 24, infor_ChargeAddr, 100);
-
+		g_Printf_info("Enter %s Set OK\r\n",__func__);
 		return 0;
 	}
 	
@@ -489,20 +487,18 @@ static void g_Device_Board_Config(g_Device_Config_CMD ClientCmd)
 	/*********************串口Debug串口数据，时钟同步或LoRa配置**********************************/
 	if(ClientCmd.cmdLenth != 0)
 	{
-		// delay_ms(50);
-		// Uart_2_Flag=0;
-
 		if((ClientCmd.strcmd[0]=='A' && ClientCmd.strcmd[1]=='T' && 
 				ClientCmd.strcmd[ClientCmd.cmdLenth-2]==0x0D && ClientCmd.strcmd[ClientCmd.cmdLenth-1]==0x0A))
 		{
 			User_Printf((char *)ClientCmd.hexcmd);
-			OSBsp.Device.Usart2.WriteString(ClientCmd.strcmd);
 		}else{
 			if(FirmCMD_Receive(ClientCmd.hexcmd, ClientCmd.cmdLenth) < 0)//上位机指令解析
 			{
-				OSBsp.Device.Usart2.WriteString("Wrong Command!\n");
+				g_Printf_info("ah hahahahahaha\n");
 			}
 		}
+
+		// memset(&cRxBuff,0x0,sizeof(g_Device_Config_CMD));
 	}
 }
 
@@ -512,17 +508,17 @@ void ManagerTaskStart(void *p_arg)
 	(void)p_arg;    
 	OSTimeDlyHMSM(0u, 0u, 0u, 200u);
          
-	static uint8_t index = 0;
-	struct hal_message ConfigMsg;
-	g_ConfigQueue = Hal_QueueCreate(&QConfiMsgTb[0],QConfigMsgTb_Size);    
-	APP_TRACE_INFO(("%s ... ...\n",__func__));     
+	g_ConfigQueue = Hal_QueueCreate(QConfiMsgTb,QConfigMsgTb_Size);    
+	g_Printf_info("%s ... ...\n",__func__);     
     while (DEF_TRUE) {               /* Task body, always written as an infinite loop.       */
         if(Hal_getCurrent_work_Mode() == 0){
-			for(index=0;index<QConfigMsgTb_Size;index++){
-				if(Hal_QueueRecv(g_ConfigQueue,&ConfigMsg,10) < 0){
-					break;
-				}
-
+			struct hal_message ConfigMsg;
+			memset(&ConfigMsg,0x0,sizeof(struct hal_message));
+			int ret = Hal_QueueRecv(g_ConfigQueue,&ConfigMsg,0);
+			if(ret == 0){
+				g_Printf_info("Recv message type %d\r\n",ConfigMsg.what);
+				g_Printf_info("Recv message content %s\r\n",(char *)ConfigMsg.content);
+				
 				if (ConfigMsg.what == G_WIRELESS_UPLAOD){
 					char *cmdType = (char *)ConfigMsg.content;
 					if(strcmp(cmdType,"SerialBus") == 0){
@@ -546,14 +542,14 @@ void ManagerTaskStart(void *p_arg)
 					if(strcmp(cmdType,"ClientCMD") == 0){
 						g_Device_Config_CMD g_ConfigCMD;
 						memset(&g_ConfigCMD,0x0,sizeof(g_Device_Config_CMD));
-						OSTimeDlyHMSM(0u, 0u, 0u, 50u);	        //延时等待接收完成
-						g_Device_Usart_Rxbuff_Copy(g_ConfigCMD);
+						hal_Delay_ms(50);	        //延时等待接收完成
+						g_ConfigCMD = g_Device_Usart_UserCmd_Copy();
 						g_Device_Board_Config(g_ConfigCMD);
 					}
 				}
 			}
 			
-            OSTimeDlyHMSM(0u, 0u, 0u, 200u);  
+			hal_Delay_ms(100);
 			// GetADCValue();
         }
     }
@@ -561,17 +557,17 @@ void ManagerTaskStart(void *p_arg)
 
 
 
-int g_Device_Config_QueuePost(int type,void *state)
+int g_Device_Config_QueuePost(uint32_t type,void *state)
 {
 	struct hal_message msg;
-	APP_TRACE_INFO(("%s Message type: %d ",__func__,type);)
+	g_Printf_dbg("%s Message type: %d \r\n",__func__,type);
 	
 	msg.what = type;
 	msg.freecb = null;
 	msg.content = state;	
 	
 	if (Hal_QueueSend(g_ConfigQueue,&msg, 10) < 0){
-		APP_TRACE_DBG(("%s message failed!",__func__));
+		g_Printf_dbg("%s message failed!\r\n",__func__);
 		return -1;
 	}
 

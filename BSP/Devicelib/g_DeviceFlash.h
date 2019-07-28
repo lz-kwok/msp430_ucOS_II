@@ -23,13 +23,9 @@
  *
  */
 
-extern uint8_t Terminal_Info[14];
-
 
 
 void g_Device_InnerFlash_Init(void);
-//void InitTerminal(void);
-void InforOperate(uint8_t data);
 
 
 

@@ -5,6 +5,7 @@
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
 ../BSP/Devicelib/g_DeviceADC.c \
+../BSP/Devicelib/g_DeviceConfig.c \
 ../BSP/Devicelib/g_DeviceFlash.c \
 ../BSP/Devicelib/g_DeviceGprs.c \
 ../BSP/Devicelib/g_DeviceIO.c \
@@ -17,6 +18,7 @@ C_SRCS += \
 
 OBJS += \
 ./BSP/Devicelib/g_DeviceADC.obj \
+./BSP/Devicelib/g_DeviceConfig.obj \
 ./BSP/Devicelib/g_DeviceFlash.obj \
 ./BSP/Devicelib/g_DeviceGprs.obj \
 ./BSP/Devicelib/g_DeviceIO.obj \
@@ -29,6 +31,7 @@ OBJS += \
 
 C_DEPS += \
 ./BSP/Devicelib/g_DeviceADC.pp \
+./BSP/Devicelib/g_DeviceConfig.pp \
 ./BSP/Devicelib/g_DeviceFlash.pp \
 ./BSP/Devicelib/g_DeviceGprs.pp \
 ./BSP/Devicelib/g_DeviceIO.pp \
@@ -41,6 +44,7 @@ C_DEPS += \
 
 C_DEPS__QUOTED += \
 "BSP\Devicelib\g_DeviceADC.pp" \
+"BSP\Devicelib\g_DeviceConfig.pp" \
 "BSP\Devicelib\g_DeviceFlash.pp" \
 "BSP\Devicelib\g_DeviceGprs.pp" \
 "BSP\Devicelib\g_DeviceIO.pp" \
@@ -53,6 +57,7 @@ C_DEPS__QUOTED += \
 
 OBJS__QUOTED += \
 "BSP\Devicelib\g_DeviceADC.obj" \
+"BSP\Devicelib\g_DeviceConfig.obj" \
 "BSP\Devicelib\g_DeviceFlash.obj" \
 "BSP\Devicelib\g_DeviceGprs.obj" \
 "BSP\Devicelib\g_DeviceIO.obj" \
@@ -65,6 +70,7 @@ OBJS__QUOTED += \
 
 C_SRCS__QUOTED += \
 "../BSP/Devicelib/g_DeviceADC.c" \
+"../BSP/Devicelib/g_DeviceConfig.c" \
 "../BSP/Devicelib/g_DeviceFlash.c" \
 "../BSP/Devicelib/g_DeviceGprs.c" \
 "../BSP/Devicelib/g_DeviceIO.c" \
