@@ -30,13 +30,12 @@
 
 #if (TRANSMIT_TYPE == GPRS_Mode)
 
-uint8_t GprsInitStatus = 0;
-uint8_t WirelessStatus = (enum GprsStatus)PowerOff;
-
 enum CoordinateSystem{
 	WGS_84 = 1,
 	GCJ_02 = 2
 };
+
+static char gprs_tick = 0;
 
 
 //static char TimeString[20] = "20170804 16:00:00";
@@ -49,57 +48,132 @@ enum CoordinateSystem{
 *******************************************************************************/
 void g_Device_GPRS_Init(void)
 {
+	if(AppDataPointer->TransMethodData.GPRSStatus == GPRS_Waitfor_SMSReady){
+		g_Printf_info("Start Init GPRS\r\n");
+		hal_Delay_ms(10);
+		g_Printf_info("Please Wait ...\r\n");
+		hal_Delay_ms(10);
+
+		g_Printf_dbg("AT\r\n");
+		User_Printf("AT\r\n");           //AT同步，与主机端同步波特率
+		OSTimeDly(500);
+
+		g_Printf_dbg("ATE0\r\n");
+		User_Printf("ATE0\r\n");         //关闭回显，初始化阶段关闭
+		OSTimeDly(500);
+		AppDataPointer->TransMethodData.GPRSStatus == GPRS_Preinit;
+	}else if(AppDataPointer->TransMethodData.GPRSStatus == GPRS_Preinit){
+		if((AppDataPointer->TransMethodData.GPRSNet == 0)&&
+				(AppDataPointer->TransMethodData.GPRSAttached == 0)){
+			g_Printf_dbg("AT+CSQ\r\n");
+			User_Printf("AT+CSQ\r\n");   //查询信号质量		
+			gprs_tick ++;
+			OSTimeDly(1000);
+			if(gprs_tick == 5){
+				gprs_tick = 0;
+				g_Printf_info("%s failed : Poor signal quality\r\n",__func__);
+			}	
+		}else if((AppDataPointer->TransMethodData.GPRSNet == 1)&&
+				(AppDataPointer->TransMethodData.GPRSAttached == 0)){
+			g_Printf_dbg("AT+CGATT?\r\n");
+			User_Printf("AT+CGATT?\r\n"); 		//查询GPRS附着状态 ，0表示分离，1表示附着
+			gprs_tick ++;
+			OSTimeDly(1000);	
+			if((gprs_tick == 5)&&(AppDataPointer->TransMethodData.GPRSAttached == 0)){
+				gprs_tick = 0;
+				g_Printf_info("Manual gain access to network\r\n");
+				g_Printf_dbg("AT+CGATT=1\r\n"); //手动附着GPRS网络
+				User_Printf("AT+CGATT=1\r\n");
+				OSTimeDly(1000);
+			}	
+		}else if((AppDataPointer->TransMethodData.GPRSNet == 1)&&
+				(AppDataPointer->TransMethodData.GPRSAttached == 1)){
 #ifdef SIM800C
-	static char gprs_tick = 0;
-
-	OSBsp.Device.Usart2.WriteString("Start Init GPRS\r\n");
-	hal_Delay_ms(100);
-	OSBsp.Device.Usart2.WriteString("Please Wait ...\r\n");
-	hal_Delay_ms(100);
-
-	OSBsp.Device.Usart2.WriteString("AT\r\n");
-	User_Printf("AT\r\n");           //AT同步，与主机端同步波特率
-	hal_Delay_sec(1);
-
-	OSBsp.Device.Usart2.WriteString("ATE0\r\n");
-	User_Printf("ATE0\r\n");         //关闭回显，初始化阶段关闭
-	hal_Delay_sec(1);
-
-	gprs_tick = 0;
-	while( (AppDataPointer->TransMethodData.GPRSNet == 0)&&(gprs_tick<5) )
-	{
-		gprs_tick++;
-		OSBsp.Device.Usart2.WriteString("AT+CSQ\r\n");
-		User_Printf("AT+CSQ\r\n");   //查询信号质量
-		hal_Delay_sec(2);
+			g_Printf_dbg("AT+CIPSHUT\r\n");
+			User_Printf("AT+CIPSHUT\r\n");
+#endif
+			OSTimeDly(2000);
+			AppDataPointer->TransMethodData.GPRSStatus = GPRS_Http_Init_Done;
+#ifdef AIR202
+			AppDataPointer->TransMethodData.GPRSStatus = GPRS_Http_Preinit;
+			AppDataPointer->TransMethodData.GPRSATStatus = GPRS_Waitfor_OK;
+#endif
+		}	
 	}
-
-	gprs_tick = 0;
-	while( (AppDataPointer->TransMethodData.GPRSAttached == 0)&&(gprs_tick<5) )
-	{
-		gprs_tick++;
-		OSBsp.Device.Usart2.WriteString("AT+CGATT?\r\n");
-		User_Printf("AT+CGATT?\r\n"); 		//查询GPRS附着状态 ，0表示分离，1表示附着
-		hal_Delay_sec(2);
-		if (AppDataPointer->TransMethodData.GPRSAttached == 0)
+#ifdef AIR202
+	else if(AppDataPointer->TransMethodData.GPRSStatus == GPRS_Http_Preinit){
+		gprs_tick = 0;
+		while(gprs_tick<7) 
 		{
-			OSBsp.Device.Usart2.WriteString("AT+CGATT=1\r\n"); //手动附着GPRS网络
-			User_Printf("AT+CGATT=1\r\n");
-			hal_Delay_sec(2);
+			if(gprs_tick == 0){
+				if(AppDataPointer->TransMethodData.GPRSATStatus == GPRS_Waitfor_OK){
+					g_Printf_dbg("AT+SAPBR=3,1,\"CONTYPE\",\"GPRS\"\r\n");
+					User_Printf("AT+SAPBR=3,1,\"CONTYPE\",\"GPRS\"\r\n");
+					OSTimeDly(1000);
+				}else{
+					gprs_tick = 1;
+					AppDataPointer->TransMethodData.GPRSATStatus = GPRS_Waitfor_OK;
+				}
+			}else if(gprs_tick == 1){
+				if(AppDataPointer->TransMethodData.GPRSATStatus == GPRS_Waitfor_OK){
+					g_Printf_dbg("AT+SAPBR=3,1,\"APN\",\"CMNET\"\r\n");
+					User_Printf("AT+SAPBR=3,1,\"APN\",\"CMNET\"\r\n");
+					OSTimeDly(1000);
+				}else{
+					gprs_tick = 2;
+					AppDataPointer->TransMethodData.GPRSATStatus = GPRS_Waitfor_OK;
+				}
+			}else if(gprs_tick == 2){
+				if(AppDataPointer->TransMethodData.GPRSATStatus == GPRS_Waitfor_OK){
+					g_Printf_dbg("AT+SAPBR=5,1\r\n");
+					User_Printf("AT+SAPBR=5,1\r\n");
+					OSTimeDly(1000);
+				}else{
+					gprs_tick = 3;
+					AppDataPointer->TransMethodData.GPRSATStatus = GPRS_Waitfor_OK;
+				}
+			}else if(gprs_tick == 3){
+				if(AppDataPointer->TransMethodData.GPRSATStatus == GPRS_Waitfor_OK){
+					g_Printf_dbg("AT+SAPBR =1,1\r\n");
+					User_Printf("AT+SAPBR =1,1\r\n");
+					OSTimeDly(1000);
+				}else{
+					gprs_tick = 4;
+					AppDataPointer->TransMethodData.GPRSATStatus = GPRS_Waitfor_GetIP;
+				}
+			}else if(gprs_tick == 4){         
+				if(AppDataPointer->TransMethodData.GPRSATStatus == GPRS_Waitfor_GetIP){
+					AppDataPointer->TransMethodData.Http_Cid = 0;
+					memset(aRxBuff,0x0,256);
+					aRxNum = 0;
+					g_Printf_dbg("AT+SAPBR=2,1\r\n");
+					User_Printf("AT+SAPBR=2,1\r\n");
+					OSTimeDly(1000);
+				}else{
+					gprs_tick = 5;
+					AppDataPointer->TransMethodData.GPRSATStatus = GPRS_Waitfor_OK;
+				}
+			}else if(gprs_tick == 5){         
+				if(AppDataPointer->TransMethodData.GPRSATStatus == GPRS_Waitfor_OK){
+					g_Printf_dbg("AT+HTTPINIT\r\n");
+					User_Printf("AT+HTTPINIT\r\n");
+					OSTimeDly(1000);
+				}else{
+					gprs_tick = 6;
+					AppDataPointer->TransMethodData.GPRSATStatus = GPRS_Waitfor_OK;
+				}
+			}else if(gprs_tick == 6){          
+				if(AppDataPointer->TransMethodData.GPRSATStatus == GPRS_Waitfor_OK){
+					User_Printf("AT+HTTPPARA=\"CID\",%d\r\n",AppDataPointer->TransMethodData.Http_Cid);
+					OSTimeDly(1000);
+				}else{
+					gprs_tick ++;
+					AppDataPointer->TransMethodData.GPRSATStatus = GPRS_Waitfor_OK;
+					AppDataPointer->TransMethodData.GPRSStatus = GPRS_Http_Init_Done;
+				}
+			}
 		}
-	}
-
-	OSBsp.Device.Usart2.WriteString("AT+CIPSHUT\r\n");
-	User_Printf("AT+CIPSHUT\r\n");
-	hal_Delay_sec(5);
-
-	if( (AppDataPointer->TransMethodData.GPRSNet == 0)||(AppDataPointer->TransMethodData.GPRSAttached == 0))
-	{
-		OSBsp.Device.Usart2.WriteString("GPRS Init Failed!!!\r\n");
-	}
-	if( (AppDataPointer->TransMethodData.GPRSNet == 1)&&(AppDataPointer->TransMethodData.GPRSAttached == 1) )
-	{
-		OSBsp.Device.Usart2.WriteString("GPRS Init Succeess!\r\n");
+		gprs_tick = 0;
 	}
 #endif
 }
@@ -121,12 +195,13 @@ void g_Device_Establish_TCP_Connection(const char *ip,uint32_t port)
 /*******************************************************************************
 * 函数名		: GprsHttpPost
 * 描述	    	: http上报数据
-* 输入参数  	: host,path,apikey,data,response,timeout
+* 输入参数  	: host,path,apikey,data,response,timeout(sec)
 * 返回参数  	: code
 *******************************************************************************/
 int g_Device_http_post(const char *host,const char* path,const char *apikey,const char *data,
                       char *response,int timeout)
 {
+	int timer = 0;
 #ifdef SIM800C
     uint32_t datalen = 0;
 	datalen = strlen(data);
@@ -161,51 +236,76 @@ int g_Device_http_post(const char *host,const char* path,const char *apikey,cons
 #endif
 
 #ifdef AIR202
-	static char PostTick = 0;  
 	uint32_t datalen = 0;
-
-	if(PostTick == 0){      //设置Http会话参数
-		if(AppDataPointer->TransMethodData.GPRSATStatus == GPRS_Waitfor_OK){
-			User_Printf("AT+HTTPPARA=\"URL\",\"%s%s\"\r\n",host,path);
-			hal_Delay_sec(2);
-		}else{
-			PostTick = 1;
-			AppDataPointer->TransMethodData.GPRSATStatus = GPRS_Waitfor_OK;
-		}
-	}else if(PostTick == 1){      //
-		if(AppDataPointer->TransMethodData.GPRSATStatus == GPRS_Waitfor_OK){
-			datalen = strlen(data);
-			User_Printf("AT+HTTPDATA=%d,100000\r\n",datalen);
-			hal_Delay_sec(2);
-			if(AppDataPointer->TransMethodData.GPRSATStatus == GPRS_Waitfor_Download){
-				User_Printf("%s\r\n",data);
-				PostTick = 2;
-				hal_Delay_sec(1);
+	int g_err = 0;
+	struct hal_timeval now;		
+	struct hal_timeval tmp_tv;
+	int32_t	sub_timeout_sec;
+	Hal_GetTimeOfDay(&now);
+	while(g_err == 0){
+		if(gprs_tick == 0){      //设置Http会话参数
+			if(AppDataPointer->TransMethodData.GPRSATStatus == GPRS_Waitfor_OK){
+				User_Printf("AT+HTTPPARA=\"URL\",\"%s%s\"\r\n",host,path);
+				OSTimeDly(1000);
+			}else{
+				gprs_tick = 1;
+				AppDataPointer->TransMethodData.GPRSATStatus = GPRS_Waitfor_OK;
 			}
+		}else if(gprs_tick == 1){      //
+			if(AppDataPointer->TransMethodData.GPRSATStatus == GPRS_Waitfor_OK){
+				datalen = strlen(data);
+				User_Printf("AT+HTTPDATA=%d,100000\r\n",datalen);
+				OSTimeDly(1000);
+				if(AppDataPointer->TransMethodData.GPRSATStatus == GPRS_Waitfor_Download){
+					User_Printf("%s\r\n",data);
+					gprs_tick = 2;
+					OSTimeDly(1000);
+				}
 
-			AppDataPointer->TransMethodData.GPRSATStatus = GPRS_Waitfor_OK;
+				AppDataPointer->TransMethodData.GPRSATStatus = GPRS_Waitfor_OK;
+			}
+		}else if(gprs_tick == 2){      //
+			if(AppDataPointer->TransMethodData.GPRSATStatus == GPRS_Waitfor_OK){
+				User_Printf("AT+HTTPACTION=1\r\n");
+				OSTimeDly(1000);
+			}else if(AppDataPointer->TransMethodData.GPRSATStatus == GPRS_Get_HTTPACT){
+				gprs_tick = 3;
+				User_Printf("AT+HTTPREAD\r\n");
+				OSTimeDly(1000);
+				AppDataPointer->TransMethodData.GPRSATStatus = GPRS_Waitfor_OK;
+			}
+		}else if(gprs_tick == 3){
+			if(AppDataPointer->TransMethodData.GPRSATStatus == GPRS_Waitfor_OK){
+				User_Printf("AT+HTTPTERM\r\n");    //根据需要看是否需结束Http服务
+				OSTimeDly(1000);
+			}else{
+				gprs_tick = 0;
+				// HttpStart = 0;
+				AppDataPointer->TransMethodData.GPRSATStatus = GPRS_Waitfor_OK;
+				AppDataPointer->TransMethodData.GPRSStatus = GPRS_Init_Done;
+
+				g_err = 1;
+			}
 		}
-	}else if(PostTick == 2){      //
-		if(AppDataPointer->TransMethodData.GPRSATStatus == GPRS_Waitfor_OK){
-			User_Printf("AT+HTTPACTION=1\r\n");
-			hal_Delay_sec(2);
-		}else if(AppDataPointer->TransMethodData.GPRSATStatus == GPRS_Get_HTTPACT){
-			PostTick = 3;
-			User_Printf("AT+HTTPREAD\r\n");
-			hal_Delay_sec(2);
-			AppDataPointer->TransMethodData.GPRSATStatus = GPRS_Waitfor_OK;
-		}
-	}else if(PostTick == 3){
-		if(AppDataPointer->TransMethodData.GPRSATStatus == GPRS_Waitfor_OK){
-			User_Printf("AT+HTTPTERM\r\n");    //根据需要看是否需结束Http服务
-			hal_Delay_sec(2);
-		}else{
-			PostTick = 0;
-			// HttpStart = 0;
-			AppDataPointer->TransMethodData.GPRSATStatus = GPRS_Waitfor_OK;
-			AppDataPointer->TransMethodData.GPRSStatus = GPRS_Init_Done;
+
+		Hal_GetTimeOfDay(&tmp_tv);
+		sub_timeout_sec = tmp_tv.tv_sec - now.tv_sec;
+		if(sub_timeout_sec > timeout){
+			if((gprs_tick < 2)&&(gprs_tick > 0))){
+				g_Printf_info("%s para set timerout\r\n",__func__);						
+			}else if(gprs_tick == 2){
+				g_Printf_info("%s failed . http timerout\r\n",__func__);
+				gprs_tick = 3;
+				User_Printf("AT+HTTPTERM\r\n");   //结束Http服务
+				OSTimeDly(1000);
+				AppDataPointer->TransMethodData.GPRSATStatus = GPRS_Waitfor_OK;
+
+				g_err = -1;
+			}
 		}
 	}
+
+	return g_err;
 #endif
 }
 
@@ -217,31 +317,33 @@ void g_Device_check_Response(char *res)
 
 #ifdef SIM800C
 	if(Hal_CheckString(response,"CONNECT OK")){
-		OSBsp.Device.Usart2.WriteString("Connect OK\r\n");
+		g_Printf_dbg("Connect OK\r\n");
 		AppDataPointer->TransMethodData.GPRSConnect = 1;
 	}else if(Hal_CheckString(response,"SEND OK")){
 		// App.Data.GprsSendStatus = 1;
-		OSBsp.Device.Usart2.WriteString("Send OK\r\n");
+		g_Printf_dbg("Send OK\r\n");
 	} else if(Hal_CheckString(response,"CLOSED")){
-		OSBsp.Device.Usart2.WriteString("Web Closed\r\n");
+		g_Printf_dbg("Web Closed\r\n");
 		// AllowSend=0;
 		// GPRSReset;
 		// Ctr_GPRS_OFF;  //鍏抽棴GPRS
 	}else if(Hal_CheckString(response,"+CSQ:")){
 		if (Hal_CheckString(response,"0,0")){
-			OSBsp.Device.Usart2.WriteString("CSQ Faild!\r\n");
+			g_Printf_dbg("CSQ Faild!\r\n");
 			AppDataPointer->TransMethodData.GPRSNet = 0;
 		}else{
-			OSBsp.Device.Usart2.WriteString("CSQ OK!\r\n");
+			g_Printf_dbg("CSQ OK!\r\n");
 			AppDataPointer->TransMethodData.GPRSNet = 1;
+			gprs_tick = 0;
 		}
 	}else if(Hal_CheckString(response,"+CGATT:")){
 		if (Hal_CheckString(response,"0")){
-			OSBsp.Device.Usart2.WriteString("Attached Faild!\r\n");
+			g_Printf_dbg("Attached Faild!\r\n");
 			AppDataPointer->TransMethodData.GPRSAttached = 0;
 		}else{
-			OSBsp.Device.Usart2.WriteString("Attached OK!\r\n");
+			g_Printf_dbg("Attached OK!\r\n");
 			AppDataPointer->TransMethodData.GPRSAttached = 1;
+			gprs_tick = 0;
 		}
 	}
 #endif
@@ -263,11 +365,11 @@ void g_Device_check_Response(char *res)
 		{
 			if (Hal_CheckString(response,"0"))
 			{
-				OSBsp.Device.Usart2.WriteString("Attached Faild!\r\n");
+				g_Printf_dbg("Attached Faild!\r\n");
 				AppDataPointer->TransMethodData.GPRSAttached = 0;
 			}else
 			{
-				OSBsp.Device.Usart2.WriteString("Attached OK!\r\n");
+				g_Printf_dbg("Attached OK!\r\n");
 				AppDataPointer->TransMethodData.GPRSAttached = 1;
 			}
 		}

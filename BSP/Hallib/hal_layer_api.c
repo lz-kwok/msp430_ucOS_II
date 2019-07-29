@@ -73,6 +73,9 @@ typedef struct {
 }gHal_Device_Manager;
 
 static gHal_Device_Manager gManager;
+static Mutex_t gMutex = null;
+static uint32_t mLastTimems = 0;
+static struct hal_timeval mTimeVal;
 
 /*******************************************************************************
 * Function Name  : Crc16(uint8_t *bufferpoint,int16_t sum)
@@ -207,6 +210,20 @@ int Hal_QueueSend(Queue_t queue, struct hal_message* msg, int timeout)
      return -1;
  }
 
+int Hal_QueueNum_Waitfor_Pend(Queue_t queue)
+ {
+     uint8_t err;
+     int num = 0;
+     OS_Q_DATA Q_Data;
+     err = OSQQuery(queue, &Q_Data);
+     if (OS_ERR_NONE == err){
+         num = Q_Data.OSNMsgs;
+         return num;
+     }
+
+     return num;
+ }
+
 Mutex_t Hal_MutexCreate(int priority)
 {
     Mutex_t pmutex;
@@ -241,6 +258,57 @@ void Hal_MutexUnlock(Mutex_t mutex)
     err = OSMutexPost(mutex);
 }
 
+void Hal_GetTimeOfDay(struct hal_timeval* tv)
+{
+    uint32_t timems = 0; //it will roll over every 49 days, 17 hours.
+    uint32_t timediff = 0;
+
+	Hal_MutexLock(gMutex);
+    //Gets time in milliseconds since RTOS start
+    timems = OSTimeGet();
+    if (timems < mLastTimems) {
+        int32_t maxTime = -1;
+
+        timediff = maxTime - mLastTimems;
+        timediff += timems;
+    } else {
+        timediff = timems - mLastTimems;
+    }
+
+    mLastTimems = timems;
+	if (mTimeVal.tv_msec == 0 && mTimeVal.tv_sec == 0) {
+		mTimeVal.tv_sec = timediff / 1000;
+		mTimeVal.tv_msec = timediff;
+	}else {
+		mTimeVal.tv_msec += timediff;
+		if (mTimeVal.tv_msec >= 1000) { // 1 second
+			mTimeVal.tv_sec += mTimeVal.tv_msec / 1000000;
+			mTimeVal.tv_msec = mTimeVal.tv_msec % 1000000;
+		}
+	}
+
+    tv->tv_sec = mTimeVal.tv_sec;
+    tv->tv_msec = mTimeVal.tv_msec;
+
+    Hal_MutexUnlock(gMutex);
+}
+
+int Hal_Platform_Init(void)
+{
+    ScadaData_base_Init();
+    Terminal_Para_Init();
+
+    gMutex = Hal_MutexCreate(LOWEST_TASK_PRIO);
+    if (gMutex == null) {
+        g_Printf_dbg("%s mutex create Failed\r\n",__func__);
+        return -1;
+    }
+
+    mTimeVal.tv_sec = 0;
+    mTimeVal.tv_msec = 0;
+	mLastTimems = 0;
+    return 0;
+}
 
 int Hal_getProductName(char *proName)
 {

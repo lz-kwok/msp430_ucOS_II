@@ -18,6 +18,13 @@ extern uint8_t Uart_0_Flag;
 #define cRxLength 100		//UART2 buff length
 #define dRxLength 50		//UART3 buff length
 
+enum G_UART_PORT{
+	Usart0 = 0x1,		
+	Usart1,
+    Usart2,
+    Usart3
+};
+
 extern char aRxBuff[];
 extern uint8_t aRxNum;
 // extern g_Device_Config_CMD cRxBuff;
@@ -30,8 +37,7 @@ void g_Device_Usart0_Init(uint32_t BaudRate);     //LoRa
 void g_Device_Usart1_Init(uint32_t BaudRate);     //GPS
 void g_Device_Usart2_Init(uint32_t BaudRate);     //Debug
 void g_Device_Usart3_Init(uint32_t BaudRate);     //485
-void g_Device_Usart_Rxbuff_Copy(g_Device_Config_CMD dst);
-g_Device_Config_CMD g_Device_Usart_UserCmd_Copy(void);
+g_Device_Config_CMD g_Device_Usart_UserCmd_Copy(G_UART_PORT Port);
 
 
 

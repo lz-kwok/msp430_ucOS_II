@@ -45,6 +45,7 @@
 #endif
 
 /*------------------------ Nothing Below This Line --------------------------*/
+#define SCADATIME					60
 // 定义是否具备GPS功能
 #define HAVE_GPS_SERVICE
 // 定义是否具备蓝牙功能

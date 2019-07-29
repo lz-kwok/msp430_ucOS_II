@@ -28,6 +28,11 @@ struct hal_message{
 	message_free_cb freecb; /* free content func */
 };
 
+struct hal_timeval{
+	long    tv_sec;         /* seconds */
+	long    tv_msec;        /* and microseconds */
+};
+
 typedef union
 {
 	uint8_t Hex[4];
@@ -69,11 +74,13 @@ Queue_t Hal_QueueCreate(void **start,int size);
 void Hal_QueueDestory(Queue_t queue);
 int Hal_QueueSend(Queue_t queue, struct hal_message* msg, int timeout);
 int Hal_QueueRecv(Queue_t queue, struct hal_message* msg, int timeout);
+int Hal_QueueNum_Waitfor_Pend(Queue_t queue);
 Mutex_t Hal_MutexCreate(int priority);
 void Hal_MutexDestory(Mutex_t mutex);
 void Hal_MutexLock(Mutex_t mutex);
 void Hal_MutexUnlock(Mutex_t mutex);
-
+void Hal_GetTimeOfDay(struct hal_timeval* tv);
+int Hal_Platform_Init(void);
 int Hal_getProductName(char *proName);
 uint32_t Hal_getDeviceID(void);
 uint32_t Hal_getManufactureDate(void);

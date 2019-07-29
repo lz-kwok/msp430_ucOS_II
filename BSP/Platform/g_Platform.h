@@ -5,6 +5,12 @@
 #include <hal_device.h>
 
 
+enum DEVICE_STATUS_e {
+	DEVICE_STATUS_POWER_OFF = 0x01, 
+	DEVICE_STATUS_POWER_SCANNING = 0x02,
+	DEVICE_STATUS_POWER_SCAN_OVER = 0x03
+};
+
 typedef struct
 {
 	uint8_t  Second;
@@ -37,14 +43,14 @@ typedef struct
 	uint16_t LoraDeveui;				//LoRa Deveui
 
 	uint16_t SensorStatus;              //传感器状态
-
+	char DeviceStatus;
 	char ProductKey[32];
 	char DeviceName[32];
 	char DeviceSecret[64];
-	unsigned char hmacmd5Val[64];
-	unsigned char hmacsha1[64];
-	unsigned char AliiotToken[64];
-	unsigned char AliiotID[64];
+	uint8_t hmacmd5Val[64];
+	uint8_t hmacsha1[64];
+	uint8_t AliiotToken[64];
+	uint8_t AliiotID[64];
 }TerminalPlatform;
 
 typedef struct

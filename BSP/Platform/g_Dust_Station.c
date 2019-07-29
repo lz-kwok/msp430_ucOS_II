@@ -196,8 +196,8 @@ void InqureSensor(void)
 		}
 		hal_Delay_ms(10);//高波特率降低延时为1-2ms，否则容易丢包；低波特率增加延时，如4800延时10ms，否则容易丢包
 		Recive_485_Enable;
-		OSTimeDly(500);
 		LED_ON;
+		OSTimeDly(500);  //任务挂起
 		int ret = AnalyzeComand(dRxBuff,dRxNum);
 		uint32_t times = scadaIndex;
 		if(ret == 0){
@@ -303,6 +303,11 @@ void ScadaData_base_Init(void)
     AppDataPointer = &(App.Data);     //DataStruct * AppDataPointer; 定义结构体类型的指针 ,只是一个名字，具体要定义指针的地址
 
 	//只初始化要用到的数据
+#if (TRANSMIT_TYPE == GPRS_Mode)
+	AppDataPointer->TerminalInfoData.DeviceStatus = DEVICE_STATUS_POWER_OFF;
+	AppDataPointer->TransMethodData.GPRSStatus = GPRS_Power_off;
+	AppDataPointer->TransMethodData.GPRSNet = 0;
+#endif
 }
 
 /*******************************************************************************

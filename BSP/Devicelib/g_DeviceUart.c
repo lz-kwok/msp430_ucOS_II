@@ -373,26 +373,26 @@ void g_Device_Usart3_Init(uint32_t BaudRate)
 
 
 
-void g_Device_Usart_Rxbuff_Copy(g_Device_Config_CMD dst)
-{
-	dst = bRxBuff;
-	memset(&bRxBuff,0x0,sizeof(g_Device_Config_CMD));
-}
 
-g_Device_Config_CMD g_Device_Usart_UserCmd_Copy(void)
+g_Device_Config_CMD g_Device_Usart_UserCmd_Copy(G_UART_PORT Port)
 {
+	static int m = 0;
 	g_Device_Config_CMD dst;
 	memset(&dst,0x0,sizeof(g_Device_Config_CMD));
-	static int m = 0;
-	g_Printf_info("%s len:%d data:",__func__,cRxNum);
-	for(m=0;m<cRxNum;m++){
-		dst.hexcmd[m] = cRxBuff[m];
-		g_Printf_info("%02x ",dst.hexcmd[m]);
+	if(Port == Usart2){
+		g_Printf_info("%s len:%d data:",__func__,cRxNum);
+		for(m=0;m<cRxNum;m++){
+			dst.hexcmd[m] = cRxBuff[m];
+			g_Printf_info("%02x ",dst.hexcmd[m]);
+		}
+		g_Printf_info("\r\n");
+		dst.cmdLenth = cRxNum;
+		cRxNum = 0;
+		memset(cRxBuff,0x0,cRxLength);
+	}else if(Port == Usart1){
+		dst = bRxBuff;
+		memset(&bRxBuff,0x0,sizeof(g_Device_Config_CMD));
 	}
-	g_Printf_info("\r\n");
-	dst.cmdLenth = cRxNum;
-	cRxNum = 0;
-	memset(cRxBuff,0x0,cRxLength);
 
 	return dst;
 }

@@ -6,9 +6,6 @@
 
 #if (TRANSMIT_TYPE == GPRS_Mode)
 
-extern uint8_t GprsInitStatus;
-extern uint8_t WirelessStatus;
-
 enum GprsStatus
 {
 	PowerOff     = 0,
@@ -20,8 +17,9 @@ enum GprsStatus
 };
 
 enum GPRS_STATUS {
-	GPRS_Waitfor_SMSReady = 0,
-	GPRS_Preinit = 1,
+	GPRS_Power_off = 0,
+	GPRS_Waitfor_SMSReady = 1,
+	GPRS_Preinit = 2,
 	GPRS_Init_Done,
 	GPRS_Mqtt_Preinit,
 	GPRS_Mqtt_Init_Done,

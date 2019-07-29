@@ -134,6 +134,8 @@ static void Power(ControlPower type)
 		break;
 		case AIR202_Power_On:
 			P2OUT |= BIT4;	    //打开传感板上电机 //传感器接口电机上电
+			hal_Delay_sec(2);
+			P2OUT &=~BIT4; 
 		break;
 		case AIR202_Power_Off:
 			P2OUT &=~BIT4; 		//关闭传感板上电机 //传感器接口电机掉电
