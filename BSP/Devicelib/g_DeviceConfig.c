@@ -563,7 +563,6 @@ void ManagerTaskStart(void *p_arg)
 int g_Device_Config_QueuePost(uint32_t type,void *state)
 {
 	struct hal_message msg;
-	g_Printf_dbg("%s Message type: %d \r\n",__func__,type);
 	
 	msg.what = type;
 	msg.freecb = null;
