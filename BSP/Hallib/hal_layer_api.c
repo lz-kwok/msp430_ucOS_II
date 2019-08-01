@@ -277,13 +277,13 @@ void Hal_GetTimeOfDay(struct hal_timeval* tv)
 
     mLastTimems = timems;
 	if (mTimeVal.tv_msec == 0 && mTimeVal.tv_sec == 0) {
-		mTimeVal.tv_sec = timediff / 1000;
-		mTimeVal.tv_msec = timediff;
+		mTimeVal.tv_sec = timediff / 500;
+		mTimeVal.tv_msec = timediff % 500;
 	}else {
 		mTimeVal.tv_msec += timediff;
-		if (mTimeVal.tv_msec >= 1000) { // 1 second
-			mTimeVal.tv_sec += mTimeVal.tv_msec / 1000000;
-			mTimeVal.tv_msec = mTimeVal.tv_msec % 1000000;
+		if (mTimeVal.tv_msec >= 500) { // 1 second
+			mTimeVal.tv_sec += mTimeVal.tv_msec / 500;
+            mTimeVal.tv_msec = mTimeVal.tv_msec % 500;
 		}
 	}
 

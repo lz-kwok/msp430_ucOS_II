@@ -61,7 +61,7 @@ void g_Device_GPRS_Init(void)
 		g_Printf_dbg("ATE0\r\n");
 		User_Printf("ATE0\r\n");         //关闭回显，初始化阶段关闭
 		OSTimeDly(500);
-		AppDataPointer->TransMethodData.GPRSStatus == GPRS_Preinit;
+		AppDataPointer->TransMethodData.GPRSStatus = GPRS_Preinit;
 	}else if(AppDataPointer->TransMethodData.GPRSStatus == GPRS_Preinit){
 		if((AppDataPointer->TransMethodData.GPRSNet == 0)&&
 				(AppDataPointer->TransMethodData.GPRSAttached == 0)){
@@ -291,7 +291,7 @@ int g_Device_http_post(const char *host,const char* path,const char *apikey,cons
 		Hal_GetTimeOfDay(&tmp_tv);
 		sub_timeout_sec = tmp_tv.tv_sec - now.tv_sec;
 		if(sub_timeout_sec > timeout){
-			if((gprs_tick < 2)&&(gprs_tick > 0))){
+			if((gprs_tick < 2)&&(gprs_tick > 0)){
 				g_Printf_info("%s para set timerout\r\n",__func__);						
 			}else if(gprs_tick == 2){
 				g_Printf_info("%s failed . http timerout\r\n",__func__);

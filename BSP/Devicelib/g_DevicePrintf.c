@@ -1072,7 +1072,7 @@ uint32_t User_Printf(char *pcFmt, ...)
     va_start(pArgs, pcFmt);
     ui32NumChars = am_util_stdio_vsprintf(g_prfbuf, pcFmt, pArgs);
     va_end(pArgs);
-    g_pfnCharPrint(g_prfbuf);
+    OSBsp.Device.Usart0.WriteString(g_prfbuf);
 
     return ui32NumChars;
 }

@@ -112,10 +112,10 @@ static  void  ScadaTaskStart (void *p_arg)
     while (DEF_TRUE) {               /* Task body, always written as an infinite loop.       */
         if(Hal_getCurrent_work_Mode() == 0){
             if(AppDataPointer->TerminalInfoData.DeviceStatus == DEVICE_STATUS_POWER_OFF){
-                g_Printf_info("SenSor_Power_On\n");
+                g_Printf_info("SenSor_Power_On\r\n");
                 OSBsp.Device.IOControl.PowerSet(SenSor_Power_On);
                 //个别传感器需预热，任务挂起时间视情况而定，默认10s
-                OSTimeDly(1000);OSTimeDly(1000);OSTimeDly(1000);OSTimeDly(1000);OSTimeDly(1000);
+                OSTimeDly(2000);
                 AppDataPointer->TerminalInfoData.DeviceStatus = DEVICE_STATUS_POWER_SCANNING;
                 g_Printf_info("%s ... ...\n",__func__);
                 Hal_GetTimeOfDay(&before_Scada);
@@ -123,6 +123,7 @@ static  void  ScadaTaskStart (void *p_arg)
                 InqureSensor();
                 Hal_GetTimeOfDay(&after_Scada);
                 Scada_timeout_sec = after_Scada.tv_sec - before_Scada.tv_sec;
+                g_Printf_info("Scada_timeout_sec = %d\r\n",Scada_timeout_sec);
                 if(Scada_timeout_sec > SCADATIME){
                     AppDataPointer->TerminalInfoData.DeviceStatus = DEVICE_STATUS_POWER_SCAN_OVER;
                     g_Printf_info("ScadaTask is over\n");

@@ -91,6 +91,7 @@ void  BSP_Init(void)
 
     g_Device_InnerRTC_Init();   
     g_DeviceIO_Init();
+    g_Device_Usart0_Init(9600);
     g_Device_Usart1_Init(9600);
     g_Device_Usart2_Init(115200);     
     g_Device_Usart3_Init(9600);      

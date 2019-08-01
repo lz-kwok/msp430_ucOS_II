@@ -513,8 +513,8 @@ void ManagerTaskStart(void *p_arg)
     while (DEF_TRUE) {               /* Task body, always written as an infinite loop.       */
         if(Hal_getCurrent_work_Mode() == 0){
 			struct hal_message ConfigMsg;
-			int Num = Hal_QueueNum_Waitfor_Pend(g_ConfigQueue);
-			for(index=0;index<Num;index++){
+			// int Num = Hal_QueueNum_Waitfor_Pend(g_ConfigQueue);
+			// for(index=0;index<Num;index++){
 				memset(&ConfigMsg,0x0,sizeof(struct hal_message));
 				int ret = Hal_QueueRecv(g_ConfigQueue,&ConfigMsg,0);
 				if(ret == 0){
@@ -550,9 +550,9 @@ void ManagerTaskStart(void *p_arg)
 						}
 					}
 				}
-			}
+			// }
 
-			hal_Delay_ms(100);
+			OSTimeDly(100);
 			// GetADCValue();
         }
     }
