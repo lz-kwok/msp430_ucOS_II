@@ -366,7 +366,7 @@ void g_Device_Usart3_Init(uint32_t BaudRate)
     UCA3IE |= UCRXIE;                         // 浣胯兘鎺ユ敹涓柇
 
     OSBsp.Device.Usart3.WriteData   = g_Device_SendByte_Uart3;
-	OSBsp.Device.Usart3.WriteNData   = g_Device_SendNByte_Uart3;
+	OSBsp.Device.Usart3.WriteNData  = g_Device_SendNByte_Uart3;
 	OSBsp.Device.Usart3.WriteString = g_Device_SendString_Uart3;
 //    am_util_stdio_printf_init((am_util_stdio_print_char_t)SendStringToLoRa); //涓插彛鎵撳嵃鏄犲皠鍒颁覆鍙�
 }

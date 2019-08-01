@@ -18,12 +18,12 @@ extern uint8_t Uart_0_Flag;
 #define cRxLength 100		//UART2 buff length
 #define dRxLength 50		//UART3 buff length
 
-enum G_UART_PORT{
+typedef enum {
 	Usart0 = 0x1,		
 	Usart1,
     Usart2,
     Usart3
-};
+}G_UART_PORT;
 
 extern char aRxBuff[];
 extern uint8_t aRxNum;
