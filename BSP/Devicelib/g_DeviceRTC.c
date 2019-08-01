@@ -185,11 +185,11 @@ void DS1302_read_time(uint8_t *data,uint8_t dataType)
 //***********************************************************************
 void g_Device_ExtRTC_Init(void) 
 {
-	RESET_CLR;			                        //RESET????�
-	SCK_CLR;			                        //SCK????�
-	RESET_OUT;			                        //RESET?????????
-	SCK_OUT;			                        //SCK?????????
-	DS1302_write_byte(DS1302_sec_add,0x00);	    //???
+	RESET_CLR;			                        //RESET脚置低
+	SCK_CLR;			                        //SCK脚置低
+	RESET_OUT;			                        //RESET脚设置为输出
+	SCK_OUT;			                        //SCK脚设置为输出
+	DS1302_write_byte(DS1302_sec_add,0x00);	    //启动
 
 	OSBsp.Device.RTC.ReadExtTime = DS1302_read_time;
 	OSBsp.Device.RTC.ConfigExtTime = DS1302_write_time;
@@ -225,7 +225,7 @@ void Create_TimeData(uint8_t *p1,uint8_t *p2)
 	p2[18]=(time_buf[6]&0x0f)+0x30; 			    //0
 }
 //***********************************************************************
-//??????????�
+//生成时间戳函数
 //***********************************************************************
 void Create_TimeString(uint8_t *p1,uint8_t *p2)
 {
@@ -258,22 +258,22 @@ void Create_TimeString(uint8_t *p1,uint8_t *p2)
 void g_Device_InnerRTC_Init(void)
 {
     RTCCTL01 = RTCMODE + RTCBCD + RTCHOLD + RTCTEV_0 + RTCSSEL_0;		//  Min. changed interrupt
-    RTCHOUR = 0x00;        //???????�2000?�0?�0?�00:00:00
+    RTCHOUR = 0x00;        //初始时间：2000年0月0日00:00:00
     RTCMIN  = 0x00;
     RTCSEC  = 0x00;
     RTCDAY  = 0x00;
     RTCMON  = 0x00;
     RTCYEAR = 0x2000;
-    RTCCTL01 &= ~RTCHOLD;//?????????
+    RTCCTL01 &= ~RTCHOLD;//启动实时时钟
 
-    RTCCTL0 |= RTCTEVIE;//?????????????�
-//    RTCCTL0 |= RTCRDYIE;//?????????????�
+    RTCCTL0 |= RTCTEVIE;//打开每分钟中断标志
+//    RTCCTL0 |= RTCRDYIE;//打开每秒钟中断标志
 }
 
 //????????TC???
 void Write_info_RTC(uint8_t *time)
 {
-    RTCCTL01 |= RTCHOLD;//?????????
+    RTCCTL01 |= RTCHOLD;//关闭实时时钟
 
     RTCYEAR_L   = time[1];
     RTCMON      = time[2];
@@ -283,12 +283,12 @@ void Write_info_RTC(uint8_t *time)
     RTCSEC      = time[6];
     RTCADOWDAY  = time[7];
 
-    RTCCTL01 &= ~RTCHOLD;//?????????
-//    RTCCTL0 |= RTCTEVIE;//?????????????�
-//    RTCCTL0 |= RTCRDYIE;//?????????????�
+    RTCCTL01 &= ~RTCHOLD;//启动实时时钟
+//    RTCCTL0 |= RTCTEVIE;//打开每分钟中断标志
+//    RTCCTL0 |= RTCRDYIE;//打开每秒钟中断标志
 }
 
-////?????????RTC???
+//读系统自带的RTC函数
 void Read_info_RTC(uint8_t *time)
 {
     time[0] = (uint8_t)RTCYEAR;
@@ -308,12 +308,12 @@ __interrupt void RTC_ISR(void)
         case RTC_NONE:
             break;
 
-        case RTC_RTCTEVIFG://????????????????
+        case RTC_RTCTEVIFG:		//秒
 			{
 
-			} //RTC_RTCTEVIFG://????????????????
+			} 
         	break;
-        case  RTC_RTCRDYIFG://????????????????
+        case  RTC_RTCRDYIFG:	//分钟
 			{
 				//P1OUT ^= BIT7;
 			}

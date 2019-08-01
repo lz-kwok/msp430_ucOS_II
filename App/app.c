@@ -126,9 +126,10 @@ static  void  ScadaTaskStart (void *p_arg)
                 if(Scada_timeout_sec > SCADATIME){
                     AppDataPointer->TerminalInfoData.DeviceStatus = DEVICE_STATUS_POWER_SCAN_OVER;
                     g_Printf_info("ScadaTask is over\n");
+                    OSTimeDly(500);
+                    OSBsp.Device.IOControl.PowerSet(SenSor_Power_Off);
                 }
             }
-            
             
             OSTimeDlyHMSM(0u, 0u, 1u, 0u);  
         }
@@ -157,7 +158,7 @@ static  void  TransmitTaskStart (void *p_arg)
             }else if(AppDataPointer->TransMethodData.GPRSStatus == GPRS_Http_Init_Done){
                  if( AppDataPointer->TerminalInfoData.DeviceStatus == DEVICE_STATUS_POWER_SCAN_OVER){
                      char *data = Hal_Malloc(512*sizeof(char));
-                     char *response Hal_Malloc(64*sizeof(char));;
+                     char *response = Hal_Malloc(64*sizeof(char));
                      data = MakeJsonBodyData(AppDataPointer);
                      int code = g_Device_http_post(g_30000IoT_HOST,g_30000IoT_PATH,null,data,response,15);
 

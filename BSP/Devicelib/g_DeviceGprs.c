@@ -299,9 +299,9 @@ int g_Device_http_post(const char *host,const char* path,const char *apikey,cons
 				User_Printf("AT+HTTPTERM\r\n");   //结束Http服务
 				OSTimeDly(1000);
 				AppDataPointer->TransMethodData.GPRSATStatus = GPRS_Waitfor_OK;
-
-				g_err = -1;
 			}
+
+			g_err = -1;
 		}
 	}
 
