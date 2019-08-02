@@ -29,7 +29,7 @@ Destroy message queue with input parameter as queue pointer to destroy
 ### 1.5. Hal_QueueSend(Queue_t queue, struct hal_message* msg, int timeout)  ###
 Send message function. Send message is a structure pointer, which includes message type and message content.
 
-### 1.6 int Hal_QueueNum_Waitfor_Pend(Queue_t queue) ###
+### 1.6. int Hal_QueueNum_Waitfor_Pend(Queue_t queue) ###
 query Number of messages waiting in the queue
 
 ### 1.7. Hal_QueueRecv(Queue_t queue, struct hal_message* msg, int timeout)  ###
@@ -38,21 +38,32 @@ Receiving message function, receiving message is a structure pointer, which incl
 ### 1.8. Mutex_t Hal_MutexCreate(int priority) ###
 Create a mutually exclusive semaphore with input parameters as the priority of the semaphore
 
-### 1.9. Mutex_t Hal_MutexCreate(Mutex_t mutex) ###
+### 1.9. void Hal_MutexDestory(Mutex_t mutex) ###
 Destroy mutually exclusive semaphore and input parameter is the pointer of the semaphore
 
-### 2.0. Mutex_t Hal_MutexLock(Mutex_t mutex) ###
+### 1.10. void Hal_MutexLock(Mutex_t mutex) ###
 Obtain the right to use semaphores
 
-### 2.1. Mutex_t Hal_MutexUnlock(Mutex_t mutex) ###
+### 1.11. void Hal_MutexUnlock(Mutex_t mutex) ###
 Release semaphore usage rights
 
-### 2.2. void Hal_EnterLowPower_Mode(void) ###
+### 1.12. void Hal_EnterLowPower_Mode(void) ###
 Enter Low Power Mode
 
-### 2.3. void Hal_ExitLowPower_Mode(void) ###
+### 1.13. void Hal_ExitLowPower_Mode(void) ###
 Exit Low Power Mode
 
+### 1.14. void Hal_GetTimeOfDay(struct hal_timeval* tv) ###
+Acquire relative time value based on system ticks.
+
 ## 2. app.c ##
-There are three threads in the app.c,which are scada task, transmission task and management task.
+There are four threads in the app.c,which are scada task, transmission task , management task and IDLE task
 ### 2.1. static  void  ScadaTaskStart (void *p_arg)  ###
+
+
+
+
+
+
+
+

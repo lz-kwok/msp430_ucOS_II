@@ -513,44 +513,41 @@ void ManagerTaskStart(void *p_arg)
     while (DEF_TRUE) {               /* Task body, always written as an infinite loop.       */
         if(Hal_getCurrent_work_Mode() == 0){
 			struct hal_message ConfigMsg;
-			// int Num = Hal_QueueNum_Waitfor_Pend(g_ConfigQueue);
-			// for(index=0;index<Num;index++){
-				memset(&ConfigMsg,0x0,sizeof(struct hal_message));
-				int ret = Hal_QueueRecv(g_ConfigQueue,&ConfigMsg,0);
-				if(ret == 0){
-					hal_Delay_ms(50);	        //延时等待接收完成
-					g_Printf_info("Recv message type %d\r\n",ConfigMsg.what);
-					g_Printf_info("Recv message content %s\r\n",(char *)ConfigMsg.content);
-					
-					if (ConfigMsg.what == G_WIRELESS_UPLAOD){
-						char *cmdType = (char *)ConfigMsg.content;
-						if(strcmp(cmdType,"SerialBus") == 0){
+			memset(&ConfigMsg,0x0,sizeof(struct hal_message));
+			int ret = Hal_QueueRecv(g_ConfigQueue,&ConfigMsg,0);
+			if(ret == 0){
+				hal_Delay_ms(50);	        //延时等待接收完成
+				g_Printf_info("Recv message type %d\r\n",ConfigMsg.what);
+				g_Printf_info("Recv message content %s\r\n",(char *)ConfigMsg.content);
+				
+				if (ConfigMsg.what == G_WIRELESS_UPLAOD){
+					char *cmdType = (char *)ConfigMsg.content;
+					if(strcmp(cmdType,"SerialBus") == 0){
 #if ((ACCESSORY_TYPR == RS485_Mode)||(ACCESSORY_TYPR == RS232_Mode))
-							g_Device_Config_CMD g_ConfigCMD;
-							memset(&g_ConfigCMD,0x0,sizeof(g_Device_Config_CMD));
-							OSTimeDlyHMSM(0u, 0u, 0u, 50u);	        //延时等待接收完成
-							g_ConfigCMD = g_Device_Usart_UserCmd_Copy(Usart1);
-							g_Device_WiredUpload_Config(g_ConfigCMD);
+						g_Device_Config_CMD g_ConfigCMD;
+						memset(&g_ConfigCMD,0x0,sizeof(g_Device_Config_CMD));
+						OSTimeDlyHMSM(0u, 0u, 0u, 50u);	        //延时等待接收完成
+						g_ConfigCMD = g_Device_Usart_UserCmd_Copy(Usart1);
+						g_Device_WiredUpload_Config(g_ConfigCMD);
 #endif
-						}else if(strcmp(cmdType,"Wireless") == 0){
-							hal_Delay_ms(50);	        //延时等待接收完成					
-						}else if(strcmp(cmdType,"GPS_Info") == 0){
-							g_Device_Config_CMD g_ConfigCMD;
-							memset(&g_ConfigCMD,0x0,sizeof(g_Device_Config_CMD));
-							g_ConfigCMD = g_Device_Usart_UserCmd_Copy(Usart1);
-							g_Device_GPS_Config(g_ConfigCMD);
-						}
-					}else if (ConfigMsg.what == G_CLIENT_CMD){
-						char *cmdType = (char *)ConfigMsg.content;
-						if(strcmp(cmdType,"ClientCMD") == 0){
-							g_Device_Config_CMD g_ConfigCMD;
-							memset(&g_ConfigCMD,0x0,sizeof(g_Device_Config_CMD));
-							g_ConfigCMD = g_Device_Usart_UserCmd_Copy(Usart2);
-							g_Device_Board_Config(g_ConfigCMD);
-						}
+					}else if(strcmp(cmdType,"Wireless") == 0){
+						hal_Delay_ms(50);	        //延时等待接收完成					
+					}else if(strcmp(cmdType,"GPS_Info") == 0){
+						g_Device_Config_CMD g_ConfigCMD;
+						memset(&g_ConfigCMD,0x0,sizeof(g_Device_Config_CMD));
+						g_ConfigCMD = g_Device_Usart_UserCmd_Copy(Usart1);
+						g_Device_GPS_Config(g_ConfigCMD);
+					}
+				}else if (ConfigMsg.what == G_CLIENT_CMD){
+					char *cmdType = (char *)ConfigMsg.content;
+					if(strcmp(cmdType,"ClientCMD") == 0){
+						g_Device_Config_CMD g_ConfigCMD;
+						memset(&g_ConfigCMD,0x0,sizeof(g_Device_Config_CMD));
+						g_ConfigCMD = g_Device_Usart_UserCmd_Copy(Usart2);
+						g_Device_Board_Config(g_ConfigCMD);
 					}
 				}
-			// }
+			}
 
 			OSTimeDly(100);
 			// GetADCValue();

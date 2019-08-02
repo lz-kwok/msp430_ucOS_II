@@ -50,6 +50,8 @@ uint8_t cRxNum = 0;
 uint8_t dRxBuff[dRxLength];		//UART3 receive data buff
 uint8_t dRxNum=0;		        //UART3 receive data num
 
+static Mutex_t gUartMutex = null;
+
 /*******************************************************************************
 * Function Name  : Clear_CMD_Buffer
 * Description    :
@@ -228,6 +230,7 @@ void g_Device_SendByte_Uart2(uint8_t Chr)
 {
 	UCA2TXBUF = Chr;
 	while(!(UCA2IFG & UCTXIFG));
+	Hal_MutexUnlock(gUartMutex);
 }
 /*******************************************************************************
 * Function Name  : g_Device_SendNByte_Uart2
@@ -237,12 +240,14 @@ void g_Device_SendByte_Uart2(uint8_t Chr)
 *******************************************************************************/
 void g_Device_SendNByte_Uart2(uint8_t *data,uint8_t len)
 {
+	Hal_MutexLock(gUartMutex);
 	static uint8_t m = 0;
 	for(m=0;m<len;m++)
 	{
 		UCA2TXBUF = data[m];
 		while(!(UCA2IFG & UCTXIFG));
 	}
+	Hal_MutexUnlock(gUartMutex);
 }
 /*******************************************************************************
 * Function Name  : g_Device_SendString_Uart2
@@ -252,10 +257,12 @@ void g_Device_SendNByte_Uart2(uint8_t *data,uint8_t len)
 *******************************************************************************/
 void g_Device_SendString_Uart2(char *s)
 {
+	Hal_MutexLock(gUartMutex);
 	while(*s != '\0')
 	{
 		g_Device_SendByte_Uart2((uint8_t)*s++);
 	}
+	Hal_MutexUnlock(gUartMutex);
 }
 /*******************************************************************************
 * Function Name  : g_Device_Usart2_Init		
@@ -292,7 +299,11 @@ void g_Device_Usart2_Init(uint32_t BaudRate)
     OSBsp.Device.Usart2.WriteData   = g_Device_SendByte_Uart2;
 	OSBsp.Device.Usart2.WriteNData  = g_Device_SendNByte_Uart2;
 	OSBsp.Device.Usart2.WriteString = g_Device_SendString_Uart2;
-//    am_util_stdio_printf_init((am_util_stdio_print_char_t)SendStringToUart2); //涓插彛鎵撳嵃鏄犲皠鍒颁覆鍙�
+
+	gUartMutex = Hal_MutexCreate(LOWEST_TASK_PRIO-1);
+    if (gUartMutex == null) {
+        g_Printf_dbg("%s gUartMutex create Failed\r\n",__func__);
+    }
 }
 /*******************************************************************************
 * Function Name  : g_Device_SendByte_Uart3

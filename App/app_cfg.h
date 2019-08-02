@@ -56,7 +56,7 @@
 #define  TRANSMIT_TASK_TASK_PRIO      6
 #define  MANAGER_TASK_TASK_PRIO       5
 
-#define  LOWEST_TASK_PRIO             10
+#define  LOWEST_TASK_PRIO             15
 /*
 *********************************************************************************************************
 *                                            TASK STACK SIZES

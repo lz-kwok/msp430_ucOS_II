@@ -115,7 +115,7 @@ static  void  ScadaTaskStart (void *p_arg)
                 g_Printf_info("SenSor_Power_On\r\n");
                 OSBsp.Device.IOControl.PowerSet(SenSor_Power_On);
                 //个别传感器需预热，任务挂起时间视情况而定，默认10s
-                OSTimeDly(2000);
+                OSTimeDly(5000);
                 AppDataPointer->TerminalInfoData.DeviceStatus = DEVICE_STATUS_POWER_SCANNING;
                 g_Printf_info("%s ... ...\n",__func__);
                 Hal_GetTimeOfDay(&before_Scada);
