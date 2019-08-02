@@ -43,4 +43,4 @@ Obtain the right to use semaphores
 
 ### 2.0. Mutex_t Hal_MutexUnlock(Mutex_t mutex) ###
 Release semaphore usage rights
-
+//test push dinghui 20190802
