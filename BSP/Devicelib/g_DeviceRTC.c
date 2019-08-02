@@ -196,65 +196,31 @@ void g_Device_ExtRTC_Init(void)
 }
 
 //***********************************************************************
-//??????????�
-//***********************************************************************
-void Create_TimeData(uint8_t *p1,uint8_t *p2)
-{
-	uint8_t time_buf[8];
-	memset(time_buf,0x0,8);
-	DS1302_read_time(time_buf,RealTime);
-
-	p1[3]=p2[0]=((time_buf[0]>>4)&0x0f)+0x30;	    //2   year
-	p1[4]=p2[1]=(time_buf[0]&0x0f)+0x30;   	        //0
-	p1[5]=p2[2]=((time_buf[1]>>4)&0x0f)+0x30;	    //1
-	p1[6]=p2[3]=(time_buf[1]&0x0f)+0x30;			//7
-
-	p1[7]=p2[5]=((time_buf[2]>>4)&0x0f)+0x30;		//0		month
-	p1[8]=p2[6]=(time_buf[2]&0x0f)+0x30; 			//3
-
-	p1[9]=p2[8]=((time_buf[3]>>4)&0x0f)+0x30;		//0		day
-	p1[10]=p2[9]=(time_buf[3]&0x0f)+0x30; 			//6
-
-	p2[11]=((time_buf[4]>>4)&0x0f)+0x30;		    //2		hour
-	p2[12]=(time_buf[4]&0x0f)+0x30; 			    //0
-
-	p2[14]=((time_buf[5]>>4)&0x0f)+0x30;		    //5		min
-	p2[15]=(time_buf[5]&0x0f)+0x30; 			    //6
-
-	p2[17]=((time_buf[6]>>4)&0x0f)+0x30;	      	//0		sec
-	p2[18]=(time_buf[6]&0x0f)+0x30; 			    //0
-}
-//***********************************************************************
 //生成时间戳函数
 //***********************************************************************
-void Create_TimeString(uint8_t *p1,uint8_t *p2)
+void g_Device_RTCstring_Creat(uint8_t *datetime,char *t_str)
 {
-	uint8_t time_buf[8];
-	memset(time_buf,0x0,8);
-	DS1302_read_time(time_buf,RealTime);
+	t_str[0]=((datetime[0]>>4)&0x0f)+0x30;	    //year
+	t_str[1]=(datetime[0]&0x0f)+0x30;   	    //
+	t_str[2]=((datetime[1]>>4)&0x0f)+0x30;	    //
+	t_str[3]=(datetime[1]&0x0f)+0x30;			//
 
-	p1[3]=p2[0]=((time_buf[0]>>4)&0x0f)+0x30;	    //2   year
-	p1[4]=p2[1]=(time_buf[0]&0x0f)+0x30;   	        //0
-	p1[5]=p2[2]=((time_buf[1]>>4)&0x0f)+0x30;	    //1
-	p1[6]=p2[3]=(time_buf[1]&0x0f)+0x30;			//7
-
-	p1[7]=p2[4]=((time_buf[2]>>4)&0x0f)+0x30;		//0		month
-	p1[8]=p2[5]=(time_buf[2]&0x0f)+0x30; 			//3
-
-	p1[9]=p2[6]=((time_buf[3]>>4)&0x0f)+0x30;		//0		day
-	p1[10]=p2[7]=(time_buf[3]&0x0f)+0x30; 			//6
-
-	p2[9]=((time_buf[4]>>4)&0x0f)+0x30;		        //2		hour
-	p2[10]=(time_buf[4]&0x0f)+0x30; 			    //0
-
-	p2[12]=((time_buf[5]>>4)&0x0f)+0x30;		    //5		min
-	p2[13]=(time_buf[5]&0x0f)+0x30; 			    //6
-
-	p2[15]=((time_buf[6]>>4)&0x0f)+0x30;	      	//0		sec
-	p2[16]=(time_buf[6]&0x0f)+0x30; 			    //0
+	t_str[4]=((datetime[2]>>4)&0x0f)+0x30;		//month
+	t_str[5]=(datetime[2]&0x0f)+0x30; 			//
+	
+	t_str[6]=((datetime[3]>>4)&0x0f)+0x30;		//day
+	t_str[7]=(datetime[3]&0x0f)+0x30; 			//
+	t_str[8]=":";
+	t_str[9]=((datetime[4]>>4)&0x0f)+0x30;		 //hour
+	t_str[10]=(datetime[4]&0x0f)+0x30; 			 //
+	t_str[11]=":";
+	t_str[12]=((datetime[5]>>4)&0x0f)+0x30;	 	 //min
+	t_str[13]=(datetime[5]&0x0f)+0x30; 			 //
+	t_str[14]=":";
+	t_str[15]=((datetime[6]>>4)&0x0f)+0x30;	     //sec
+	t_str[16]=(datetime[6]&0x0f)+0x30; 			 //
 }
 
-//??????RTC???????�
 void g_Device_InnerRTC_Init(void)
 {
     RTCCTL01 = RTCMODE + RTCBCD + RTCHOLD + RTCTEV_0 + RTCSSEL_0;		//  Min. changed interrupt

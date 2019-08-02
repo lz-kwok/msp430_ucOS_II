@@ -46,8 +46,7 @@ extern uint8_t clock_flag;
 
 
 void g_Device_ExtRTC_Init(void);
-void Create_TimeData(uint8_t *p1,uint8_t *p2);
-void Create_TimeString(uint8_t *p1,uint8_t *p2);
+void g_Device_RTCstring_Creat(uint8_t *datetime,char *t_str);
 
 void g_Device_InnerRTC_Init(void);
 void Write_info_RTC(uint8_t *time);

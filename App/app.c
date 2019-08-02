@@ -124,7 +124,7 @@ static  void  ScadaTaskStart (void *p_arg)
                 Hal_GetTimeOfDay(&after_Scada);
                 Scada_timeout_sec = after_Scada.tv_sec - before_Scada.tv_sec;
                 g_Printf_info("Scada_timeout_sec = %d\r\n",Scada_timeout_sec);
-                if(Scada_timeout_sec > SCADATIME){
+                if(Scada_timeout_sec >= SCADATIME){
                     AppDataPointer->TerminalInfoData.DeviceStatus = DEVICE_STATUS_POWER_SCAN_OVER;
                     g_Printf_info("ScadaTask is over\n");
                     OSTimeDly(500);
