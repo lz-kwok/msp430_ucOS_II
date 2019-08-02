@@ -372,6 +372,7 @@ void Terminal_Para_Init(void)
 	// InitSim800C();           //初始化GPRS
 	#endif
 	#ifdef AIR202
+	g_Device_Usart0_Init(9600);        //根据所选通信方式选择初始化波特率
 	// Socket_5V_ON;            //GPRS  PowerON-P5.0 //传输板上插GPRS模块时供电
 	// Socket_3V_ON;
 	// delay_sec(2);
@@ -381,26 +382,19 @@ void Terminal_Para_Init(void)
 	if(Hal_getProductKey(App.Data.TerminalInfoData.ProductKey) != 0){
 		return ;
 	}
-	OSBsp.Device.Usart2.WriteString("ProductKey: ");
-	OSBsp.Device.Usart2.WriteString(App.Data.TerminalInfoData.ProductKey);
-	OSBsp.Device.Usart2.WriteString("\r\n");
+	g_Printf_info("ProductKey:%s\r\n",App.Data.TerminalInfoData.ProductKey);
 
 	if(Hal_getDeviceName(App.Data.TerminalInfoData.DeviceName) != 0){
 		return ;
 	}
-	OSBsp.Device.Usart2.WriteString("DeviceName: ");
-	OSBsp.Device.Usart2.WriteString(App.Data.TerminalInfoData.DeviceName);
-	OSBsp.Device.Usart2.WriteString("\r\n");
+	g_Printf_info("DeviceName:%s\r\n",App.Data.TerminalInfoData.DeviceName);
 
 	if(Hal_getDeviceSecret(App.Data.TerminalInfoData.DeviceSecret) != 0){
 		return ;
 	}
-	OSBsp.Device.Usart2.WriteString("DeviceSecret: ");
-	OSBsp.Device.Usart2.WriteString(App.Data.TerminalInfoData.DeviceSecret);
-	OSBsp.Device.Usart2.WriteString("\r\n");
+	g_Printf_info("DeviceSecret:%s\r\n",App.Data.TerminalInfoData.DeviceSecret);
 
 	// HashValueSet();
-	g_Device_Usart0_Init(9600);        //根据所选通信方式选择初始化波特率
 	AppDataPointer->TransMethodData.GPRSStatus = GPRS_Waitfor_SMSReady;
 	#endif
 #elif (TRANSMIT_TYPE == NBIoT_BC95_Mode)
