@@ -38,6 +38,7 @@ void g_Device_Usart1_Init(uint32_t BaudRate);     //GPS
 void g_Device_Usart2_Init(uint32_t BaudRate);     //Debug
 void g_Device_Usart3_Init(uint32_t BaudRate);     //485
 g_Device_Config_CMD g_Device_Usart_UserCmd_Copy(G_UART_PORT Port);
+void UartRecTaskStart(void *p_arg);
 
 
 

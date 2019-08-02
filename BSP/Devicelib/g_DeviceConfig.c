@@ -29,7 +29,7 @@
 */
 #include  <bsp.h>
 
-
+static OS_STK UartRecTaskStartStk[MINIMUM_TASK_STK_SIZE];
 static 	Queue_t  g_ConfigQueue;
 void *QConfiMsgTb[QConfigMsgTb_Size];
 
@@ -368,8 +368,8 @@ static int FirmCMD_Receive(uint8_t *RxBuff, uint8_t RxNum)
 	uint8_t Send_Tmp[15];
 	int i;
 	if((RxNum==10)&& (RxBuff[0]==0x0D) && (RxBuff[RxNum-1]==0x0D)){
+		hal_Delay_ms(10);
 		if(RxBuff[1] == 0xEF){	//固件升级请求指令
-			hal_Delay_ms(10);
 			g_Printf_info("Enter %s and System will goto bootloader\r\n",__func__);
 			loop5:
 				hal_Delay_ms(10);
@@ -383,7 +383,6 @@ static int FirmCMD_Receive(uint8_t *RxBuff, uint8_t RxNum)
 			
 			return 0;	
 		}else if(RxBuff[1] == 0xF0){		//终端信息查询指令
-			hal_Delay_ms(10);
 			g_Printf_info("Enter %s and Check device Info now\r\n",__func__);
 			Send_Tmp[0] = 0xFF;
 			Send_Tmp[1] = OSBsp.Device.InnerFlash.innerFLASHRead(1, infor_BootAddr);//固件版本号
@@ -394,7 +393,6 @@ static int FirmCMD_Receive(uint8_t *RxBuff, uint8_t RxNum)
 			OSBsp.Device.Usart2.WriteNData(Send_Tmp, 15);
 			return 0;
 		}else if(RxBuff[1] == 0xF5){	//时钟同步
-			hal_Delay_ms(10);
 			uint8_t time_buf[8];
 			for(i = 1; i < 8; i++){
 				time_buf[i]=RxBuff[i+1];	//存“年月日时分秒周”
@@ -404,7 +402,6 @@ static int FirmCMD_Receive(uint8_t *RxBuff, uint8_t RxNum)
 			return 0;
 		}else if(RxBuff[1] == 0xFA){		//设置终端信息
 			loop6:
-				hal_Delay_ms(10);
 				g_Printf_info("Enter %s and Set device type\r\n",__func__);
 				for(i=0;i<7;i++){
 					Flash_Tmp[i] = OSBsp.Device.InnerFlash.innerFLASHRead(i,infor_ChargeAddr);
@@ -426,7 +423,6 @@ static int FirmCMD_Receive(uint8_t *RxBuff, uint8_t RxNum)
 					goto loop6;
 		}else if(RxBuff[1] == 0xFE){	//设置出厂信息
 			loop7:
-				hal_Delay_ms(10);
 				g_Printf_info("Enter %s and Set device product date\r\n",__func__);
 				Flash_Tmp[0] = RxBuff[5];//设备编号高八位
 				Flash_Tmp[1] = RxBuff[6];//设备编号低八位
@@ -448,14 +444,12 @@ static int FirmCMD_Receive(uint8_t *RxBuff, uint8_t RxNum)
 				}else
 					goto loop7;
 		}else if(RxBuff[1] == 0xFD){	//复位终端
-			hal_Delay_ms(10);
 			g_Printf_info("Enter %s and System will reboot\r\n",__func__);
 			hal_Delay_ms(100);
 			hal_Reboot();
 			return 0;
 		}
 	}else if((RxNum > 10)&&(RxNum == (RxBuff[2]+4))&&(RxBuff[RxNum-1]==0x0D)){
-		hal_Delay_ms(10);
 		if(RxBuff[1] == 0x01){
 			OSBsp.Device.InnerFlash.FlashRsvWrite(&RxBuff[2], RxBuff[2]+1, infor_ChargeAddr, 13);//把终端信息写入FLASH
 		}else if(RxBuff[1] == 0x02){
@@ -466,7 +460,6 @@ static int FirmCMD_Receive(uint8_t *RxBuff, uint8_t RxNum)
 		g_Printf_info("Enter %s Set OK\r\n",__func__);
 		return 0;
 	}else if((RxNum == 27)&&(RxBuff[1] == 0xD1)&&(RxBuff[RxNum-1]==0x0D)){
-		hal_Delay_ms(10);
 		OSBsp.Device.InnerFlash.FlashRsvWrite(&RxBuff[2], 24, infor_ChargeAddr, 100);
 		g_Printf_info("Enter %s Set OK\r\n",__func__);
 		return 0;
@@ -510,13 +503,17 @@ void ManagerTaskStart(void *p_arg)
 	static int index = 0;
 	g_ConfigQueue = Hal_QueueCreate(QConfiMsgTb,QConfigMsgTb_Size);    
 	g_Printf_info("%s ... ...\n",__func__);     
+	Hal_ThreadCreate(UartRecTaskStart,
+				(void *)"UartRecTaskStart",
+				&UartRecTaskStartStk[MINIMUM_TASK_STK_SIZE-1u],
+				UART_REC_TASK_TASK_PRIO);
     while (DEF_TRUE) {               /* Task body, always written as an infinite loop.       */
         if(Hal_getCurrent_work_Mode() == 0){
 			struct hal_message ConfigMsg;
 			memset(&ConfigMsg,0x0,sizeof(struct hal_message));
 			int ret = Hal_QueueRecv(g_ConfigQueue,&ConfigMsg,0);
 			if(ret == 0){
-				hal_Delay_ms(50);	        //延时等待接收完成
+				// hal_Delay_ms(50);	        //延时等待接收完成
 				g_Printf_info("Recv message type %d\r\n",ConfigMsg.what);
 				g_Printf_info("Recv message content %s\r\n",(char *)ConfigMsg.content);
 				

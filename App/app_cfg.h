@@ -52,6 +52,7 @@
 
 
 #define  OS_TASK_TMR_PRIO            (OS_LOWEST_PRIO - 4)
+#define  UART_REC_TASK_TASK_PRIO      8
 #define  SCADA_TASK_TASK_PRIO         7
 #define  TRANSMIT_TASK_TASK_PRIO      6
 #define  MANAGER_TASK_TASK_PRIO       5
@@ -62,7 +63,7 @@
 *                                            TASK STACK SIZES
 *********************************************************************************************************
 */
-
+#define  MINIMUM_TASK_STK_SIZE        256
 #define  DEFAULT_TASK_STK_SIZE        512
 #define  TRANSMIT_TASK_STK_SIZE       2048
 

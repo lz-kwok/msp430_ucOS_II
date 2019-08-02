@@ -391,14 +391,15 @@ g_Device_Config_CMD g_Device_Usart_UserCmd_Copy(G_UART_PORT Port)
 	g_Device_Config_CMD dst;
 	memset(&dst,0x0,sizeof(g_Device_Config_CMD));
 	if(Port == Usart2){
-		g_Printf_info("%s len:%d data:",__func__,cRxNum);
-		for(m=0;m<cRxNum;m++){
+		dst.cmdLenth = cRxNum;
+		cRxNum = 0;
+		g_Printf_info("%s len:%d data:",__func__,dst.cmdLenth);
+		for(m=0;m<dst.cmdLenth;m++){
 			dst.hexcmd[m] = cRxBuff[m];
 			g_Printf_info("%02x ",dst.hexcmd[m]);
 		}
 		g_Printf_info("\r\n");
-		dst.cmdLenth = cRxNum;
-		cRxNum = 0;
+		
 		memset(cRxBuff,0x0,cRxLength);
 	}else if(Port == Usart1){
 		dst = bRxBuff;
@@ -406,6 +407,24 @@ g_Device_Config_CMD g_Device_Usart_UserCmd_Copy(G_UART_PORT Port)
 	}
 
 	return dst;
+}
+
+void UartRecTaskStart(void *p_arg)
+{
+	(void)p_arg;    
+	OSTimeDlyHMSM(0u, 0u, 0u, 200u);
+	static int RecLen = 0;
+	g_Printf_info("%s ... ...\r\n",__func__);     
+    while (DEF_TRUE) {   
+		if(cRxNum != 0){
+			RecLen = cRxNum;
+			OSTimeDly(25);
+			if(cRxNum == RecLen){
+				g_Device_Config_QueuePost(G_CLIENT_CMD,(void *)"ClientCMD");
+				RecLen = 0;
+			}
+		}
+	}
 }
 
 
@@ -417,10 +436,10 @@ __interrupt void USCI_A0_ISR(void)
 	{
 		case 0:break;                             // Vector 0 - no interrupt
 		case 2:                                   // Vector 2 - RXIFG
-		    __bic_SR_register_on_exit(LPM0_bits);	//閫�嚭浣庡姛鑰�
+		    __bic_SR_register_on_exit(LPM0_bits);	//
 			while(!(UCA0IFG&UCTXIFG));            // USCI_A3 TX buffer ready?
 			{
-				OSBsp.Device.Usart2.WriteData(UCA0RXBUF);  //Debug鍙�
+				OSBsp.Device.Usart2.WriteData(UCA0RXBUF);  //
 				aRxBuff[aRxNum++] = UCA0RXBUF;
 				if((aRxBuff[aRxNum-2] == 0x0D)&&(aRxBuff[aRxNum-1] == 0x0A)){
 					aRxNum = 0;
@@ -492,11 +511,11 @@ __interrupt void USCI_A2_ISR(void)
 			{
 				if(cRxNum < cRxLength){
 					cRxBuff[cRxNum++] = UCA2RXBUF;
-					if(cRxNum == ComData_MiniSize){
-						OSIntEnter();
-						g_Device_Config_QueuePost(G_CLIENT_CMD,(void *)"ClientCMD");
-						OSIntExit();	
-					}	
+					// if(cRxNum == ComData_MiniSize){
+					// 	OSIntEnter();
+					// 	g_Device_Config_QueuePost(G_CLIENT_CMD,(void *)"ClientCMD");
+					// 	OSIntExit();	
+					// }	
 				}else{
 					cRxNum = 0;
 				}
