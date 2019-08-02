@@ -50,6 +50,8 @@
 #define HAVE_GPS_SERVICE
 // 定义是否具备蓝牙功能
 #define HAVE_BT_SERVICE
+// 定义是否具备log存储功能
+#define HAVE_LOG_STORE_SERVICE
 //*****************终端类型*********************//
 #define Air_Station           		0x01	 //空气监测仪
 #define Voc_Station           		0x02	 //VOC监测仪
