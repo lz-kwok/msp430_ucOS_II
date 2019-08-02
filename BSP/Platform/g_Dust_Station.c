@@ -415,9 +415,9 @@ void Terminal_Para_Init(void)
 	OSBsp.Device.IOControl.ResetWirelesModule();    //模块复位管脚复位
 #if LoRa_QunDeng
 	g_Device_Usart0_Init(115200);      //根据所选通信方式选择初始化波特率   LoRa
-	LoRaDevEui = System.Device.InnerFlash.innerFLASHRead(9,infor_ChargeAddr);
+	LoRaDevEui = OSBsp.Device.InnerFlash.innerFLASHRead(9,infor_ChargeAddr);
 	LoRaDevEui=LoRaDevEui<<8;
-	LoRaDevEui += System.Device.InnerFlash.innerFLASHRead(10,infor_ChargeAddr);
+	LoRaDevEui += OSBsp.Device.InnerFlash.innerFLASHRead(10,infor_ChargeAddr);
 	LoRa_Deveui[27]= LoRaDevEui/1000 + 0x30;
 	LoRa_Deveui[28]= LoRaDevEui%1000/100 + 0x30;
 	LoRa_Deveui[29]= LoRaDevEui%100/10 + 0x30;
