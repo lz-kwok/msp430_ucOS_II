@@ -1,4 +1,3 @@
-//ML TEST
 	 ________         __            _________          
 	/ ______|        |  |          |____    _|         
 	| |   _____      |  |               /  /           
@@ -47,9 +46,6 @@ Obtain the right to use semaphores
 
 ### 1.11. void Hal_MutexUnlock(Mutex_t mutex) ###
 Release semaphore usage rights
-<<<<<<< HEAD
-//test push second dinghui 20190802
-=======
 
 ### 1.12. void Hal_EnterLowPower_Mode(void) ###
 Enter Low Power Mode
@@ -71,4 +67,3 @@ There are four threads in the app.c,which are scada task, transmission task , ma
 
 
 
->>>>>>> 9dd9be13bb0bd9f92d903affa6a8406b9adc464d
