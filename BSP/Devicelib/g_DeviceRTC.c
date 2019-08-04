@@ -26,26 +26,18 @@
 */
 #include <bsp.h>
 
-
-/*¶¨Òå³õÊ¼Ê±¼ä£¬BCDÂë¸ñÊ½£¬ÏÂÃæÊ±¼ä2018-03-15£¬15:20:50£¬ĞÇÆÚËÄ*/
-uint8_t time_buf[8] = {0x20,0x18,0x03,0x15,0x20,0x50,0x00,0x04};
-/*¶¨Òå³õÊ¼Ê±¼ästring¸ñÊ½*/
-uint8_t time_string_buf[16] = {};
-/*¶¨ÒåÄÖÖÓÊ±¼ä**************************************************/
-uint8_t clock_buf[2] = {0x09,0x02};
-uint8_t ds1302_ram[1] = {0};
-uint8_t clock_flag;
+static uint32_t g_MinuteTick = 0;
 
 //***********************************************************************
-//                      ÏòDS1302Ğ´ÈëÒ»×Ö½ÚÊı¾İ
+//                      DS1302_write_byte
 //***********************************************************************
-void DS1302_write_byte(uint8_t addr, uint8_t d) 
+static void DS1302_write_byte(uint8_t addr, uint8_t d) 
 {
 	uint8_t i;
-	RESET_SET;				    //Æô¶¯DS1302×ÜÏß
-	/*Ğ´ÈëÄ¿±êµØÖ·£ºaddr*/
+	RESET_SET;				    //??????DS1302??????
+	/*??????????????ddr*/
 	IO_OUT;
-	addr = addr & 0xFE;         //×îµÍÎ»ÖÃÁã
+	addr = addr & 0xFE;         //???????????ï¿½
 	for (i = 0; i < 8; i ++)
 	{
 		if (addr & 0x01)
@@ -60,7 +52,7 @@ void DS1302_write_byte(uint8_t addr, uint8_t d)
 		SCK_CLR;
 		addr = addr >> 1;
 	}
-	/*Ğ´ÈëÊı¾İ£ºd*/
+	/*???????????d*/
 	IO_OUT;
 	for (i = 0; i < 8; i ++)
 	{
@@ -76,19 +68,19 @@ void DS1302_write_byte(uint8_t addr, uint8_t d)
 		SCK_CLR;
 		d = d >> 1;
 	}
-	RESET_CLR;				//Í£Ö¹DS1302×ÜÏß
+	RESET_CLR;				//??DS1302??????
 }
 //***********************************************************************
-//                   ´ÓDS1302¶Á³öÒ»×Ö½ÚÊı¾İ
+//                   DS1302_read_byte
 //***********************************************************************
-uint8_t DS1302_read_byte(uint8_t addr)
+static uint8_t DS1302_read_byte(uint8_t addr)
 {
 	uint8_t i;
 	uint8_t temp;
-	RESET_SET;					//Æô¶¯DS1302×ÜÏß
-	/*Ğ´ÈëÄ¿±êµØÖ·£ºaddr*/
+	RESET_SET;					//??????DS1302??????
+	/*??????????????ddr*/
 	IO_OUT;
-	addr = addr | 0x01;         //×îµÍÎ»ÖÃ¸ß
+	addr = addr | 0x01;         //?????????ï¿½
 	for (i = 0; i < 8; i ++)
 	{
 		if (addr & 0x01)
@@ -103,7 +95,7 @@ uint8_t DS1302_read_byte(uint8_t addr)
 		SCK_CLR;
 		addr = addr >> 1;
 	}
-	/*Êä³öÊı¾İ£ºtemp*/
+	/*????????????emp*/
 	IO_IN;
 	for (i = 0; i < 8; i ++)
 	{
@@ -119,136 +111,134 @@ uint8_t DS1302_read_byte(uint8_t addr)
 		SCK_SET;
 		SCK_CLR;
 	}
-	RESET_CLR;				//Í£Ö¹DS1302×ÜÏß
+	RESET_CLR;				//??DS1302??????
 	return temp;
 }
 
 //***********************************************************************
-//                   ÏòDS302Ğ´ÈëÊ±ÖÓÊı¾İ
+//                   ??S302?????????
 //***********************************************************************
-void DS1302_write_time(void)
+void DS1302_write_time(uint8_t *data,uint8_t dataType)
 {
-  DS1302_write_byte(DS1302_control_add,0x00);		//¹Ø±ÕĞ´±£»¤ 
-  DS1302_write_byte(DS1302_sec_add,0x80);	        //ÔİÍ£ 
-  //DS1302_write_byte(DS1302_charger_add,0xa9);		//ä¸Á÷³äµç 
-  DS1302_write_byte(DS1302_year_add,time_buf[1]);	//Äê 
-  DS1302_write_byte(DS1302_month_add,time_buf[2]);	//ÔÂ
-  DS1302_write_byte(DS1302_date_add,time_buf[3]);	//ÈÕ
-  DS1302_write_byte(DS1302_hr_add,time_buf[4]);		//Ê±
-  DS1302_write_byte(DS1302_min_add,time_buf[5]);	//·Ö
-  DS1302_write_byte(DS1302_sec_add,time_buf[6]);	//Ãë
-  DS1302_write_byte(DS1302_day_add,time_buf[7]);	//ÖÜ
-//  DS1302_write_byte(DS1302_clock_hr_add,clock_buf[0]);	//ÄÖÖÓÊ±
-//  DS1302_write_byte(DS1302_clock_min_add,clock_buf[1]);	//ÄÖÖÓ·Ö
-//  DS1302_write_byte(DS1302_FLASH,ds1302_ram[0]);
-  DS1302_write_byte(DS1302_control_add,0x80);		//´ò¿ªĞ´±£»¤
+	DS1302_write_byte(DS1302_control_add,0x00);		//???????ï¿½ 
+	DS1302_write_byte(DS1302_sec_add,0x80);	        //??? 
+	//DS1302_write_byte(DS1302_charger_add,0xa9);		//?????? 
+	switch(dataType){
+		case RealTime:{
+			DS1302_write_byte(DS1302_year_add,data[1]);	//?ï¿½ 
+			DS1302_write_byte(DS1302_month_add,data[2]);	//?ï¿½
+			DS1302_write_byte(DS1302_date_add,data[3]);	//?ï¿½
+			DS1302_write_byte(DS1302_hr_add,data[4]);		//?ï¿½
+			DS1302_write_byte(DS1302_min_add,data[5]);	//?ï¿½
+			DS1302_write_byte(DS1302_sec_add,data[6]);	//?ï¿½
+			DS1302_write_byte(DS1302_day_add,data[7]);	//?ï¿½
+		}
+		break;
+		case AlarmData:{
+			DS1302_write_byte(DS1302_clock_hr_add,data[0]);	//????ï¿½
+			DS1302_write_byte(DS1302_clock_min_add,data[1]);	//????ï¿½
+		}
+		break;
+		case InnerRam:{
+			DS1302_write_byte(DS1302_FLASH,data[0]);
+		}
+		break;
+	}
+
+	DS1302_write_byte(DS1302_control_add,0x80);		//???????ï¿½
 }
 
 //***********************************************************************
-//                     ´ÓDS302¶Á³öÊ±ÖÓÊı¾İ
+//                     ??S302?????????
 //***********************************************************************
 
-void DS1302_read_time(void)  
+void DS1302_read_time(uint8_t *data,uint8_t dataType)
 { 
-  time_buf[1]=DS1302_read_byte(DS1302_year_add);	    //Äê
-  time_buf[2]=DS1302_read_byte(DS1302_month_add);	    //ÔÂ
-  time_buf[3]=DS1302_read_byte(DS1302_date_add);	    //ÈÕ
-  time_buf[4]=DS1302_read_byte(DS1302_hr_add);		    //Ê±
-  time_buf[5]=DS1302_read_byte(DS1302_min_add);		    //·Ö
-  time_buf[6]=(DS1302_read_byte(DS1302_sec_add))&0x7F;  //Ãë
-  time_buf[7]=DS1302_read_byte(DS1302_day_add);		    //ÖÜ
-  ds1302_ram[0]=DS1302_read_byte(DS1302_FLASH);
-  clock_buf[0]=DS1302_read_byte(DS1302_clock_hr_add);	//clockÊ±
-  clock_buf[1]=DS1302_read_byte(DS1302_clock_min_add);	//clock·Ö
+	switch(dataType){
+		case RealTime:{
+			data[1]=DS1302_read_byte(DS1302_year_add);	    //?ï¿½
+			data[2]=DS1302_read_byte(DS1302_month_add);	    //?ï¿½
+			data[3]=DS1302_read_byte(DS1302_date_add);	    //?ï¿½
+			data[4]=DS1302_read_byte(DS1302_hr_add);		    //?ï¿½
+			data[5]=DS1302_read_byte(DS1302_min_add);		    //?ï¿½
+			data[6]=(DS1302_read_byte(DS1302_sec_add))&0x7F;  //?ï¿½
+			data[7]=DS1302_read_byte(DS1302_day_add);		    //?ï¿½
+		}
+		break;
+		case AlarmData:{
+			data[0]=DS1302_read_byte(DS1302_clock_hr_add);	//clock?ï¿½
+			data[1]=DS1302_read_byte(DS1302_clock_min_add);	//clock?ï¿½
+		}
+		break;
+		case InnerRam:{
+			data[0]=DS1302_read_byte(DS1302_FLASH);
+		}
+		break;
+	}
 }
 
 //***********************************************************************
-//               DS302³õÊ¼»¯º¯Êı
+//               DS302???????ï¿½
 //***********************************************************************
-void DS1302_init(void) 
+void g_Device_ExtRTC_Init(void) 
 {
-  RESET_CLR;			                        //RESET½ÅÖÃµÍ
-  SCK_CLR;			                            //SCK½ÅÖÃµÍ
-  RESET_OUT;			                        //RESET½ÅÉèÖÃÎªÊä³ö
-  SCK_OUT;			                            //SCK½ÅÉèÖÃÎªÊä³ö
-  DS1302_write_byte(DS1302_sec_add,0x00);	    //Æô¶¯
+	RESET_CLR;			                        //RESETè„šç½®ä½
+	SCK_CLR;			                        //SCKè„šç½®ä½
+	RESET_OUT;			                        //RESETè„šè®¾ç½®ä¸ºè¾“å‡º
+	SCK_OUT;			                        //SCKè„šè®¾ç½®ä¸ºè¾“å‡º
+	DS1302_write_byte(DS1302_sec_add,0x00);	    //å¯åŠ¨
+
+	OSBsp.Device.RTC.ReadExtTime = DS1302_read_time;
+	OSBsp.Device.RTC.ConfigExtTime = DS1302_write_time;
 }
 
 //***********************************************************************
-//Éú³ÉÊ±¼ä´Áº¯Êı
+//ç”Ÿæˆæ—¶é—´æˆ³å‡½æ•°
 //***********************************************************************
-void Create_TimeData(uint8_t *p1,uint8_t *p2)
+void g_Device_RTCstring_Creat(uint8_t *datetime,char *t_str)
 {
-	DS1302_read_time();//¶ÁÈ¡µ±Ç°Ê±¼ä
-	//Êı¾İÈÕÆÚºÏ³É
-	p1[3]=p2[0]=((time_buf[0]>>4)&0x0f)+0x30;	    //2   year
-	p1[4]=p2[1]=(time_buf[0]&0x0f)+0x30;   	        //0
-	p1[5]=p2[2]=((time_buf[1]>>4)&0x0f)+0x30;	    //1
-	p1[6]=p2[3]=(time_buf[1]&0x0f)+0x30;			//7
+	// t_str[0]=((datetime[0]>>4)&0x0f)+0x30;	    //year
+	// t_str[1]=(datetime[0]&0x0f)+0x30;   	    //
+	t_str[0]='2';	    //year
+	t_str[1]='0';   	    //
+	t_str[2]=((datetime[1]>>4)&0x0f)+0x30;	    //
+	t_str[3]=(datetime[1]&0x0f)+0x30;			//
 
-	p1[7]=p2[5]=((time_buf[2]>>4)&0x0f)+0x30;		//0		month
-	p1[8]=p2[6]=(time_buf[2]&0x0f)+0x30; 			//3
-
-	p1[9]=p2[8]=((time_buf[3]>>4)&0x0f)+0x30;		//0		day
-	p1[10]=p2[9]=(time_buf[3]&0x0f)+0x30; 			//6
-
-	p2[11]=((time_buf[4]>>4)&0x0f)+0x30;		    //2		hour
-	p2[12]=(time_buf[4]&0x0f)+0x30; 			    //0
-
-	p2[14]=((time_buf[5]>>4)&0x0f)+0x30;		    //5		min
-	p2[15]=(time_buf[5]&0x0f)+0x30; 			    //6
-
-	p2[17]=((time_buf[6]>>4)&0x0f)+0x30;	      	//0		sec
-	p2[18]=(time_buf[6]&0x0f)+0x30; 			    //0
-}
-//***********************************************************************
-//Éú³ÉÊ±¼ä´Áº¯Êı
-//***********************************************************************
-void Create_TimeString(uint8_t *p1,uint8_t *p2)
-{
-	DS1302_read_time();//¶ÁÈ¡µ±Ç°Ê±¼ä
-	//Êı¾İÈÕÆÚºÏ³É
-	p1[3]=p2[0]=((time_buf[0]>>4)&0x0f)+0x30;	    //2   year
-	p1[4]=p2[1]=(time_buf[0]&0x0f)+0x30;   	        //0
-	p1[5]=p2[2]=((time_buf[1]>>4)&0x0f)+0x30;	    //1
-	p1[6]=p2[3]=(time_buf[1]&0x0f)+0x30;			//7
-
-	p1[7]=p2[4]=((time_buf[2]>>4)&0x0f)+0x30;		//0		month
-	p1[8]=p2[5]=(time_buf[2]&0x0f)+0x30; 			//3
-
-	p1[9]=p2[6]=((time_buf[3]>>4)&0x0f)+0x30;		//0		day
-	p1[10]=p2[7]=(time_buf[3]&0x0f)+0x30; 			//6
-
-	p2[9]=((time_buf[4]>>4)&0x0f)+0x30;		        //2		hour
-	p2[10]=(time_buf[4]&0x0f)+0x30; 			    //0
-
-	p2[12]=((time_buf[5]>>4)&0x0f)+0x30;		    //5		min
-	p2[13]=(time_buf[5]&0x0f)+0x30; 			    //6
-
-	p2[15]=((time_buf[6]>>4)&0x0f)+0x30;	      	//0		sec
-	p2[16]=(time_buf[6]&0x0f)+0x30; 			    //0
+	t_str[4]=((datetime[2]>>4)&0x0f)+0x30;		//month
+	t_str[5]=(datetime[2]&0x0f)+0x30; 			//
+	
+	t_str[6]=((datetime[3]>>4)&0x0f)+0x30;		//day
+	t_str[7]=(datetime[3]&0x0f)+0x30; 			//
+	t_str[8]=' ';
+	t_str[9]=((datetime[4]>>4)&0x0f)+0x30;		 //hour
+	t_str[10]=(datetime[4]&0x0f)+0x30; 			 //
+	t_str[11]=':';
+	t_str[12]=((datetime[5]>>4)&0x0f)+0x30;	 	 //min
+	t_str[13]=(datetime[5]&0x0f)+0x30; 			 //
+	t_str[14]=':';
+	t_str[15]=((datetime[6]>>4)&0x0f)+0x30;	     //sec
+	t_str[16]=(datetime[6]&0x0f)+0x30; 			 //
 }
 
-//ÏµÍ³×Ô´øRTC³õÊ¼»¯º¯Êı
-void g_Device_RTC_Init(void)
+void g_Device_InnerRTC_Init(void)
 {
     RTCCTL01 = RTCMODE + RTCBCD + RTCHOLD + RTCTEV_0 + RTCSSEL_0;		//  Min. changed interrupt
-    RTCHOUR = 0x00;        //³õÊ¼Ê±¼ä£º2000Äê0ÔÂ0ÈÕ00:00:00
+    RTCHOUR = 0x00;        //åˆå§‹æ—¶é—´ï¼š2000å¹´0æœˆ0æ—¥00:00:00
     RTCMIN  = 0x00;
     RTCSEC  = 0x00;
     RTCDAY  = 0x00;
     RTCMON  = 0x00;
     RTCYEAR = 0x2000;
-    RTCCTL01 &= ~RTCHOLD;//Æô¶¯ÊµÊ±Ê±ÖÓ
+    RTCCTL01 &= ~RTCHOLD;//å¯åŠ¨å®æ—¶æ—¶é’Ÿ
 
-    RTCCTL0 |= RTCTEVIE;//´ò¿ªÃ¿·ÖÖÓÖĞ¶Ï±êÖ¾
-//    RTCCTL0 |= RTCRDYIE;//´ò¿ªÃ¿ÃëÖÓÖĞ¶Ï±êÖ¾
+    RTCCTL0 |= RTCTEVIE;//æ‰“å¼€æ¯åˆ†é’Ÿä¸­æ–­æ ‡å¿—
+//    RTCCTL0 |= RTCRDYIE;//æ‰“å¼€æ¯ç§’é’Ÿä¸­æ–­æ ‡å¿—
 }
 
-//Ğ´ÏµÍ³×Ô´øRTCº¯Êı
+//????????TC???
 void Write_info_RTC(uint8_t *time)
 {
-    RTCCTL01 |= RTCHOLD;//¹Ø±ÕÊµÊ±Ê±ÖÓ
+    RTCCTL01 |= RTCHOLD;//å…³é—­å®æ—¶æ—¶é’Ÿ
 
     RTCYEAR_L   = time[1];
     RTCMON      = time[2];
@@ -258,12 +248,12 @@ void Write_info_RTC(uint8_t *time)
     RTCSEC      = time[6];
     RTCADOWDAY  = time[7];
 
-    RTCCTL01 &= ~RTCHOLD;//Æô¶¯ÊµÊ±Ê±ÖÓ
-//    RTCCTL0 |= RTCTEVIE;//´ò¿ªÃ¿·ÖÖÓÖĞ¶Ï±êÖ¾
-//    RTCCTL0 |= RTCRDYIE;//´ò¿ªÃ¿ÃëÖÓÖĞ¶Ï±êÖ¾
+    RTCCTL01 &= ~RTCHOLD;//å¯åŠ¨å®æ—¶æ—¶é’Ÿ
+//    RTCCTL0 |= RTCTEVIE;//æ‰“å¼€æ¯åˆ†é’Ÿä¸­æ–­æ ‡å¿—
+//    RTCCTL0 |= RTCRDYIE;//æ‰“å¼€æ¯ç§’é’Ÿä¸­æ–­æ ‡å¿—
 }
 
-//¶ÁÏµÍ³×Ô´øµÄRTCº¯Êı
+//è¯»ç³»ç»Ÿè‡ªå¸¦çš„RTCå‡½æ•°
 void Read_info_RTC(uint8_t *time)
 {
     time[0] = (uint8_t)RTCYEAR;
@@ -278,360 +268,34 @@ void Read_info_RTC(uint8_t *time)
 #pragma vector=RTC_VECTOR
 __interrupt void RTC_ISR(void)
 {
-//     switch (__even_in_range(RTCIV, RTC_RT1PSIFG))
-//     {
-//         case RTC_NONE:
-//             break;
+    switch (__even_in_range(RTCIV, RTC_RT1PSIFG))
+    {
+        case RTC_NONE:
+            break;
 
-//         case RTC_RTCTEVIFG://Ã¿·ÖÖÓ½øÒ»´ÎÖĞ¶Ï
-// 			{
-// 				min++;
-// 				if(Hour_Mod == 1){
-// 					Min_Real ++;
-// 					if(Min_Real >= 240)
-// 						Min_Real = 0;
-// 				}
+        case RTC_RTCTEVIFG:		//åˆ†é’Ÿ
+			{
+				g_MinuteTick ++;
+				g_Printf_info("g_MinuteTick wakeup %d times\r\n",g_MinuteTick);
+				if(g_MinuteTick == App.Data.TerminalInfoData.SendPeriod){
+					g_MinuteTick = 0;
+					if(Hal_getCurrent_work_Mode() == 1){          //å½“å‰ä¸ºä½åŠŸè€—çŠ¶æ€
+						__bic_SR_register_on_exit(LPM0_bits);
+						WDTCTL  = WDT_MDLY_32;
+						SFRIE1 |= 1;  
+						Hal_ExitLowPower_Mode();
+					}
+					
+				}
+			} 
+        	break;
+        case  RTC_RTCRDYIFG:	//åˆ†é’Ÿ
+			{
 
-// //				if(min==5)
-// //				{
-// //					switch(CommunicationIndex)
-// //					{
-// //						case LoRa_OM402_Mode:
-// //							Flag_LoRa_OM402_JoinReset = 1;
-// //							break;
-// //						default:
-// //							break;
-// //					}
-// //				}
-// 				if(min>=60)//Ã¿Ò»Ğ¡Ê±
-// 				{
-// 					min=0;
-// 					hour++;
-// 	//				Flag_ResetMotor = 1;  //Ã¿Ìì½øĞĞÒ»´Îµç»ú¸´Î»
-
-// 	//				if(Flag_GPSPositionOK == 1)
-// 	//				{
-// 	//					Flag_GPSPositionOK = 0;
-// 	//					GPS_3V_ON;  //´ò¿ªGPS_3V3µÄµçÔ´
-// 	//				}
-// 					if(hour==1)
-// 					{
-// 						switch(CommunicationIndex)
-// 						{
-// 							case LoRa_OM402_Mode:
-// 								Flag_LoRa_OM402_JoinReset = 1;
-// 								break;
-// 							default:
-// 								break;
-// 						}
-// 					}
-
-// 					if(hour==5 | hour==17)//Ã¿ÌìÉÏÎçÎåµã¡¢ÏÂÎçÎåµã£¬ÖØĞÂÈëÍø
-// 					{
-// 	//					LoRaReJoin=1;
-// 	//					LoRaNet=0;
-// 					}
-// 					if(hour>=24)//ĞÂµÄÒ»Ìì
-// 					{
-// 						hour=0;
-// 						AppDataPointer->TransMethodData.SeqNumber = 0;    //·¢ËÍÊı¾İĞòºÅÇå0
-
-// 						//******magicSTICKÃ¿Ìì×ÔÇå½àÒ»´Î*******//
-// 						switch(TerminalIndex)
-// 						{
-// 							case MagicSTICK_Station:
-// 								Flag_ResetMotor = 1;  //Ã¿Ìì½øĞĞÒ»´Îµç»ú¸´Î»
-// 								break;
-// 							default:
-// 								break;
-// 						}
-// 						//******magicSTICKÃ¿Ìì×ÔÇå½àÒ»´Îµ½´Ë½áÊø*******//
-// 						switch(AccessoryIndex)   //Åä¼şÀàĞÍ
-// 						{
-// 							case GPS_Mode:
-// 								//********Çå0Ç°Ò»ÌìµÄGPS¶¨Î»ĞÅÏ¢*********//
-// 	//							AppDataPointer->TransMethodData.GPSLat_Point = 0; //Î³¶È
-// 	//							AppDataPointer->TransMethodData.GPSLng_Point = 0; //¾­¶È
-// 								GPS_3V_ON;  //´ò¿ªGPS_3V3µÄµçÔ´
-// 								break;
-// 							default:
-// 								break;
-// 						}
-// 					} //if(hour>=24)//ĞÂµÄÒ»Ìì
-// 				}
-// 				switch(CommunicationIndex)
-// 				{
-// //					case GPRS_Mode:
-// //						switch(min % App.Data.TerminalInfoData.SendPeriod)//¸ù¾İSendPeriodÖÜÆÚ¹¤×÷
-// //						{
-// //						//×¢Òâ£ºÖĞ¶ÏÀïÃæ×îºÃÖ»ÖÃ±êÖ¾Î»£¬´®¿Ú´òÓ¡£¬¶Ë¿Ú²Ù×÷×îºÃ¶¼·ÅÈëwhile 1ÖĞ
-// //							//******ÍË³öµÍ¹¦ºÄ*******//
-// //							case 0x00:
-// //								__bic_SR_register_on_exit(LPM0_bits);	//ÍË³öµÍ¹¦ºÄ
-// //								LowPower=0;
-// //								break;
-// //							//******´ò¿ªµçÔ´£¬´«¸ĞÆ÷¹©µç¿ªÊ¼¹¤×÷
-// //							case 0x01:
-// //								System.Device.Usart2.WriteString("Exit Low Power!\r\n");
-// //								System.Device.Usart2.WriteString("Sensor Power On\r\n");
-// //								AllSensorPowerOn();    //´ò¿ªËùÓĞ´«¸ĞÆ÷µçÔ´
-// //								SenSor_3V_ON;          //´ò¿ªSensor_3V3£¬485Ğ¾Æ¬ÉÏµç
-// //								System.Device.Usart2.WriteString("Start to Scan Sensor\r\n");
-// //								System.Device.Usart2.WriteString("GPRS Power On\r\n");
-// //								ScanSensor = 1;	    //ÔÊĞí¶ÁÈ¡sensorµÄ²Ù×÷
-// //								RestartGprs = 1;    //ÖØÆôGPRS  ??·ÅÖÃÎ»ÖÃĞèÒª¿¼ÂÇ ¿ÉÒÔ¿¼ÂÇÔÚÕâ±ß¶Ïµç£¬ÉÏµç£¬½«³õÊ¼»¯·ÅÔÚconnectÖ®Ç°
-// //								SD_3V_ON;		    //´ò¿ª¶ÁÈ¡¼°´æ´¢ĞèÒªµÄµçÔ´
-// //								break;
-// //							case 0x02:			    //¹Ø±Õ´«¸ĞÆ÷µçÔ´£¬×¼±¸·¢ËÍÊı¾İ
-// //								System.Device.Usart2.WriteString("Stop to Scan Sensor\r\n");
-// //								System.Device.Usart2.WriteString("Sensor Power Off\r\n");
-// //								SenSor_3V_OFF;         //¹Ø±ÕSensor_3V3£¬485Ğ¾Æ¬µôµç
-// //								AllSensorPowerOff();   //¹ØµôËùÓĞ´«¸ĞÆ÷µçÔ´
-// //
-// //								switch(AccessoryIndex) //Åä¼şÀàĞÍ
-// //								{
-// //									case GPS_Mode:
-// //										GPS_3V_OFF;    //Åä¼şÎªGPSÊ±¹Ø±ÕGPSµçÔ´
-// //										break;
-// //									default:
-// //										break;
-// //								}
-// //								//¡Á¡Á¡Á¡Á¡Á¡Á¡ÁÆøÌå´«¸ĞÆ÷×¨ÓÃ¡Á¡Á¡Á¡Á¡Á¡Á¡Á//
-// //	//							AllSensorPowerOn();    //´ò¿ªËùÓĞ´«¸ĞÆ÷µçÔ´
-// //								//¡Á¡Á¡Á¡Á¡Á¡Á¡ÁÆøÌå´«¸ĞÆ÷END¡Á¡Á¡Á¡Á¡Á¡Á¡Á//
-// //								ScanSensor=0;	       //½ûÖ¹¶ÁÈ¡sensorµÄ²Ù×÷
-// //
-// //								AllowSend=1;	       //ÔÊĞí·¢ËÍÊı¾İ
-// //								LowPower=1;		       //²Ù×÷Íê±Ïºó½øÈëµÍ¹¦ºÄ
-// //								break;
-// //							default:
-// //								break;
-// //						}
-// //						break;
-
-// 					case GPRS_Mode:
-// 						switch(min % App.Data.TerminalInfoData.SendPeriod)//¸ù¾İSendPeriodÖÜÆÚ¹¤×÷
-// 						{
-// 						//×¢Òâ£ºÖĞ¶ÏÀïÃæ×îºÃÖ»ÖÃ±êÖ¾Î»£¬´®¿Ú´òÓ¡£¬¶Ë¿Ú²Ù×÷×îºÃ¶¼·ÅÈëwhile 1ÖĞ
-// 							//******ÍË³öµÍ¹¦ºÄ*******//
-// 							case 0x01:
-// 								__bic_SR_register_on_exit(LPM0_bits);	//ÍË³öµÍ¹¦ºÄ
-// 								LowPower=0;
-// 								break;
-// 							//******´ò¿ªµçÔ´£¬´«¸ĞÆ÷¹©µç¿ªÊ¼¹¤×÷
-// 							case 0x02:
-// 								System.Device.Usart2.WriteString("Exit Low Power!\r\n");
-// 								System.Device.Usart2.WriteString("Sensor Power On\r\n");
-// 								AllSensorPowerOn();    //´ò¿ªËùÓĞ´«¸ĞÆ÷µçÔ´
-// 								SenSor_3V_ON;          //´ò¿ªSensor_3V3£¬485Ğ¾Æ¬ÉÏµç
-// 								break;
-// 							case 0x03:			    //µ¥Æ¬»úÆô¶¯¶ÁÈ¡´«¸ĞÆ÷Êı¾İ
-// 								System.Device.Usart2.WriteString("Start to Scan Sensor\r\n");
-// 								System.Device.Usart2.WriteString("GPRS Power On\r\n");
-// 								ScanSensor = 1;	    //ÔÊĞí¶ÁÈ¡sensorµÄ²Ù×÷
-// 								RestartGprs = 1;    //ÖØÆôGPRS  ??·ÅÖÃÎ»ÖÃĞèÒª¿¼ÂÇ ¿ÉÒÔ¿¼ÂÇÔÚÕâ±ß¶Ïµç£¬ÉÏµç£¬½«³õÊ¼»¯·ÅÔÚconnectÖ®Ç°
-// 								SD_3V_ON;		    //´ò¿ª¶ÁÈ¡¼°´æ´¢ĞèÒªµÄµçÔ´
-// 								break;
-// 							case 0x04:			    //¹Ø±Õ´«¸ĞÆ÷µçÔ´£¬×¼±¸·¢ËÍÊı¾İ
-// 								System.Device.Usart2.WriteString("Stop to Scan Sensor\r\n");
-// 								System.Device.Usart2.WriteString("Sensor Power Off\r\n");
-// 								SenSor_3V_OFF;         //¹Ø±ÕSensor_3V3£¬485Ğ¾Æ¬µôµç
-// 								AllSensorPowerOff();   //¹ØµôËùÓĞ´«¸ĞÆ÷µçÔ´
-
-// 								switch(AccessoryIndex) //Åä¼şÀàĞÍ
-// 								{
-// 									case GPS_Mode:
-// 										GPS_3V_OFF;    //Åä¼şÎªGPSÊ±¹Ø±ÕGPSµçÔ´
-// 										break;
-// 									default:
-// 										break;
-// 								}
-// 								//¡Á¡Á¡Á¡Á¡Á¡Á¡ÁÆøÌå´«¸ĞÆ÷×¨ÓÃ¡Á¡Á¡Á¡Á¡Á¡Á¡Á//
-// 	//							AllSensorPowerOn();    //´ò¿ªËùÓĞ´«¸ĞÆ÷µçÔ´
-// 								//¡Á¡Á¡Á¡Á¡Á¡Á¡ÁÆøÌå´«¸ĞÆ÷END¡Á¡Á¡Á¡Á¡Á¡Á¡Á//
-// 								ScanSensor=0;	       //½ûÖ¹¶ÁÈ¡sensorµÄ²Ù×÷
-
-// 								AllowSend=1;	       //ÔÊĞí·¢ËÍÊı¾İ
-// 								LowPower=1;		       //²Ù×÷Íê±Ïºó½øÈëµÍ¹¦ºÄ
-// 								break;
-// 							default:
-// 								break;
-// 						}
-// 						break;
-// 					case NBIoT_BC95_Mode:
-// 						switch(min % App.Data.TerminalInfoData.SendPeriod)//¸ù¾İSendPeriodÖÜÆÚ¹¤×÷
-// 						{
-// 							//******ÍË³öµÍ¹¦ºÄ*******//
-// 							case 0x01:
-// 								__bic_SR_register_on_exit(LPM0_bits);	//ÍË³öµÍ¹¦ºÄ
-// 								LowPower=0;
-// 								break;
-// 							//******´ò¿ªµçÔ´£¬´«¸ĞÆ÷¹©µç¿ªÊ¼¹¤×÷
-// 							case 0x02:
-// 								System.Device.Usart2.WriteString("Exit Low Power!\r\n");
-// 								System.Device.Usart2.WriteString("Sensor Power On\r\n");
-// 								AllSensorPowerOn();    //´ò¿ªËùÓĞ´«¸ĞÆ÷µçÔ´
-// 								SenSor_3V_ON;          //´ò¿ªSensor_3V3£¬485Ğ¾Æ¬ÉÏµç
-// 								break;
-// 							case 0x03:			    //µ¥Æ¬»úÆô¶¯¶ÁÈ¡´«¸ĞÆ÷Êı¾İ
-// 								System.Device.Usart2.WriteString("Start to Scan Sensor\r\n");
-// 	//							System.Device.Usart2.WriteString("GPRS Power On\r\n");
-// 								ScanSensor = 1;	    //ÔÊĞí¶ÁÈ¡sensorµÄ²Ù×÷
-// 	//							RestartGprs = 1;    //ÖØÆôGPRS  ??·ÅÖÃÎ»ÖÃĞèÒª¿¼ÂÇ ¿ÉÒÔ¿¼ÂÇÔÚÕâ±ß¶Ïµç£¬ÉÏµç£¬½«³õÊ¼»¯·ÅÔÚconnectÖ®Ç°
-// 								SD_3V_ON;		    //´ò¿ª¶ÁÈ¡¼°´æ´¢ĞèÒªµÄµçÔ´
-// 								break;
-// 							case 0x04:			    //¹Ø±Õ´«¸ĞÆ÷µçÔ´£¬×¼±¸·¢ËÍÊı¾İ
-// 								System.Device.Usart2.WriteString("Stop to Scan Sensor\r\n");
-// 								System.Device.Usart2.WriteString("Sensor Power Off\r\n");
-// 								SenSor_3V_OFF;         //¹Ø±ÕSensor_3V3£¬485Ğ¾Æ¬µôµç
-// 								AllSensorPowerOff();   //¹ØµôËùÓĞ´«¸ĞÆ÷µçÔ´
-
-// 								switch(AccessoryIndex) //Åä¼şÀàĞÍ
-// 								{
-// 									case GPS_Mode:
-// 										GPS_3V_OFF;    //Åä¼şÎªGPSÊ±¹Ø±ÕGPSµçÔ´
-// 										break;
-// 									default:
-// 										break;
-// 								}
-// 								//¡Á¡Á¡Á¡Á¡Á¡Á¡ÁÆøÌå´«¸ĞÆ÷×¨ÓÃ¡Á¡Á¡Á¡Á¡Á¡Á¡Á//
-// 		//							AllSensorPowerOn();    //´ò¿ªËùÓĞ´«¸ĞÆ÷µçÔ´
-// 								//¡Á¡Á¡Á¡Á¡Á¡Á¡ÁÆøÌå´«¸ĞÆ÷END¡Á¡Á¡Á¡Á¡Á¡Á¡Á//
-// 								ScanSensor=0;	       //½ûÖ¹¶ÁÈ¡sensorµÄ²Ù×÷
-
-// 								AllowSend=1;	       //ÔÊĞí·¢ËÍÊı¾İ
-// 								LowPower=1;		       //²Ù×÷Íê±Ïºó½øÈëµÍ¹¦ºÄ
-// 								break;
-// 							default:
-// 								break;
-// 						}
-// 						break;
-
-// 					case LoRa_F8L10D_Mode:
-// 					case LoRa_S78S_Mode:
-// 					case LoRa_OM402_Mode:
-// 						switch(min % App.Data.TerminalInfoData.SendPeriod)//¸ù¾İSendPeriodÖÜÆÚ¹¤×÷
-// 						{
-// 							//******ÍË³öµÍ¹¦ºÄ*******//
-// 							case 0x01:
-// 								__bic_SR_register_on_exit(LPM0_bits);	//ÍË³öµÍ¹¦ºÄ
-// 								LowPower=0;
-// 								System.Device.Usart2.WriteString("Exit Low Power!\r\n");
-// 								if(Flag_LoRa_OM402_JoinReset == 1)
-// 								{
-// 									Flag_LoRa_OM402_JoinReset = 0;
-// 									Flag_OM402_JoinReset = 1;
-// 								}
-// 								break;
-// 							//******´ò¿ªµçÔ´£¬´«¸ĞÆ÷¹©µç¿ªÊ¼¹¤×÷
-// 							case 0x02:
-// 								System.Device.Usart2.WriteString("Exit Low Power!\r\n");
-// 								System.Device.Usart2.WriteString("Sensor Power On\r\n");
-// 								AllSensorPowerOn();    //´ò¿ªËùÓĞ´«¸ĞÆ÷µçÔ´
-// 								SenSor_3V_ON;          //´ò¿ªSensor_3V3£¬485Ğ¾Æ¬ÉÏµç
-// 								break;
-// 							case 0x03:			    //µ¥Æ¬»úÆô¶¯¶ÁÈ¡´«¸ĞÆ÷Êı¾İ
-// 								System.Device.Usart2.WriteString("Start to Scan Sensor\r\n");
-// 	//							System.Device.Usart2.WriteString("GPRS Power On\r\n");
-// 								ScanSensor = 1;	    //ÔÊĞí¶ÁÈ¡sensorµÄ²Ù×÷
-// 	//							RestartGprs = 1;    //ÖØÆôGPRS  ??·ÅÖÃÎ»ÖÃĞèÒª¿¼ÂÇ ¿ÉÒÔ¿¼ÂÇÔÚÕâ±ß¶Ïµç£¬ÉÏµç£¬½«³õÊ¼»¯·ÅÔÚconnectÖ®Ç°
-// 								SD_3V_ON;		    //´ò¿ª¶ÁÈ¡¼°´æ´¢ĞèÒªµÄµçÔ´
-// 								break;
-// 							case 0x04:			    //¹Ø±Õ´«¸ĞÆ÷µçÔ´£¬×¼±¸·¢ËÍÊı¾İ
-// 								System.Device.Usart2.WriteString("Stop to Scan Sensor\r\n");
-// 								System.Device.Usart2.WriteString("Sensor Power Off\r\n");
-// 								SenSor_3V_OFF;         //¹Ø±ÕSensor_3V3£¬485Ğ¾Æ¬µôµç
-// 								AllSensorPowerOff();   //¹ØµôËùÓĞ´«¸ĞÆ÷µçÔ´
-
-// 								switch(AccessoryIndex) //Åä¼şÀàĞÍ
-// 								{
-// 									case GPS_Mode:
-// 										GPS_3V_OFF;    //Åä¼şÎªGPSÊ±¹Ø±ÕGPSµçÔ´
-// 										break;
-// 									default:
-// 										break;
-// 								}
-// 								//¡Á¡Á¡Á¡Á¡Á¡Á¡ÁÆøÌå´«¸ĞÆ÷×¨ÓÃ¡Á¡Á¡Á¡Á¡Á¡Á¡Á//
-// 		//							AllSensorPowerOn();    //´ò¿ªËùÓĞ´«¸ĞÆ÷µçÔ´
-// 								//¡Á¡Á¡Á¡Á¡Á¡Á¡ÁÆøÌå´«¸ĞÆ÷END¡Á¡Á¡Á¡Á¡Á¡Á¡Á//
-// 								ScanSensor=0;	       //½ûÖ¹¶ÁÈ¡sensorµÄ²Ù×÷
-
-// 								AllowSend=1;	       //ÔÊĞí·¢ËÍÊı¾İ
-// 								LowPower=1;		       //²Ù×÷Íê±Ïºó½øÈëµÍ¹¦ºÄ
-// 								break;
-// 							default:
-// 								break;
-// 						}
-// 						break;
-// 					case GPRS_AIR202_Mode:
-// 						if(Hour_Mod == 1){
-// 							Min_Mod = Min_Real;
-// 						}else{
-// 							Min_Mod = min;
-// 						}
-						
-// 						switch(Min_Mod % App.Data.TerminalInfoData.SendPeriod)//¸ù¾İSendPeriodÖÜÆÚ¹¤×÷
-// 						{
-// 							case 0x01:
-// 								__bic_SR_register_on_exit(LPM0_bits);	//ÍË³öµÍ¹¦ºÄ
-// 								LowPower=0;
-// 								ForceLowPower = 0;
-// 								System.Device.Usart2.WriteString("Exit Low Power!\r\n");
-// 								System.Device.Usart2.WriteString("Sensor Power On\r\n");
-// 								delay_ms(10);
-// 								AllSensorPowerOn();    //´ò¿ªËùÓĞ´«¸ĞÆ÷µçÔ´¼°485µçÔ´
-// 								break;
-// 							//******´ò¿ªµçÔ´£¬´«¸ĞÆ÷¹©µç¿ªÊ¼¹¤×÷
-// 							case 0x02:
-// 								System.Device.Usart2.WriteString("Start to Scan Sensor\r\n");
-// 								ScanSensor = 1; 	//ÔÊĞí¶ÁÈ¡sensorµÄ²Ù×÷
-// 								break;
-// 							case 0x03:
-// 								ScanSensor = 0;
-// 								SenSor_3V_OFF;		   //¹Ø±ÕSensor_3V3£¬485Ğ¾Æ¬µôµç
-// 								AllSensorPowerOff();   //¹ØµôËùÓĞ´«¸ĞÆ÷µçÔ´
-// 								SD_3V_ON;			//´ò¿ª¶ÁÈ¡¼°´æ´¢ĞèÒªµÄµçÔ´
-// 								System.Device.Usart2.WriteString("Stop to Scan Sensor\r\n");
-// 								System.Device.Usart2.WriteString("Sensor Power Off\r\n");
-// 								AllowSend=1;		   //ÔÊĞí·¢ËÍÊı¾İ
-// 								RestartGprs = 1;
-// //								System.Device.Usart2.WriteString("GPRS Power On\r\n");
-// 								break;
-// 							case 0x05:				//µ¥Æ¬»úÆô¶¯¶ÁÈ¡´«¸ĞÆ÷Êı¾İ
-// 								switch(AccessoryIndex) //Åä¼şÀàĞÍ
-// 								{
-// 									case GPS_Mode:
-// 										GPS_3V_OFF;    //Åä¼şÎªGPSÊ±¹Ø±ÕGPSµçÔ´
-// 										break;
-// 									default:
-// 										break;
-// 								}
-// 								LowPower = 1; 		   //²Ù×÷Íê±Ïºó½øÈëµÍ¹¦ºÄ
-// 								break;
-// 							case 0x06:
-// 								System.Device.Usart2.WriteString("ForceLowPower\r\n");
-// 								ForceLowPower = 1;
-// 								break;
-// 							case 0x07:
-// 								Socket_5V_OFF;
-// 				                Socket_3V_OFF;
-// 								break;
-// 							default:
-// 								break;
-// 						}
-// 						break;
-
-// 					default:
-// 						break;
-// 				}   //switch(CommunicationIndex)
-// 			} //RTC_RTCTEVIFG://Ã¿·ÖÖÓ½øÒ»´ÎÖĞ¶Ï
-//         	break;
-//         case  RTC_RTCRDYIFG://Ã¿ÃëÖÓ½øÒ»´ÎÖĞ¶Ï
-// 			{
-// 				//P1OUT ^= BIT7;
-// 			}
-//         	break;
-//         default:
-//             break;
-//     }
+        
+			}
+        	break;
+        default:
+            break;
+    }
 }

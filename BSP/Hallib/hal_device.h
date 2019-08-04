@@ -45,16 +45,13 @@
 #endif
 
 /*------------------------ Nothing Below This Line --------------------------*/
-// 无线模组为GPRS
-#define HAVE_GPRS_CONFIG 
-// 无线模组为LoRa
-#define HAVE_LORA_CONFIG 
-// 无线模组为NB-IoT
-#define HAVE_NB_CONFIG 
+#define SCADATIME					60
 // 定义是否具备GPS功能
 #define HAVE_GPS_SERVICE
 // 定义是否具备蓝牙功能
 #define HAVE_BT_SERVICE
+// 定义是否具备log存储功能
+#define HAVE_LOG_STORE_SERVICE
 //*****************终端类型*********************//
 #define Air_Station           		0x01	 //空气监测仪
 #define Voc_Station           		0x02	 //VOC监测仪
@@ -86,10 +83,34 @@
 #define Custom_Station	      		0x55	 //定制需求监测站
 
 
-#define PRODUCT_TYPE                Air_Station
+#define PRODUCT_TYPE                Dust_Station
 
 
+//*****************通信方式*********************//
+#define GPRS_Mode		      		0x01
+#define NBIoT_BC95_Mode	      		0x02
+#define NBIoT_M5310_Mode	  		0x03
+#define LoRa_F8L10D_Mode	  		0x04
+#define LoRa_S78S_Mode		  		0x05
+#define LoRa_OM402_Mode		  		0x06
+#define GPRS_AIR202_Mode      		0x07
+#define TRANSMIT_TYPE 			    GPRS_Mode
 
+#if (TRANSMIT_TYPE == GPRS_Mode)
+	//这俩预定义只能选一个
+	//#define SIM800C
+	#define AIR202
+	//这俩预定义只能选一个
+	#define ReportToAliOnly
+	// #define ReportTo30000IoT
+#endif
+
+//*****************配件方式*********************//
+#define GPS_Mode		      		0x01     //GPS配件
+#define RS485_Mode		      		0x02     //485配件
+#define RS232_Mode		      		0x03     //232配件
+#define None_Mode	          		0xFF     //无配件
+#define ACCESSORY_TYPR              GPS_Mode
 
 
 

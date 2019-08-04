@@ -52,16 +52,20 @@
 
 
 #define  OS_TASK_TMR_PRIO            (OS_LOWEST_PRIO - 4)
-#define  SCADA_TASK_TASK_PRIO         5
+#define  UART_REC_TASK_TASK_PRIO      8
+#define  SCADA_TASK_TASK_PRIO         7
+#define  TRANSMIT_TASK_TASK_PRIO      6
+#define  MANAGER_TASK_TASK_PRIO       5
 
+#define  LOWEST_TASK_PRIO             15
 /*
 *********************************************************************************************************
 *                                            TASK STACK SIZES
 *********************************************************************************************************
 */
-
+#define  MINIMUM_TASK_STK_SIZE        256
 #define  DEFAULT_TASK_STK_SIZE        512
-
+#define  TRANSMIT_TASK_STK_SIZE       2048
 
 /*
  *********************************************************************************************************
@@ -73,12 +77,13 @@
 
 #define  TRACE_LEVEL_OFF                                0u
 #define  TRACE_LEVEL_INFO                               1u
-#define  TRACE_LEVEL_DBG                                2u
+#define  TRACE_LEVEL_WARN                               2u
+#define  TRACE_LEVEL_ERR                                3u
+#define  TRACE_LEVEL_DBG                                4u
 
-#define  APP_CFG_TRACE_LEVEL                            TRACE_LEVEL_INFO
-#define  APP_CFG_TRACE                                  printf
+#define  APP_CFG_TRACE_LEVEL                            TRACE_LEVEL_DBG
 
-#define  APP_TRACE_INFO(x)    ((APP_CFG_TRACE_LEVEL >= TRACE_LEVEL_INFO) ? (void)(APP_CFG_TRACE x) : (void)0)
-#define  APP_TRACE_DBG(x)     ((APP_CFG_TRACE_LEVEL >= TRACE_LEVEL_DBG)  ? (void)(APP_CFG_TRACE x) : (void)0)
+
+
 
 #endif

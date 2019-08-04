@@ -42,15 +42,15 @@
 *********************************************************************************************************
 */
 
-
 /*
 *********************************************************************************************************
 *                                                VARIABLES
 *********************************************************************************************************
 */
 
-static OS_STK ScadaTaskStartStk[APP_START_TASK_STK_SIZE];
-
+static OS_STK ScadaTaskStartStk[DEFAULT_TASK_STK_SIZE];
+static OS_STK TransmitTaskStartStk[TRANSMIT_TASK_STK_SIZE];
+static OS_STK ManagerTaskStartStk[DEFAULT_TASK_STK_SIZE];
 
 /*
 *********************************************************************************************************
@@ -58,7 +58,6 @@ static OS_STK ScadaTaskStartStk[APP_START_TASK_STK_SIZE];
 *********************************************************************************************************
 */
 static  void  ScadaTaskStart(void *p_arg);
-
 
 /*
 *********************************************************************************************************
@@ -70,49 +69,69 @@ static  void  ScadaTaskStart(void *p_arg);
 * Arguments   : none
 *********************************************************************************************************
 */
-
 void  main (void)
 {
     OSInit();                                /* Initialize "uC/OS-II, The Real-Time Kernel"          */
     OSBsp.Init();                            /* Initialize BSP functions                             */
-#if (OS_TASK_STAT_EN > 0)
-    OSStatInit();                            /* Determine CPU capacity                               */
-#endif
+    if(Hal_Platform_Init() == 0){
+        g_Printf_info("Hal_Platform_Init Success\r\n");
+    }
 
     Hal_ThreadCreate(ScadaTaskStart,
                     (void *)"ScadaTaskStart",
-                    &ScadaTaskStartStk,
-                    512,
-                    DEFAULT_TASK_STK_SIZE,
+                    &ScadaTaskStartStk[DEFAULT_TASK_STK_SIZE-1u],
                     SCADA_TASK_TASK_PRIO);
+                    
+    Hal_ThreadCreate(TransmitTaskStart,
+                    (void *)"TransmitTaskStart",
+                    &TransmitTaskStartStk[TRANSMIT_TASK_STK_SIZE-1u],
+                    TRANSMIT_TASK_TASK_PRIO);
+
+    Hal_ThreadCreate(ManagerTaskStart,
+                    (void *)"ManagerTaskStart",
+                    &ManagerTaskStartStk[DEFAULT_TASK_STK_SIZE-1u],
+                    MANAGER_TASK_TASK_PRIO);
+
 
     OSStart();                               /* Start multitasking (i.e. give control to uC/OS-II)   */
 }
 
 
-/*
-*********************************************************************************************************
-*                                               AppTaskStart()
-*
-* Description : This is an example of a startup task.  As mentioned in the book's text, you MUST
-*               initialize the ticker only once multitasking has started.
-*
-* Arguments   : p_arg   is the argument passed to 'AppStartTask()' by 'OSTaskCreate()'.
-*
-* Note(s)     : 1) The first line of code is used to prevent a compiler warning because 'p_arg' is not
-*                  used.  The compiler should not generate any code for this statement.
-*               2) Interrupts are enabled once the task start because the I-bit of the CCR register was
-*                  set to 0 by 'OSTaskCreate()'.
-*********************************************************************************************************
-*/
 
 static  void  ScadaTaskStart (void *p_arg)
 {
-    (void)p_arg;                   
-
-    while (DEF_TRUE) {                                          /* Task body, always written as an infinite loop.       */
-        APP_TRACE_INFO(("Hello, world!\n"));
-        OSTimeDlyHMSM(0u, 0u, 1u, 0u);
+    (void)p_arg;
+#if (OS_TASK_STAT_EN > 0)
+    OSStatInit();                            /* Determine CPU capacity                       */
+#endif
+	struct hal_timeval before_Scada;		
+	struct hal_timeval after_Scada;
+	int32_t	Scada_timeout_sec;
+    while (DEF_TRUE) {               /* Task body, always written as an infinite loop.       */
+        if(Hal_getCurrent_work_Mode() == 0){
+            if(AppDataPointer->TerminalInfoData.DeviceStatus == DEVICE_STATUS_POWER_OFF){
+                g_Printf_info("SenSor_Power_On\r\n");
+                //个别传感器需预热，任务挂起时间视情况而定，默认10s
+                OSTimeDly(5000);
+                AppDataPointer->TerminalInfoData.DeviceStatus = DEVICE_STATUS_POWER_SCANNING;
+                g_Printf_info("%s ... ...\n",__func__);
+                Hal_GetTimeOfDay(&before_Scada);
+            }else if(AppDataPointer->TerminalInfoData.DeviceStatus == DEVICE_STATUS_POWER_SCANNING){
+                InqureSensor();
+                Hal_GetTimeOfDay(&after_Scada);
+                Scada_timeout_sec = after_Scada.tv_sec - before_Scada.tv_sec;
+                g_Printf_info("Scada_timeout_sec = %d\r\n",Scada_timeout_sec);
+                // if(Scada_timeout_sec >= SCADATIME){
+                    if(Scada_timeout_sec >= 30){
+                    AppDataPointer->TerminalInfoData.DeviceStatus = DEVICE_STATUS_POWER_SCAN_OVER;
+                    g_Printf_info("ScadaTask is over\n");
+                    OSTimeDly(500);
+                    // OSBsp.Device.IOControl.PowerSet(SenSor_Power_Off);
+                }
+            }
+            
+            OSTimeDlyHMSM(0u, 0u, 1u, 0u);  
+        }
     }
 }
 

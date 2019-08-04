@@ -53,11 +53,25 @@
 #include <hal_types.h>
 #include <hal_ucs.h>
 
+#include <cjson.h>
+#include <malloc.h>
+#include <utils_hmac.h>
+#include <utils_md5.h>
+#include <utils_sha1.h>
+
+#include <g_DeviceIO.h>
 #include <g_DeviceUart.h>
 #include <g_DeviceRTC.h>
+#include <g_DeviceADC.h>
 #include <g_DeviceSpi.h>
 #include <g_DeviceSD.h>
 #include <g_DeviceSDMMC.h>
+#include <g_DeviceFlash.h>
+#include <g_DeviceGprs.h>
+#include <g_DevicePrintf.h>
+#include <g_DeviceConfig.h>
+
+#include <g_Platform.h>
 
 #include <Diskio.h>
 #include <FatFS.h>
@@ -137,6 +151,19 @@ typedef struct
         	void (*innerFLASHWrite)(uint8_t *data_ptr,uint8_t *flashAddr,uint16_t count);
         	void (*FlashRsvWrite)(uint8_t *data_ptr,uint8_t index,uint32_t infostartaddr,uint8_t num);
         }InnerFlash;
+
+        struct IOControl
+        {
+            void (*PowerSet)(ControlPower src);
+            void (*ResetWirelesModule)(void);
+
+        }IOControl;
+
+        struct RTC
+        {
+            void (*ReadExtTime)(uint8_t *data,uint8_t dataType);
+            void (*ConfigExtTime)(uint8_t *data,uint8_t dataType);
+        }RTC;
     }Device;
 
 

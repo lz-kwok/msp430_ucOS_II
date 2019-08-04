@@ -5,7 +5,7 @@
 	| |  |_   _|     |  |              /  /            
 	| |____| |       |  |____       __/  /____         
 	\________|       |_______|     |__________|        
- Copyright (C) 2013 - 2020, liangzhiGuo, <lz_kwok@163.com>, et al 
+ Copyright (C) 2018 - present, liangzhiGuo, <lz_kwok@163.com>, et al 
  msp430_ucOS_II
 ## Note : ##
 ### 1. The branch of "master" is the original branch, so you can't upload code at will. You can test your own code in the branch of "develop" and Refer to the following steps: ###
@@ -15,7 +15,7 @@
 to check if your local branch is "develop"
 =============================================================================================================================================================================
 ## 1. hal_layer_api.c ##
-### 1.1. int Hal_ThreadCreate(void *func, void *funcname,void *TaskStk, int stack_size,int priority)  ###
+### 1.1. int Hal_ThreadCreate(void (*func)(void *p_arg), void *funcname,OS_STK *TaskStk, int priority)  ###
 Create tasks and set stack pointers, sizes, and priorities for tasks
 
 ### 1.2. int Hal_ThreadDestory(int priority)  ###
@@ -30,18 +30,45 @@ Destroy message queue with input parameter as queue pointer to destroy
 ### 1.5. Hal_QueueSend(Queue_t queue, struct hal_message* msg, int timeout)  ###
 Send message function. Send message is a structure pointer, which includes message type and message content.
 
-### 1.6. Hal_QueueRecv(Queue_t queue, struct hal_message* msg, int timeout)  ###
+### 1.6. int Hal_QueueNum_Waitfor_Pend(Queue_t queue) ###
+query Number of messages waiting in the queue
+
+### 1.7. Hal_QueueRecv(Queue_t queue, struct hal_message* msg, int timeout)  ###
 Receiving message function, receiving message is a structure pointer, which includes message type and message content.
 
-### 1.7. Mutex_t Hal_MutexCreate(int priority) ###
+### 1.8. Mutex_t Hal_MutexCreate(int priority) ###
 Create a mutually exclusive semaphore with input parameters as the priority of the semaphore
 
-### 1.8. Mutex_t Hal_MutexCreate(Mutex_t mutex) ###
+### 1.9. void Hal_MutexDestory(Mutex_t mutex) ###
 Destroy mutually exclusive semaphore and input parameter is the pointer of the semaphore
 
-### 1.9. Mutex_t Hal_MutexLock(Mutex_t mutex) ###
+### 1.10. void Hal_MutexLock(Mutex_t mutex) ###
 Obtain the right to use semaphores
 
-### 2.0. Mutex_t Hal_MutexUnlock(Mutex_t mutex) ###
+### 1.11. void Hal_MutexUnlock(Mutex_t mutex) ###
 Release semaphore usage rights
+<<<<<<< HEAD
 //test push second dinghui 20190802
+=======
+
+### 1.12. void Hal_EnterLowPower_Mode(void) ###
+Enter Low Power Mode
+
+### 1.13. void Hal_ExitLowPower_Mode(void) ###
+Exit Low Power Mode
+
+### 1.14. void Hal_GetTimeOfDay(struct hal_timeval* tv) ###
+Acquire relative time value based on system ticks.
+
+## 2. app.c ##
+There are four threads in the app.c,which are scada task, transmission task , management task and IDLE task
+### 2.1. static  void  ScadaTaskStart (void *p_arg)  ###
+
+
+
+
+
+
+
+
+>>>>>>> 9dd9be13bb0bd9f92d903affa6a8406b9adc464d

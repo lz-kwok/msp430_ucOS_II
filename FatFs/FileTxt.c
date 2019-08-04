@@ -27,76 +27,47 @@
 #include <bsp.h>
 
 
-char TimeString[20] = "20170804 16:00:00";
-
-char File_name[]={"0:/20170314.txt"};
-
-extern unsigned char time_buf[8];
-
-
 
 //创建文件路径
-void Create_filename()
+void g_SD_FileName_Creat(const char *docPath,uint8_t *date,char *filename)
 {
-	//u32 Date,Time;
-	char string0[21] = {"0:/"};		     //根目录
-	char string1[11]  = {"       "};	 //目录
-	char string2[5]  = {".txt"};	     //文件类型
-	//文件名合成
-	string1[0]=((time_buf[0]>>4)&0x0f)+0x30;	    //2
-	string1[1]=(time_buf[0]&0x0f)+0x30;   	        //0
-	string1[2]=((time_buf[1]>>4)&0x0f)+0x30;	    //1
-	string1[3]=(time_buf[1]&0x0f)+0x30;			    //7
-	string1[4]='-';
-	string1[5]=((time_buf[2]>>4)&0x0f)+0x30;		//0
-	string1[6]=(time_buf[2]&0x0f)+0x30; 		    //3
-	string1[7]='-';
-	string1[8]=((time_buf[3]>>4)&0x0f)+0x30;		//0
-	string1[9]=(time_buf[3]&0x0f)+0x30; 		    //6
+	char date_string[7];
+	date_string[0]=((date[1]>>4)&0x0f)+0x30;	    //1
+	date_string[1]=(date[1]&0x0f)+0x30;			    //7
+	date_string[2]=((date[2]>>4)&0x0f)+0x30;		//0
+	date_string[3]=(date[2]&0x0f)+0x30; 		    //3
+	date_string[4]=((date[3]>>4)&0x0f)+0x30;		//0
+	date_string[5]=(date[3]&0x0f)+0x30; 		    //6
 
-	strcat(string0,string1);	//合成文件路径
-	strcat(string0,string2);
-	strcpy(File_name,string0);
+	sprintf(filename,"%s%s.txt",docPath,date_string);
+	g_Printf_dbg("%s : %s\n\r",__func__,filename);
 }
-void Write_dataToTxt(const char *file_path,char *dat)
+
+void g_SD_File_Write(const char *file_path,const char *dat)
 {
 	FRESULT res;
 	FIL fsrc;
 	FATFS fs;
 	uint16_t bw;
 
-#if DEBUG
-	OSBsp.Device.Usart2.WriteString("write file ......\n\r");
-#endif
+	g_Printf_dbg("write file to %s......\n\r",file_path);
 	res=f_mount(0, &fs);
 	res=f_open(&fsrc,(char *)file_path, FA_OPEN_ALWAYS | FA_WRITE);
-	if(res != FR_OK)
-	{
-		OSBsp.Device.Usart2.WriteString("open file error\n\r");
-	}
-	else
-	{
-#if DEBUG
-		OSBsp.Device.Usart2.WriteString("open file OK!\n\r");
-#endif
-		f_lseek(&fsrc,fsrc.fsize);                      //移动指针到末尾
+	if(res != FR_OK){
+		uint32_t res_s = res;
+		g_Printf_dbg("open file error = %d\n\r",res_s);
+	}else{
+		g_Printf_dbg("open file OK!\n\r");
+		f_lseek(&fsrc,fsrc.fsize);                      //移动指针到末�?
 		res = f_write(&fsrc, dat, strlen(dat), &bw);    /* Write it to the dst file */
-#if DEBUG
-		if(res == FR_OK)
-		{
-			unsigned int num_w;
+		if(res == FR_OK){
+			uint32_t num_w;
 			num_w=strlen(dat);
-			SendByteToUart2(num_w/100+0x30);
-			SendByteToUart2(num_w%100/10+0x30);
-			SendByteToUart2(num_w%10+0x30);
-			OSBsp.Device.Usart2.WriteString(" bytes has been writted!\r\n");
-			OSBsp.Device.Usart2.WriteString("write data ok! \n\r");
+			g_Printf_info("%d bytes has been writted!\r\n",num_w);
+			g_Printf_info("write data ok! \n\r");
+		}else{
+			g_Printf_dbg("write data error \n\r");
 		}
-		else
-		{
-			OSBsp.Device.Usart2.WriteString("write data error \n\r");
-		}
-#endif
 		/*close file */
 		f_close(&fsrc);
 	}
