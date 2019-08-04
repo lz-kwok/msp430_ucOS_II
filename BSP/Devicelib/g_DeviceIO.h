@@ -63,7 +63,7 @@ typedef enum {
 
 
 
-void g_DeviceIO_Init(void);
+void g_Device_IO_Init(void);
 
 
 

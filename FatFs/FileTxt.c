@@ -31,18 +31,13 @@
 //创建文件路径
 void g_SD_FileName_Creat(const char *docPath,uint8_t *date,char *filename)
 {
-	char date_string[11];
-	//文件名合成
-	date_string[0]=((date[0]>>4)&0x0f)+0x30;	    //2
-	date_string[1]=(date[0]&0x0f)+0x30;   	        //0
-	date_string[2]=((date[1]>>4)&0x0f)+0x30;	    //1
-	date_string[3]=(date[1]&0x0f)+0x30;			    //7
-	date_string[4]='-';
-	date_string[5]=((date[2]>>4)&0x0f)+0x30;		//0
-	date_string[6]=(date[2]&0x0f)+0x30; 		    //3
-	date_string[7]='-';
-	date_string[8]=((date[3]>>4)&0x0f)+0x30;		//0
-	date_string[9]=(date[3]&0x0f)+0x30; 		    //6
+	char date_string[7];
+	date_string[0]=((date[1]>>4)&0x0f)+0x30;	    //1
+	date_string[1]=(date[1]&0x0f)+0x30;			    //7
+	date_string[2]=((date[2]>>4)&0x0f)+0x30;		//0
+	date_string[3]=(date[2]&0x0f)+0x30; 		    //3
+	date_string[4]=((date[3]>>4)&0x0f)+0x30;		//0
+	date_string[5]=(date[3]&0x0f)+0x30; 		    //6
 
 	sprintf(filename,"%s%s.txt",docPath,date_string);
 	g_Printf_dbg("%s : %s\n\r",__func__,filename);
@@ -55,14 +50,15 @@ void g_SD_File_Write(const char *file_path,const char *dat)
 	FATFS fs;
 	uint16_t bw;
 
-	g_Printf_dbg("write file ......\n\r");
+	g_Printf_dbg("write file to %s......\n\r",file_path);
 	res=f_mount(0, &fs);
 	res=f_open(&fsrc,(char *)file_path, FA_OPEN_ALWAYS | FA_WRITE);
 	if(res != FR_OK){
-		g_Printf_dbg("open file error\n\r");
+		uint32_t res_s = res;
+		g_Printf_dbg("open file error = %d\n\r",res_s);
 	}else{
 		g_Printf_dbg("open file OK!\n\r");
-		f_lseek(&fsrc,fsrc.fsize);                      //移动指针到末尾
+		f_lseek(&fsrc,fsrc.fsize);                      //移动指针到末�?
 		res = f_write(&fsrc, dat, strlen(dat), &bw);    /* Write it to the dst file */
 		if(res == FR_OK){
 			uint32_t num_w;

@@ -372,7 +372,6 @@ static int FirmCMD_Receive(uint8_t *RxBuff, uint8_t RxNum)
 		if(RxBuff[1] == 0xEF){	//固件升级请求指令
 			g_Printf_info("Enter %s and System will goto bootloader\r\n",__func__);
 			loop5:
-				hal_Delay_ms(10);
 				Flash_Tmp[0] = 0x01;
 				OSBsp.Device.InnerFlash.FlashRsvWrite(Flash_Tmp, 1, infor_BootAddr, 0);//把infor_BootAddr写0x01，建立固件升级标志位
 				hal_Delay_ms(10);
@@ -480,9 +479,10 @@ static void g_Device_Board_Config(g_Device_Config_CMD ClientCmd)
 	/*********************串口Debug串口数据，时钟同步或LoRa配置**********************************/
 	if(ClientCmd.cmdLenth != 0)
 	{
-		if((ClientCmd.strcmd[0]=='A' && ClientCmd.strcmd[1]=='T' && 
-				ClientCmd.strcmd[ClientCmd.cmdLenth-2]==0x0D && ClientCmd.strcmd[ClientCmd.cmdLenth-1]==0x0A))
+		if((ClientCmd.hexcmd[0]=='A' && ClientCmd.hexcmd[1]=='T' && 
+				ClientCmd.hexcmd[ClientCmd.cmdLenth-2]==0x0D && ClientCmd.hexcmd[ClientCmd.cmdLenth-1]==0x0A))
 		{
+			g_Printf_info((char *)ClientCmd.hexcmd);
 			User_Printf((char *)ClientCmd.hexcmd);
 		}else{
 			if(FirmCMD_Receive(ClientCmd.hexcmd, ClientCmd.cmdLenth) < 0)//上位机指令解析

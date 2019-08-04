@@ -26,10 +26,7 @@
 */
 #include <bsp.h>
 
-
-uint8_t time_string_buf[16] = {};
-/*????????????????**************************************************/
-uint8_t clock_flag;
+static uint32_t g_MinuteTick = 0;
 
 //***********************************************************************
 //                      DS1302_write_byte
@@ -200,8 +197,10 @@ void g_Device_ExtRTC_Init(void)
 //***********************************************************************
 void g_Device_RTCstring_Creat(uint8_t *datetime,char *t_str)
 {
-	t_str[0]=((datetime[0]>>4)&0x0f)+0x30;	    //year
-	t_str[1]=(datetime[0]&0x0f)+0x30;   	    //
+	// t_str[0]=((datetime[0]>>4)&0x0f)+0x30;	    //year
+	// t_str[1]=(datetime[0]&0x0f)+0x30;   	    //
+	t_str[0]='2';	    //year
+	t_str[1]='0';   	    //
 	t_str[2]=((datetime[1]>>4)&0x0f)+0x30;	    //
 	t_str[3]=(datetime[1]&0x0f)+0x30;			//
 
@@ -210,13 +209,13 @@ void g_Device_RTCstring_Creat(uint8_t *datetime,char *t_str)
 	
 	t_str[6]=((datetime[3]>>4)&0x0f)+0x30;		//day
 	t_str[7]=(datetime[3]&0x0f)+0x30; 			//
-	t_str[8]=":";
+	t_str[8]=' ';
 	t_str[9]=((datetime[4]>>4)&0x0f)+0x30;		 //hour
 	t_str[10]=(datetime[4]&0x0f)+0x30; 			 //
-	t_str[11]=":";
+	t_str[11]=':';
 	t_str[12]=((datetime[5]>>4)&0x0f)+0x30;	 	 //min
 	t_str[13]=(datetime[5]&0x0f)+0x30; 			 //
-	t_str[14]=":";
+	t_str[14]=':';
 	t_str[15]=((datetime[6]>>4)&0x0f)+0x30;	     //sec
 	t_str[16]=(datetime[6]&0x0f)+0x30; 			 //
 }
@@ -274,14 +273,26 @@ __interrupt void RTC_ISR(void)
         case RTC_NONE:
             break;
 
-        case RTC_RTCTEVIFG:		//秒
+        case RTC_RTCTEVIFG:		//分钟
 			{
-
+				g_MinuteTick ++;
+				g_Printf_info("g_MinuteTick wakeup %d times\r\n",g_MinuteTick);
+				if(g_MinuteTick == App.Data.TerminalInfoData.SendPeriod){
+					g_MinuteTick = 0;
+					if(Hal_getCurrent_work_Mode() == 1){          //当前为低功耗状态
+						__bic_SR_register_on_exit(LPM0_bits);
+						WDTCTL  = WDT_MDLY_32;
+						SFRIE1 |= 1;  
+						Hal_ExitLowPower_Mode();
+					}
+					
+				}
 			} 
         	break;
         case  RTC_RTCRDYIFG:	//分钟
 			{
-				//P1OUT ^= BIT7;
+
+        
 			}
         	break;
         default:

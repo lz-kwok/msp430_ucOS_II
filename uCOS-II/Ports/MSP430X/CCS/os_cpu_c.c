@@ -267,12 +267,15 @@ void  OSTCBInitHook (OS_TCB *ptcb)
 #if OS_CPU_HOOKS_EN > 0
 void  OSTimeTickHook (void)
 {
-    // static uint32_t kk =0;
-    // kk++;
-    // if(kk == 100){
-    //     g_Printf_info("OSTimeTickHook = %d",kk++);
-    //     kk = 0;
-    // }
+    static uint32_t kk =0;
+    kk++;
+    if(kk == 4000){
+        if(Hal_getCurrent_work_Mode() == 1){
+            g_Printf_info("aho~~~~Enter lowpower mode fail\r\n");
+        }
+        
+        kk = 0;
+    }
     
 }
 #endif

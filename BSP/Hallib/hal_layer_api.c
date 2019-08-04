@@ -499,26 +499,35 @@ int Hal_getDeviceSecret(char *devSecret)
 
 void Hal_EnterLowPower_Mode(void)
 {
-    g_Printf_info("Enter Low Power!\r\n");
+    static int m = 0;
+    g_Printf_info("Enter Low Power !\r\n");
     hal_Delay_ms(100);
     OSBsp.Device.IOControl.PowerSet(LPModule_Power_Off);
     OSBsp.Device.IOControl.PowerSet(GPRS_Power_Off);
     OSBsp.Device.IOControl.PowerSet(SDCARD_Power_Off);
     OSBsp.Device.IOControl.PowerSet(GPS_Power_Off);
-
+    OSBsp.Device.IOControl.PowerSet(BaseBoard_Power_Off);
+	OSBsp.Device.IOControl.PowerSet(SenSor_Power_Off);    		
+	OSBsp.Device.IOControl.PowerSet(Motor_Power_Off);      		
+	OSBsp.Device.IOControl.PowerSet(AIR202_Power_Off);
+    
     gManager.systemLowpower = 1;
-    UCSCTL8 = 0x00;
     LED_OFF;
+    WDTCTL = WDTPW + WDTHOLD;       //CloseWatchDog
+    SFRIE1 &= 0;
+    for(m=0;m<1000;m++);
     __bis_SR_register(LPM0_bits + GIE);
 }
 
 void Hal_ExitLowPower_Mode(void)
 {
+    hal_Delay_ms(100);
     g_Printf_info("Exit Low Power!\r\n");
-//    __bic_SR_register_on_exit(LPM0_bits);
     gManager.systemLowpower = 0;
-
+    OSBsp.Device.IOControl.PowerSet(BaseBoard_Power_On);
     OSBsp.Device.IOControl.PowerSet(SenSor_Power_On);
+    AppDataPointer->TerminalInfoData.DeviceStatus = DEVICE_STATUS_POWER_OFF;
+    AppDataPointer->TransMethodData.GPRSStatus = GPRS_Power_off;
 }
 
 char Hal_getCurrent_work_Mode(void)

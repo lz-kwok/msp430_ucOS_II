@@ -41,8 +41,7 @@
 *                                                 DEFINES
 *********************************************************************************************************
 */
-const char *g_30000IoT_HOST = "30000iot.cn:9001"; 
-const char *g_30000IoT_PATH = "/api/Upload/data/";
+
 /*
 *********************************************************************************************************
 *                                                VARIABLES
@@ -59,7 +58,6 @@ static OS_STK ManagerTaskStartStk[DEFAULT_TASK_STK_SIZE];
 *********************************************************************************************************
 */
 static  void  ScadaTaskStart(void *p_arg);
-static  void  TransmitTaskStart (void *p_arg);
 
 /*
 *********************************************************************************************************
@@ -76,7 +74,7 @@ void  main (void)
     OSInit();                                /* Initialize "uC/OS-II, The Real-Time Kernel"          */
     OSBsp.Init();                            /* Initialize BSP functions                             */
     if(Hal_Platform_Init() == 0){
-        g_Printf_info("%s Success\r\n",__func__);
+        g_Printf_info("Hal_Platform_Init Success\r\n");
     }
 
     Hal_ThreadCreate(ScadaTaskStart,
@@ -113,7 +111,6 @@ static  void  ScadaTaskStart (void *p_arg)
         if(Hal_getCurrent_work_Mode() == 0){
             if(AppDataPointer->TerminalInfoData.DeviceStatus == DEVICE_STATUS_POWER_OFF){
                 g_Printf_info("SenSor_Power_On\r\n");
-                OSBsp.Device.IOControl.PowerSet(SenSor_Power_On);
                 //个别传感器需预热，任务挂起时间视情况而定，默认10s
                 OSTimeDly(5000);
                 AppDataPointer->TerminalInfoData.DeviceStatus = DEVICE_STATUS_POWER_SCANNING;
@@ -124,11 +121,12 @@ static  void  ScadaTaskStart (void *p_arg)
                 Hal_GetTimeOfDay(&after_Scada);
                 Scada_timeout_sec = after_Scada.tv_sec - before_Scada.tv_sec;
                 g_Printf_info("Scada_timeout_sec = %d\r\n",Scada_timeout_sec);
-                if(Scada_timeout_sec >= SCADATIME){
+                // if(Scada_timeout_sec >= SCADATIME){
+                    if(Scada_timeout_sec >= 30){
                     AppDataPointer->TerminalInfoData.DeviceStatus = DEVICE_STATUS_POWER_SCAN_OVER;
                     g_Printf_info("ScadaTask is over\n");
                     OSTimeDly(500);
-                    OSBsp.Device.IOControl.PowerSet(SenSor_Power_Off);
+                    // OSBsp.Device.IOControl.PowerSet(SenSor_Power_Off);
                 }
             }
             
@@ -137,38 +135,5 @@ static  void  ScadaTaskStart (void *p_arg)
     }
 }
 
-static  void  TransmitTaskStart (void *p_arg)
-{
-    (void)p_arg;   
-    OSTimeDlyHMSM(0u, 0u, 0u, 100u);      
-    g_Printf_info("%s ... ...\n",__func__);           
-    while (DEF_TRUE) {               /* Task body, always written as an infinite loop.       */
-        if(Hal_getCurrent_work_Mode() == 0){
-            if(AppDataPointer->TransMethodData.GPRSStatus == GPRS_Power_off){
-                OSBsp.Device.IOControl.PowerSet(AIR202_Power_Off);
-                OSBsp.Device.IOControl.PowerSet(GPRS_Power_On);
-                OSTimeDly(500); 
-                OSBsp.Device.IOControl.PowerSet(AIR202_Power_On);
-                //上电后延时一段时间
-                OSTimeDly(1000);OSTimeDly(1000);OSTimeDly(1000);OSTimeDly(1000);OSTimeDly(1000);
-                OSTimeDly(1000);OSTimeDly(1000);OSTimeDly(1000);OSTimeDly(1000);OSTimeDly(1000);
-                AppDataPointer->TransMethodData.GPRSStatus = GPRS_Waitfor_SMSReady;
-            }else if((AppDataPointer->TransMethodData.GPRSStatus >= GPRS_Waitfor_SMSReady)&&
-                        (AppDataPointer->TransMethodData.GPRSStatus < GPRS_Http_Init_Done)){
-                 g_Device_GPRS_Init();
-            }else if(AppDataPointer->TransMethodData.GPRSStatus == GPRS_Http_Init_Done){
-                 if( AppDataPointer->TerminalInfoData.DeviceStatus == DEVICE_STATUS_POWER_SCAN_OVER){
-                     char *data = Hal_Malloc(512*sizeof(char));
-                     char *response = Hal_Malloc(64*sizeof(char));
-                     data = MakeJsonBodyData(AppDataPointer);
-                     int code = g_Device_http_post(g_30000IoT_HOST,g_30000IoT_PATH,null,data,response,15);
 
-                     Hal_Free(data);
-                     Hal_Free(response);
-                 }    
-            }
-            OSTimeDlyHMSM(0u, 0u, 0u, 200u);  
-        }
-    }
-}
 

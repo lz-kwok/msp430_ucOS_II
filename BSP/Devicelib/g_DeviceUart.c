@@ -230,7 +230,6 @@ void g_Device_SendByte_Uart2(uint8_t Chr)
 {
 	UCA2TXBUF = Chr;
 	while(!(UCA2IFG & UCTXIFG));
-	Hal_MutexUnlock(gUartMutex);
 }
 /*******************************************************************************
 * Function Name  : g_Device_SendNByte_Uart2

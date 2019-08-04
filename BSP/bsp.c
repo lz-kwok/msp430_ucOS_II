@@ -90,14 +90,13 @@ void  BSP_Init(void)
     BSP_OSTickInit();                                           /* Initialize the OS tick timer   */
 
     g_Device_InnerRTC_Init();   
-    g_DeviceIO_Init();
+    g_Device_IO_Init();
     g_Device_Usart0_Init(9600);
     g_Device_Usart1_Init(9600);
     g_Device_Usart2_Init(115200);     
     g_Device_Usart3_Init(9600);      
     g_Device_ADC_Init(); 
     g_Device_SD_Init();
-    // g_Device_SPI2_Init();
     g_Device_SPI3_Init();
     g_Device_InnerFlash_Init();
     hal_Delay_ms(100);
@@ -106,11 +105,9 @@ void  BSP_Init(void)
     hal_Delay_ms(100);
     g_Printf_info("RTC init over\r\n");
 
-#ifdef SDCard
     g_Device_SDCard_Check();               
     hal_Delay_ms(100);
     g_Printf_info("SD init over\r\n");
-#endif
 
     Recive_485_Enable;
     ScadaData_base_Init();

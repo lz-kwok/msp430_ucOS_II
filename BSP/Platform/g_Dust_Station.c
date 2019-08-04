@@ -154,7 +154,7 @@ static int AnalyzeComand(uint8_t *data,uint8_t Len)
 
 		Clear_CMD_Buffer(dRxBuff,dRxNum);
 		dRxNum=0;
-
+		Len = 0;
 		return 1;
 	}else{
 		return -1;
@@ -214,10 +214,9 @@ char *MakeJsonBodyData(DataStruct *DataPointer)
 {
     mallco_dev.init();
 
-    cJSON * pJsonRoot = NULL;
-	cJSON * pSubJson;
-	cJSON * pBack;
-	char * p;
+    cJSON *pJsonRoot = mymalloc(512*sizeof(cJSON *));
+	cJSON *pSubJson = mymalloc(128*sizeof(cJSON *));;
+	char *p;
 
     pJsonRoot = cJSON_CreateObject();
     if(NULL == pJsonRoot)
@@ -263,23 +262,18 @@ char *MakeJsonBodyData(DataStruct *DataPointer)
 		cJSON_AddNumberToObject(pSubJson, "噪音",DataPointer->DustData.Noise);
 	}
 	cJSON_AddItemToObject(pJsonRoot, "DustData", pSubJson);
-	pBack = NULL;
-	pBack = cJSON_CreateObject();
-	if(NULL == pBack)
-	{
-		// create object faild, exit
-		cJSON_Delete(pJsonRoot);
-		return NULL;
-	}
 	cJSON_AddNumberToObject(pJsonRoot, "Version",DataPointer->TerminalInfoData.Version);
 	cJSON_AddNumberToObject(pJsonRoot, "Quanity",DataPointer->TerminalInfoData.PowerQuantity);
 
-	char date[8];
+	uint8_t date[8];
 	char Uptime[18];
+	char filestore[18];
 	memset(date,0x0,8);
 	memset(Uptime,0x0,18);
-	OSBsp.Device.RTC.ReadExtTime(date);
+	memset(filestore,0x0,20);
+	OSBsp.Device.RTC.ReadExtTime(date,RealTime);
 	g_Device_RTCstring_Creat(date,Uptime);
+	g_Printf_info("Uptime:%s\r\n",Uptime);
 	cJSON_AddStringToObject(pJsonRoot, "Uptime",Uptime);
 
     p = cJSON_Print(pJsonRoot);
@@ -292,6 +286,11 @@ char *MakeJsonBodyData(DataStruct *DataPointer)
     }
 
     cJSON_Delete(pJsonRoot);
+	cJSON_Delete(pSubJson);
+
+	g_SD_FileName_Creat("0:/",date,filestore);
+	g_SD_File_Write(filestore,p);
+
     return p;
 }
 

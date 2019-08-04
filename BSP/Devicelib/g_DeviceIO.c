@@ -75,10 +75,12 @@ static void Power(ControlPower type)
 {
 	switch(type){
 		case BaseBoard_Power_On:
-			P5OUT |= BIT1;	//打开主板上5V电压 //FP6717控制管脚使能,VBUS-->5V转换
+			P1OUT |= BIT1;	//打开主板上5V电压 //FP6717控制管脚使能,VBUS-->5V转换
+			P4OUT |= BIT0;
 		break;
 		case BaseBoard_Power_Off:
-			P5OUT &=~BIT1;	//关闭主板上5V电压 //FP6717控制管脚失能,VBUS-->5V关闭
+			P1OUT &=~BIT1;	//关闭主板上5V电压 //FP6717控制管脚失能,VBUS-->5V关闭
+			P4OUT &=~BIT0;
 		break;
 		case LPModule_Power_On:
 			P4OUT |= BIT3;	//打开Socket_3V3 //传输板上插LoRa，NB模块时供电
@@ -87,10 +89,10 @@ static void Power(ControlPower type)
 			P4OUT &=~BIT3;	//关闭Socket_3V3 //传输板上插LoRa，NB模块时掉电
 		break;
 		case GPRS_Power_On:
-			P5OUT |= BIT0;	//打开Socket_5V //传输板上插GPRS模块时供电
+			P4OUT |= BIT2;	//打开Socket_5V //传输板上插GPRS模块时供电
 		break;
 		case GPRS_Power_Off:
-			P5OUT &=~BIT0;	//关闭Socket_5V //传输板上插GPRS模块时掉电
+			P4OUT &=~BIT2;	//关闭Socket_5V //传输板上插GPRS模块时掉电
 		break;
 		case SDCARD_Power_On:
 			P4OUT |= BIT0;	    //打开sd卡_3V3
@@ -136,6 +138,7 @@ static void Power(ControlPower type)
 			P2OUT |= BIT4;	    //打开传感板上电机 //传感器接口电机上电
 			hal_Delay_sec(2);
 			P2OUT &=~BIT4; 
+			g_Printf_info("%s AIR202 On\r\n",__func__);
 		break;
 		case AIR202_Power_Off:
 			P2OUT &=~BIT4; 		//关闭传感板上电机 //传感器接口电机掉电
@@ -153,12 +156,12 @@ static void ResetWirelesModule(void)
 }
 
 /*******************************************************************************
-* 函数名      	: g_DeviceIO_Init
+* 函数名      	: g_Device_IO_Init
 * 描述	  		: GPIO口初始化
 * 输入参数  	: 无
 * 返回参数  	: 无
 *******************************************************************************/
-void g_DeviceIO_Init(void)
+void g_Device_IO_Init(void)
 {
 	//Initialization of ports (all unused pins as outputs with low-level)
 	P1OUT = 0x00;

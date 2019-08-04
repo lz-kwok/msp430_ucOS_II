@@ -41,9 +41,6 @@ enum EXT_RTC_DATA_TYPE {
     InnerRam
 };
 
-extern uint8_t time_string_buf[16];
-extern uint8_t clock_flag;
-
 
 void g_Device_ExtRTC_Init(void);
 void g_Device_RTCstring_Creat(uint8_t *datetime,char *t_str);

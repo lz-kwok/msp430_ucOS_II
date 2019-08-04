@@ -44,19 +44,14 @@ void g_Device_SDCard_Check(void)
 		status = g_MMC_init();
 		timeout++;
 	}
-	if(status != 0)
+	if(status != 0){
+		g_Printf_dbg("Init Failure,Please Check SD!\r\n");
+	}else
 	{
-#if DEBUG
-		OSBsp.Device.Usart2.WriteString("Init Failure,Please Check SD!\r\n");
-#endif
-	}
-	else
-	{
-#if DEBUG
-		OSBsp.Device.Usart2.WriteString("Init SD Success!\r\n");
+		g_Printf_dbg("Init SD Success!\r\n");
 		cardSize =  MMC_ReadCardSize();                 //��SD���Ĵ�����ȡMMC/SD��������С�����س�����
-		SDsizeDisplay(cardSize);
-#endif
+		// SDsizeDisplay(cardSize);
+        g_Printf_dbg("SD Size: %d MB",cardSize/1048576); 
 	}
 	/***********End*******************/
 }

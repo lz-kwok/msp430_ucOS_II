@@ -18,8 +18,9 @@ enum GprsStatus
 
 enum GPRS_STATUS {
 	GPRS_Power_off = 0,
-	GPRS_Waitfor_SMSReady = 1,
-	GPRS_Preinit = 2,
+	GPRS_Power_on = 1,
+	GPRS_Waitfor_SMSReady = 2,
+	GPRS_Preinit = 3,
 	GPRS_Init_Done,
 	GPRS_Mqtt_Preinit,
 	GPRS_Mqtt_Init_Done,
@@ -39,6 +40,7 @@ enum GPRS_STATUS {
 	GPRS_MQTT_Enable_Pulish,
 	GPRS_Waitfor_GetIP,
 	GPRS_Get_HTTPACT,
+	GPRS_Http_Post_Done
 };
 
 
@@ -47,7 +49,7 @@ void g_Device_Establish_TCP_Connection(const char *ip,uint32_t port);
 int g_Device_http_post(const char *host,const char* path,const char *apikey,const char *data,
                       char *response,int timeout);
 void g_Device_check_Response(char *res);
-
+void  TransmitTaskStart (void *p_arg);
 #endif
 
 #endif
