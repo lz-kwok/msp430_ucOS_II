@@ -75,18 +75,18 @@ static void Power(ControlPower type)
 {
 	switch(type){
 		case BaseBoard_Power_On:
-			P1OUT |= BIT1;	//打开主板上5V电压 //FP6717控制管脚使能,VBUS-->5V转换
+			P6OUT |= BIT7;	//打开主板上5V电压 //FP6717控制管脚使能,VBUS-->5V转换
 			P4OUT |= BIT0;
 		break;
 		case BaseBoard_Power_Off:
-			P1OUT &=~BIT1;	//关闭主板上5V电压 //FP6717控制管脚失能,VBUS-->5V关闭
+			P6OUT &=~BIT7;	//关闭主板上5V电压 //FP6717控制管脚失能,VBUS-->5V关闭
 			P4OUT &=~BIT0;
 		break;
 		case LPModule_Power_On:
-			P4OUT |= BIT3;	//打开Socket_3V3 //传输板上插LoRa，NB模块时供电
+			P4OUT &= BIT3;	//打开Socket_3V3 //传输板上插LoRa，NB模块时供电
 		break;
 		case LPModule_Power_Off:
-			P4OUT &=~BIT3;	//关闭Socket_3V3 //传输板上插LoRa，NB模块时掉电
+			P4OUT |=~BIT3;	//关闭Socket_3V3 //传输板上插LoRa，NB模块时掉电
 		break;
 		case GPRS_Power_On:
 			P4OUT |= BIT2;	//打开Socket_5V //传输板上插GPRS模块时供电
@@ -107,7 +107,7 @@ static void Power(ControlPower type)
 			P4OUT &=~BIT1;	    //关闭sd卡_3V3
 		break;
 		case SenSor_Power_On:
-			P4OUT |= BIT2;      //打开Sensor_3V3         //485芯片上电
+			// P4OUT |= BIT2;      //打开Sensor_3V3         //485芯片上电
 			P3OUT |= BIT2;	    //打开传感板上5V总电压 //传感器接口5V总电压上电
 			P6OUT |= BIT2;	    //打开传感板上12V总电压 //传感器接口12V总电压上电
 			P1OUT |= BIT4;	    //打开传感板上12V_1 //1,2传感器接口12V上电
@@ -118,7 +118,7 @@ static void Power(ControlPower type)
 			P6OUT |= BIT5;	    //打开传感板上5V_3 //5,6传感器接口5V上电	  
 		break;
 		case SenSor_Power_Off:
-			P4OUT &=~BIT2;      //关闭Sensor_3V3         //485芯片掉电
+			// P4OUT &=~BIT2;      //关闭Sensor_3V3         //485芯片掉电
 			P3OUT &=~BIT2;	 	//关闭传感板上5V总电压 //传感器接口5V总电压掉电
 			P6OUT &=~BIT2;	 	//关闭传感板上12V总电压 //传感器接口12V总电压掉电
 			P1OUT &=~BIT4; 		//关闭传感板上12V_1 //1,2传感器接口12V掉电

@@ -71,6 +71,8 @@
 #include <g_DevicePrintf.h>
 #include <g_DeviceConfig.h>
 
+#include <g_DeviceNB.h>
+
 #include <g_Platform.h>
 
 #include <Diskio.h>

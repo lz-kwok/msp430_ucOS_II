@@ -9,6 +9,7 @@ C_SRCS += \
 ../BSP/Devicelib/g_DeviceFlash.c \
 ../BSP/Devicelib/g_DeviceGprs.c \
 ../BSP/Devicelib/g_DeviceIO.c \
+../BSP/Devicelib/g_DeviceNB.c \
 ../BSP/Devicelib/g_DevicePrintf.c \
 ../BSP/Devicelib/g_DeviceRTC.c \
 ../BSP/Devicelib/g_DeviceSD.c \
@@ -22,6 +23,7 @@ OBJS += \
 ./BSP/Devicelib/g_DeviceFlash.obj \
 ./BSP/Devicelib/g_DeviceGprs.obj \
 ./BSP/Devicelib/g_DeviceIO.obj \
+./BSP/Devicelib/g_DeviceNB.obj \
 ./BSP/Devicelib/g_DevicePrintf.obj \
 ./BSP/Devicelib/g_DeviceRTC.obj \
 ./BSP/Devicelib/g_DeviceSD.obj \
@@ -35,6 +37,7 @@ C_DEPS += \
 ./BSP/Devicelib/g_DeviceFlash.pp \
 ./BSP/Devicelib/g_DeviceGprs.pp \
 ./BSP/Devicelib/g_DeviceIO.pp \
+./BSP/Devicelib/g_DeviceNB.pp \
 ./BSP/Devicelib/g_DevicePrintf.pp \
 ./BSP/Devicelib/g_DeviceRTC.pp \
 ./BSP/Devicelib/g_DeviceSD.pp \
@@ -48,6 +51,7 @@ C_DEPS__QUOTED += \
 "BSP\Devicelib\g_DeviceFlash.pp" \
 "BSP\Devicelib\g_DeviceGprs.pp" \
 "BSP\Devicelib\g_DeviceIO.pp" \
+"BSP\Devicelib\g_DeviceNB.pp" \
 "BSP\Devicelib\g_DevicePrintf.pp" \
 "BSP\Devicelib\g_DeviceRTC.pp" \
 "BSP\Devicelib\g_DeviceSD.pp" \
@@ -61,6 +65,7 @@ OBJS__QUOTED += \
 "BSP\Devicelib\g_DeviceFlash.obj" \
 "BSP\Devicelib\g_DeviceGprs.obj" \
 "BSP\Devicelib\g_DeviceIO.obj" \
+"BSP\Devicelib\g_DeviceNB.obj" \
 "BSP\Devicelib\g_DevicePrintf.obj" \
 "BSP\Devicelib\g_DeviceRTC.obj" \
 "BSP\Devicelib\g_DeviceSD.obj" \
@@ -74,6 +79,7 @@ C_SRCS__QUOTED += \
 "../BSP/Devicelib/g_DeviceFlash.c" \
 "../BSP/Devicelib/g_DeviceGprs.c" \
 "../BSP/Devicelib/g_DeviceIO.c" \
+"../BSP/Devicelib/g_DeviceNB.c" \
 "../BSP/Devicelib/g_DevicePrintf.c" \
 "../BSP/Devicelib/g_DeviceRTC.c" \
 "../BSP/Devicelib/g_DeviceSD.c" \

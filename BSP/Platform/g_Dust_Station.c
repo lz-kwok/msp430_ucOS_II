@@ -200,11 +200,11 @@ void InqureSensor(void)
 		OSTimeDly(500);  //任务挂起
 		int ret = AnalyzeComand(dRxBuff,dRxNum);
 		uint32_t times = scadaIndex;
-		if(ret == 0){
-			g_Printf_dbg("%s.AnalyzeComand.CRC check failed\r\n",__func__);
-		}else if(ret == -1){
-			g_Printf_dbg("%s.AnalyzeComand.Sensor has no answer %d times\r\n",__func__,times);
-		}
+		// if(ret == 0){
+		// 	g_Printf_dbg("%s.AnalyzeComand.CRC check failed\r\n",__func__);
+		// }else if(ret == -1){
+		// 	g_Printf_dbg("%s.AnalyzeComand.Sensor has no answer %d times\r\n",__func__,times);
+		// }
 		LED_OFF;
 	}
 }
@@ -314,6 +314,11 @@ void ScadaData_base_Init(void)
 	AppDataPointer->TransMethodData.GPRSStatus = GPRS_Power_off;
 	AppDataPointer->TransMethodData.GPRSNet = 0;
 #endif
+#if (TRANSMIT_TYPE == NBIoT_BC95_Mode)
+	AppDataPointer->TerminalInfoData.DeviceStatus = DEVICE_STATUS_POWER_OFF;
+	AppDataPointer->TransMethodData.NBStatus = NB_Power_off;
+	AppDataPointer->TransMethodData.NBNet = 0;
+#endif
 }
 
 /*******************************************************************************
@@ -397,11 +402,8 @@ void Terminal_Para_Init(void)
 	AppDataPointer->TransMethodData.GPRSStatus = GPRS_Waitfor_SMSReady;
 	#endif
 #elif (TRANSMIT_TYPE == NBIoT_BC95_Mode)
-	Socket_3V_ON;	         			// PowerON-P4.3 //传输板上插LoRa模块时供电
-	hal_Delay_ms(100);			 			//wj20180511
-	ResetCommunication();    			//模块复位管脚复位
+	// ResetCommunication();    			//模块复位管脚复位
 	g_Device_Usart0_Init(9600);	     	//根据所选通信方式选择初始化波特率   NBIOT
-	Init_NB();
 #elif (TRANSMIT_TYPE == LoRa_F8L10D_Mode)
 	Socket_3V_ON;	         //LoRa  PowerON-P4.3 //传输板上插LoRa模块时供电
 	hal_Delay_ms(100);			 //wj20180511
