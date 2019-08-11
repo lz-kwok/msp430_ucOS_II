@@ -43,7 +43,7 @@
 *********************************************************************************************************
 */
 
-void  OSTimeDly (INT32U ticks)
+void  OSTimeDly (INT32U ticks)                  //2ms delay
 {
     INT8U      y;
 #if OS_CRITICAL_METHOD == 3u                     /* Allocate storage for CPU status register           */
