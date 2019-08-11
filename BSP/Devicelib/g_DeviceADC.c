@@ -165,7 +165,7 @@ void GetADCValue(void)
 		}
 	}
 	App.Data.TerminalInfoData.PowerQuantity = PowerQuantity;      			 //电量    3.4 10% 3.5 20% ———— 4.0 70%  4.2 90%
-	// Send_Buffer[32] = PowerQuantity;
+	Send_Buffer[32] = PowerQuantity;
 	//************电量处理END************//
 }
 

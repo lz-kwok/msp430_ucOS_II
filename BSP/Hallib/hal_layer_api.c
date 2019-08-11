@@ -427,7 +427,7 @@ uint32_t Hal_getTransmitPeriod(void)
     uint32_t temp =0;
     temp = OSBsp.Device.InnerFlash.innerFLASHRead(11,infor_ChargeAddr);
     if(temp>=120 && temp<=5){
-        temp = 15;           
+        temp = 5;           
     }
         
     g_Printf_info("%s %d\n",__func__,temp);

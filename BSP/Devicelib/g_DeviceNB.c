@@ -128,7 +128,7 @@ char g_Device_NB_Init(void)
 		}
 		OSTimeDly(20);
 		
-		if(NB_Config("AT+CFUN=1\r\n",60,5) == 0) //开机
+		if(NB_Config("AT+CFUN=1\r\n",100,5) == 0) //开机
 		{
 			AppDataPointer->TransMethodData.NBStatus = NB_Power_on;
 			return 0;
@@ -167,7 +167,7 @@ void g_Device_NB_GetIP(void)
 	//+QLWEVTIND:0
 	//+QLWEVTIND:3 
 	Clear_Buffer(aRxBuff,&aRxNum);
-	while ((aRxNum<35) & (ii < 30))
+	while ((aRxNum<35) & (ii < 60))
 	{
 		// if(String_Chk(aRxBuff,"+QLWEVTIND:0") == 1 && String_Chk(aRxBuff,"+QLWEVTIND:3") ==1)
 		// {
@@ -177,12 +177,12 @@ void g_Device_NB_GetIP(void)
 		Clear_Buffer(aRxBuff,&aRxNum);
 		User_Printf("AT+CGPADDR\r\n");
 		g_Printf_dbg("AT+CGPADDR\r\n");
-		OSTimeDlyHMSM(0u, 0u, 2u, 0u);
+		OSTimeDly(1000);
 //		System.Device.Usart2.WriteString(dRxBuff);
 		ii++;
 
 	}
-	if(ii > 30)
+	if(ii > 60)
 	{
 		AppDataPointer->TransMethodData.NBStatus = NB_Power_on;
 		g_Printf_dbg("GET IP Failed!\r\n");
@@ -349,7 +349,7 @@ void  TransmitTaskStart (void *p_arg)
 				g_Printf_dbg("Turn ON NB Power\r\n");
                 OSBsp.Device.IOControl.PowerSet(LPModule_Power_On);		//打开NB电源
 				//reset脚电平
-               OSTimeDly(5000);
+                OSTimeDly(5000);
                 // OSBsp.Device.IOControl.PowerSet(AIR202_Power_On);
                 AppDataPointer->TransMethodData.NBStatus = NB_Power_on;
 				g_Printf_dbg("NB Power ON\r\n");
@@ -372,7 +372,15 @@ void  TransmitTaskStart (void *p_arg)
                  if( AppDataPointer->TerminalInfoData.DeviceStatus == DEVICE_STATUS_POWER_SCAN_OVER){
                      char *data = Hal_Malloc(512*sizeof(char *));
                      char response[128];
-                     data = MakeJsonBodyData(AppDataPointer);		//组包json并存储SD卡
+                     //SeqNumber ++
+					 AppDataPointer->TransMethodData.SeqNumber++;
+					 if(AppDataPointer->TransMethodData.SeqNumber >= 65535)
+					 	AppDataPointer->TransMethodData.SeqNumber = 1;
+					 Send_Buffer[5] = AppDataPointer->TransMethodData.SeqNumber/256;
+					 Send_Buffer[6] = AppDataPointer->TransMethodData.SeqNumber%256;
+					 //Voltage
+					 GetADCValue();
+					 data = MakeJsonBodyData(AppDataPointer);		//组包json并存储SD卡
                      g_Printf_info("data:%s\r\n",data);
                      memset(response,0x0,128);
 					 //检查信号质量
