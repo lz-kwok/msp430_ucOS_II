@@ -3,8 +3,8 @@
 
 #include <stdint.h>
 
-/*DS1302管脚定义*/
-/*DS1302复位脚*/
+//DS1302管脚定义
+//DS1302复位脚
 #define RESET_CLR   	P1OUT &= ~BIT2            //电平置低
 #define RESET_SET	    P1OUT |=  BIT2            //电平置高
 #define RESET_IN	    P1DIR &= ~BIT2            //方向输入
@@ -15,12 +15,12 @@
 #define IO_R	        P1IN & BIT1               //电平读取
 #define IO_IN	        P1DIR &= ~BIT1            //方向输入
 #define IO_OUT	        P1DIR |=  BIT1            //方向输出
-/*DS1302时钟信号*/
+//DS1302时钟信号
 #define SCK_CLR	        P1OUT &= ~BIT0            //时钟信号
 #define SCK_SET	        P1OUT |=  BIT0            //电平置高
 #define SCK_IN	        P1DIR &= ~BIT0            //方向输入
 #define SCK_OUT	        P1DIR |=  BIT0            //方向输出
-/*DS1302命令与相关地址*/
+//DS1302命令与相关地址
 #define DS1302_sec_add		    0x80		      //秒数据地址
 #define DS1302_min_add		    0x82		      //分数据地址
 #define DS1302_hr_add		    0x84		      //时数据地址

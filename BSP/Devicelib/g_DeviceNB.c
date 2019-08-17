@@ -39,13 +39,13 @@
 // 	GCJ_02 = 2
 // };
 
-static char NB_tick = 0;
+// static char NB_tick = 0;
 // static uint32_t HTTP_Status_Code = 0;
-static int g_has_response = 0;
-static char g_response[256];
+// static int g_has_response = 0;
+// static char g_response[256];
 static unsigned char Singal_data[6]={0};
 static unsigned char SINR_data[5]={0};
-static unsigned char ECL_data=0;
+// static unsigned char ECL_data=0;
 
 //static char TimeString[20] = "20170804 16:00:00";
 /*******************************************************************************
@@ -115,6 +115,13 @@ char g_Device_NB_Init(void)
 	if(AppDataPointer->TransMethodData.NBStatus == NB_Boot)
 	{
 		if(NB_Config("AT+CFUN=0\r\n",5,5) == 0) //关机
+		{
+			AppDataPointer->TransMethodData.NBStatus = NB_Power_on;
+			return 0;
+		}
+		OSTimeDly(20);
+
+		if(NB_Config("AT+NNMI=0\r\n",5,5) == 0) //下发提示但不显示message
 		{
 			AppDataPointer->TransMethodData.NBStatus = NB_Power_on;
 			return 0;
@@ -324,13 +331,101 @@ void g_Device_NBSignal(void)
 *******************************************************************************/
 void g_Device_NB_Receive(void)
 {
+	uint8_t *Uart0_RxBuff;
+	uint8_t Uart0_RxBuff_data[50];
+	uint8_t Uart0_RxBuff_Num;
+	uint16_t Temp_SendPeriod;
+	unsigned char Flash_Tmp[14];  //flash操作中间变量
+	unsigned char TimebuffNum=0;
+	unsigned char TimeBuff_Hex[8] = {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00}; //16进制的时间Buffer  2018年3月15号 20时50分00秒 星期4
+
 	if(Hal_CheckString(aRxBuff,"OK"))
 	{
 		AppDataPointer->TransMethodData.NBStatus = NB_Send_Done;
 		g_Printf_dbg("NB send data ok\r\n");
 		Clear_Buffer(aRxBuff,&aRxNum);
+		Uart0_RxBuff_Num = 0;
 		User_Printf("AT+NMGR\r\n");
-		OSTimeDlyHMSM(0u, 0u, 0u, 200u);
+		OSTimeDly(500);
+		if(Hal_CheckString(aRxBuff,"FF") & Hal_CheckString(aRxBuff,"AA"))
+		{
+			if(Hal_CheckString(aRxBuff,"FF0102")) //修改上报周期
+			{
+				Uart0_RxBuff = strstr(aRxBuff,"FF0102");         //判断接收到的数据是否有效
+				while(*(Uart0_RxBuff+6) != 0x0A)
+				{
+					Uart0_RxBuff_data[Uart0_RxBuff_Num] = *(Uart0_RxBuff+6);
+					Uart0_RxBuff_Num++;
+					Uart0_RxBuff++;
+				}
+				Temp_SendPeriod = (Uart0_RxBuff_data[0]-0x30)*1000 + (Uart0_RxBuff_data[1]-0x30)*100
+									+ (Uart0_RxBuff_data[2]-0x30)*10 + (Uart0_RxBuff_data[3]-0x30)*1;
+				if( (Temp_SendPeriod >= 5) && (Temp_SendPeriod <= 240) )
+				{
+					App.Data.TerminalInfoData.SendPeriod = (unsigned char)(Temp_SendPeriod & 0x00FF);
+					g_Printf_dbg("NB Set SendPeriod OK\r\n");
+					//将发送周期的信息存入Flash
+					// delay_ms(10);
+					OSTimeDly(5);
+					Flash_Tmp[0] = OSBsp.Device.InnerFlash.innerFLASHRead(0, infor_ChargeAddr);
+					Flash_Tmp[1] = OSBsp.Device.InnerFlash.innerFLASHRead(1, infor_ChargeAddr);
+					Flash_Tmp[2] = OSBsp.Device.InnerFlash.innerFLASHRead(2, infor_ChargeAddr);
+					Flash_Tmp[3] = OSBsp.Device.InnerFlash.innerFLASHRead(3, infor_ChargeAddr);
+					Flash_Tmp[4] = OSBsp.Device.InnerFlash.innerFLASHRead(4, infor_ChargeAddr);
+					Flash_Tmp[5] = OSBsp.Device.InnerFlash.innerFLASHRead(5, infor_ChargeAddr);
+					Flash_Tmp[6] = OSBsp.Device.InnerFlash.innerFLASHRead(6, infor_ChargeAddr);
+					Flash_Tmp[7] = OSBsp.Device.InnerFlash.innerFLASHRead(7, infor_ChargeAddr);//终端类型
+					Flash_Tmp[8] = OSBsp.Device.InnerFlash.innerFLASHRead(8, infor_ChargeAddr);//传输方式
+					Flash_Tmp[9] = OSBsp.Device.InnerFlash.innerFLASHRead(9, infor_ChargeAddr);//DevEUI_H(高八位)
+					Flash_Tmp[10] = OSBsp.Device.InnerFlash.innerFLASHRead(10, infor_ChargeAddr);//DevEUI_L(低八位)
+					Flash_Tmp[11] = App.Data.TerminalInfoData.SendPeriod;//上传周期（min）
+					OSBsp.Device.InnerFlash.FlashRsvWrite(Flash_Tmp, 12, infor_ChargeAddr, 0);//把终端信息写入FLASH
+				}
+				else
+				{
+					g_Printf_dbg("NB Set SendPeriod Failed！\r\n");
+				}
+			}
+			if(Hal_CheckString(aRxBuff,"FF0208")) //同步设备时间
+			{
+				// System.Device.Usart2.WriteString("Time Set Done!\r\n");
+				Uart0_RxBuff = strstr(aRxBuff,"FF0208");         //判断接收到的数据是否有效
+				while(*(Uart0_RxBuff+6) != 0x0A)
+				{
+					Uart0_RxBuff_data[Uart0_RxBuff_Num] = *(Uart0_RxBuff+6);
+					Uart0_RxBuff_Num++;
+					Uart0_RxBuff++;
+				}
+
+				for(TimebuffNum=0;TimebuffNum<8;TimebuffNum++)
+				{
+					TimeBuff_Hex[TimebuffNum] = ((Uart0_RxBuff_data[TimebuffNum*2]-0x30)<<4) + (Uart0_RxBuff_data[TimebuffNum*2+1]-0x30);
+				}
+				if( (TimeBuff_Hex[0]==0x20) && (TimeBuff_Hex[1]>=0x18) && (TimeBuff_Hex[2]>=1) && (TimeBuff_Hex[2]<=0x12) && (TimeBuff_Hex[3]>=1) && (TimeBuff_Hex[3]<=0x31)
+					&& (TimeBuff_Hex[4]<0x24)  && (TimeBuff_Hex[5]<0x60) && (TimeBuff_Hex[6]<0x60) && (TimeBuff_Hex[7]>=1) && (TimeBuff_Hex[7]<=0x7) )
+				{
+					OSBsp.Device.RTC.ConfigExtTime(TimeBuff_Hex,0);   //写入时间
+					g_Printf_dbg("NB Time Set Done!\r\n");
+				}
+				else
+				{
+					g_Printf_dbg("NB Time Set Failed!\r\n");
+				}
+
+			}
+			if(Hal_CheckString(aRxBuff,"FF0301")) //复位设备
+			{
+				g_Printf_dbg("NB Reset Device OK!\r\n");
+				OSTimeDly(500);
+				hal_Reboot(); //******软件复位*******//
+			}
+			aRxNum = 0;
+		}
+		else
+		{
+			g_Printf_dbg("No (correct) message downloaded!\r\n");
+			aRxNum = 0;
+		}
 	}
 	AppDataPointer->TransMethodData.NBStatus = NB_Idel;
 }
@@ -387,19 +482,9 @@ void  TransmitTaskStart (void *p_arg)
 					 g_Device_NBSignal();
 					 //发送数据
 					 g_Device_NB_Send(Send_Buffer,34);
-					 OSTimeDly(500);
+					 OSTimeDly(2500);
 					 g_Device_NB_Receive();
-                    //  int code = g_Device_http_post(g_30000IoT_HOST,g_30000IoT_PATH,null,data,response,15);
-                    //  Hal_Free(data);
-                    //  if(code == 200)
-					//  {
-                    //      g_Printf_info("response : %s \r\n",response);   //对response解析，可以执行配置或ota操作
-                    //      AppDataPointer->TransMethodData.GPRSStatus = GPRS_Http_Post_Done;
-                    //  }
-					//  else
-					//  {    //这里可以做失败重发操作
-                    //      g_Printf_dbg("http_post failed\r\n");
-                    //  }                        
+                        
                  }    
             }
 			else if(AppDataPointer->TransMethodData.NBStatus == NB_Idel)
