@@ -427,7 +427,7 @@ uint32_t Hal_getTransmitPeriod(void)
     uint32_t temp =0;
     temp = OSBsp.Device.InnerFlash.innerFLASHRead(11,infor_ChargeAddr);
     if(temp>=120 && temp<=5){
-        temp = 15;           
+        temp = 5;           
     }
         
     g_Printf_info("%s %d\n",__func__,temp);
@@ -502,6 +502,7 @@ void Hal_EnterLowPower_Mode(void)
     static int m = 0;
     g_Printf_info("Enter Low Power !\r\n");
     hal_Delay_ms(100);
+#if (TRANSMIT_TYPE == GPRS_Mode)
     OSBsp.Device.IOControl.PowerSet(LPModule_Power_Off);
     OSBsp.Device.IOControl.PowerSet(GPRS_Power_Off);
     OSBsp.Device.IOControl.PowerSet(SDCARD_Power_Off);
@@ -510,6 +511,18 @@ void Hal_EnterLowPower_Mode(void)
 	OSBsp.Device.IOControl.PowerSet(SenSor_Power_Off);    		
 	OSBsp.Device.IOControl.PowerSet(Motor_Power_Off);      		
 	OSBsp.Device.IOControl.PowerSet(AIR202_Power_Off);
+#endif
+
+#if (TRANSMIT_TYPE == NBIoT_BC95_Mode)
+    // OSBsp.Device.IOControl.PowerSet(LPModule_Power_Off);
+    OSBsp.Device.IOControl.PowerSet(GPRS_Power_Off);
+    OSBsp.Device.IOControl.PowerSet(SDCARD_Power_Off);
+    OSBsp.Device.IOControl.PowerSet(GPS_Power_Off);
+    OSBsp.Device.IOControl.PowerSet(BaseBoard_Power_Off);
+	OSBsp.Device.IOControl.PowerSet(SenSor_Power_Off);    		
+	OSBsp.Device.IOControl.PowerSet(Motor_Power_Off);      		
+	// OSBsp.Device.IOControl.PowerSet(AIR202_Power_Off);
+#endif
     
     gManager.systemLowpower = 1;
     LED_OFF;
@@ -527,7 +540,12 @@ void Hal_ExitLowPower_Mode(void)
     OSBsp.Device.IOControl.PowerSet(BaseBoard_Power_On);
     OSBsp.Device.IOControl.PowerSet(SenSor_Power_On);
     AppDataPointer->TerminalInfoData.DeviceStatus = DEVICE_STATUS_POWER_OFF;
+#if (TRANSMIT_TYPE == GPRS_Mode)
     AppDataPointer->TransMethodData.GPRSStatus = GPRS_Power_off;
+#endif
+#if (TRANSMIT_TYPE == NBIoT_BC95_Mode)
+    AppDataPointer->TransMethodData.NBStatus = NB_Registered;
+#endif
 }
 
 char Hal_getCurrent_work_Mode(void)

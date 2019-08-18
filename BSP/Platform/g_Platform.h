@@ -66,6 +66,8 @@ typedef struct
 	char GPRSATStatus;
 	uint32_t Http_Cid;
 	uint8_t  LoRaJoinNET;        //LoRa入网状态
+	uint8_t	 NBStatus;			//NB模组运行状态
+	uint8_t  NBNet;				//NB网络标志位
 
 	float GPSLng_Point;          //GPS经度
 	float GPSLat_Point;          //GPS纬度
@@ -304,6 +306,7 @@ extern DataStruct *AppDataPointer;
 
 extern uint32_t SensorCahe;
 extern uint32_t sSensorCahe;
+extern uint32_t Send_Buffer[34];
 
 void InqureSensor(void);
 char *MakeJsonBodyData(DataStruct *DataPointer);

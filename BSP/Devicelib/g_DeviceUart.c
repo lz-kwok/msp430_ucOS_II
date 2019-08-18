@@ -67,6 +67,21 @@ void Clear_CMD_Buffer(uint8_t *data,uint8_t Len)
 	}
 }
 /*******************************************************************************
+* Function Name  : Clear_Buffer
+* Description    :
+* Input para     : *Cmd,*Len
+* Output para    : None
+*******************************************************************************/
+void Clear_Buffer(unsigned char *Cmd,unsigned char *Len)
+{
+	unsigned char m;
+	for(m=0;m<*Len;m++)
+	{
+		Cmd[m] = 0x00;
+	}
+	*Len=0;
+}
+/*******************************************************************************
 * Function Name  : g_Device_SendByte_Uart0
 * Description    :
 * Input para     : Chr
@@ -440,11 +455,18 @@ __interrupt void USCI_A0_ISR(void)
 			{
 				OSBsp.Device.Usart2.WriteData(UCA0RXBUF);  //
 				aRxBuff[aRxNum++] = UCA0RXBUF;
+#if(TRANSMIT_TYPE == NBIoT_BC95_Mode)
+				if(aRxNum >= aRxLength)
+					aRxNum = 0;
+#endif //(TRANSMIT_TYPE == NBIoT_BC95_Mode)
+#if(TRANSMIT_TYPE == GPRS_Mode)
 				if((aRxBuff[aRxNum-2] == 0x0D)&&(aRxBuff[aRxNum-1] == 0x0A)){
 					aRxNum = 0;
 					g_Device_check_Response(aRxBuff);
 					memset(aRxBuff,0x0,256);
-				}
+					}
+#endif	//(TRANSMIT_TYPE == GPRS_Mode)
+				
 			}//while
 			break;
 		case 4:break;                             // Vector 4 - TXIFG
