@@ -1,7 +1,7 @@
 ******************************************************************************
                   MSP430 Linker PC v4.4.3                      
 ******************************************************************************
->> Linked Wed Aug 14 00:27:41 2019
+>> Linked Mon Aug 19 23:07:20 2019
 
 OUTPUT FILE NAME:   <glz_msp430_ucOS_II.out>
 ENTRY POINT SYMBOL: "_c_int00_noargs_noexit"  address: 0000a5de
@@ -19,7 +19,7 @@ MEMORY CONFIGURATION
   INFOB                 00001900   00000080  00000000  00000080  RWIX
   INFOA                 00001980   00000080  00000000  00000080  RWIX
   RAM                   00002400   00007e00  000072c2  00000b3e  RWIX
-  FLASH                 0000a400   00005b80  0000111e  00004a62  RWIX
+  FLASH                 0000a400   00005b80  00001120  00004a60  RWIX
   INT00                 0000ff80   00000002  00000000  00000002  RWIX
   INT01                 0000ff82   00000002  00000000  00000002  RWIX
   INT02                 0000ff84   00000002  00000000  00000002  RWIX
@@ -212,72 +212,72 @@ section   page    origin      length       input sections
                   0000a606    0000000e     g_DeviceSpi.obj (.text:_isr:USCI_B3_ISR)
                   0000a614    00000006     rts430x_lc_ld_eabi.lib : isr_trap.obj (.text:_isr:__TI_ISR_TRAP)
 
-.const     0    0000a61a    00000e14     
-                  0000a61a    0000021a     g_DeviceNB.obj (.const:.string)
-                  0000a834    000001ce     g_DeviceConfig.obj (.const:.string)
-                  0000aa02    00000101     rts430x_lc_ld_eabi.lib : ctype.obj (.const:.string:_ctypes_)
-                  0000ab03    00000001     --HOLE-- [fill = 0]
-                  0000ab04    00000100     hal_layer_api.obj (.const:.string:CrcHighBlock)
-                  0000ac04    00000100     hal_layer_api.obj (.const:.string:CrcLowBlock)
-                  0000ad04    00000100     os_core.obj (.const:.string:OSUnMapTbl)
-                  0000ae04    0000009c     app.obj (.const:.string)
-                  0000aea0    0000009a     FileTxt.obj (.const:.string)
-                  0000af3a    00000080     Fatfs.obj (.const:.string:excvt$1)
-                  0000afba    0000007c     g_Dust_Station.obj (.const:.string)
-                  0000b036    0000005e     hal_layer_api.obj (.const:.string)
-                  0000b094    0000005a     g_DeviceUart.obj (.const:.string)
-                  0000b0ee    00000054     g_DeviceSD.obj (.const:.string)
-                  0000b142    0000003a     cjson.obj (.const:.string)
-                  0000b17c    00000036     os_tmr.obj (.const:.string)
-                  0000b1b2    00000030     bsp.obj (.const:.string)
-                  0000b1e2    00000026     rts430x_lc_ld_eabi.lib : _printfi.obj (.const:.string)
-                  0000b208    00000022     os_cpu_c.obj (.const:.string)
-                  0000b22a    00000020     g_DeviceRTC.obj (.const:.string)
-                  0000b24a    0000001e     os_core.obj (.const:.string)
-                  0000b268    0000001c     g_DeviceUart.obj (.const:.string:$P$T1$7)
-                  0000b284    0000001a     g_DeviceConfig.obj (.const:.string:$P$T2$5)
-                  0000b29e    00000017     hal_layer_api.obj (.const:.string:$P$T8$9)
-                  0000b2b5    00000001     --HOLE-- [fill = 0]
-                  0000b2b6    00000017     hal_layer_api.obj (.const:.string:$P$T9$10)
-                  0000b2cd    00000001     --HOLE-- [fill = 0]
-                  0000b2ce    00000016     hal_layer_api.obj (.const:.string:$P$T11$12)
-                  0000b2e4    00000015     g_DeviceUart.obj (.const:.string:$P$T0$4)
-                  0000b2f9    00000001     --HOLE-- [fill = 0]
-                  0000b2fa    00000014     FileTxt.obj (.const:.string:$P$T0$1)
-                  0000b30e    00000014     hal_layer_api.obj (.const:.string:$P$T10$11)
-                  0000b322    00000012     g_DeviceNB.obj (.const:.string:$P$T0$3)
-                  0000b334    00000012     hal_layer_api.obj (.const:.string:$P$T6$7)
-                  0000b346    00000011     hal_layer_api.obj (.const:.string:$P$T0$1)
-                  0000b357    00000001     --HOLE-- [fill = 0]
-                  0000b358    00000011     g_DeviceConfig.obj (.const:.string:$P$T1$4)
-                  0000b369    00000001     --HOLE-- [fill = 0]
-                  0000b36a    00000011     g_DeviceUart.obj (.const:.string:$P$T2$9)
-                  0000b37b    00000001     --HOLE-- [fill = 0]
-                  0000b37c    00000010     g_DeviceConfig.obj (.const:.string:$P$T0$2)
-                  0000b38c    00000010     hal_layer_api.obj (.const:.string:$P$T4$5)
-                  0000b39c    00000010     hal_layer_api.obj (.const:.string:$P$T7$8)
-                  0000b3ac    00000010     Fatfs.obj (.const:.string)
-                  0000b3bc    00000010     g_DeviceUart.obj (.const:.string:USCIModulation)
-                  0000b3cc    00000010     g_DeviceIO.obj (.const:.string)
-                  0000b3dc    0000000f     app.obj (.const:.string:$P$T0$1)
-                  0000b3eb    00000001     --HOLE-- [fill = 0]
-                  0000b3ec    0000000e     hal_layer_api.obj (.const:.string:$P$T3$4)
-                  0000b3fa    0000000c     malloc.obj (.const)
-                  0000b406    00000008     g_Dust_Station.obj (.const:.string:Inqure_Noise)
-                  0000b40e    00000008     g_Dust_Station.obj (.const:.string:Inqure_PM)
-                  0000b416    00000008     g_Dust_Station.obj (.const:.string:Inqure_WindDirection)
-                  0000b41e    00000006     g_DeviceIO.obj (.const:.string:$P$T0$1)
-                  0000b424    00000002     os_flag.obj (.const:.string)
-                  0000b426    00000002     os_mem.obj (.const:.string)
-                  0000b428    00000002     os_mutex.obj (.const:.string)
-                  0000b42a    00000002     os_q.obj (.const:.string)
-                  0000b42c    00000002     os_sem.obj (.const:.string)
+.const     0    0000a61a    00000e16     
+                  0000a61a    0000021c     g_DeviceNB.obj (.const:.string)
+                  0000a836    000001ce     g_DeviceConfig.obj (.const:.string)
+                  0000aa04    00000101     rts430x_lc_ld_eabi.lib : ctype.obj (.const:.string:_ctypes_)
+                  0000ab05    00000001     --HOLE-- [fill = 0]
+                  0000ab06    00000100     hal_layer_api.obj (.const:.string:CrcHighBlock)
+                  0000ac06    00000100     hal_layer_api.obj (.const:.string:CrcLowBlock)
+                  0000ad06    00000100     os_core.obj (.const:.string:OSUnMapTbl)
+                  0000ae06    0000009c     app.obj (.const:.string)
+                  0000aea2    0000009a     FileTxt.obj (.const:.string)
+                  0000af3c    00000080     Fatfs.obj (.const:.string:excvt$1)
+                  0000afbc    0000007c     g_Dust_Station.obj (.const:.string)
+                  0000b038    0000005e     hal_layer_api.obj (.const:.string)
+                  0000b096    0000005a     g_DeviceUart.obj (.const:.string)
+                  0000b0f0    00000054     g_DeviceSD.obj (.const:.string)
+                  0000b144    0000003a     cjson.obj (.const:.string)
+                  0000b17e    00000036     os_tmr.obj (.const:.string)
+                  0000b1b4    00000030     bsp.obj (.const:.string)
+                  0000b1e4    00000026     rts430x_lc_ld_eabi.lib : _printfi.obj (.const:.string)
+                  0000b20a    00000022     os_cpu_c.obj (.const:.string)
+                  0000b22c    00000020     g_DeviceRTC.obj (.const:.string)
+                  0000b24c    0000001e     os_core.obj (.const:.string)
+                  0000b26a    0000001c     g_DeviceUart.obj (.const:.string:$P$T1$7)
+                  0000b286    0000001a     g_DeviceConfig.obj (.const:.string:$P$T2$5)
+                  0000b2a0    00000017     hal_layer_api.obj (.const:.string:$P$T8$9)
+                  0000b2b7    00000001     --HOLE-- [fill = 0]
+                  0000b2b8    00000017     hal_layer_api.obj (.const:.string:$P$T9$10)
+                  0000b2cf    00000001     --HOLE-- [fill = 0]
+                  0000b2d0    00000016     hal_layer_api.obj (.const:.string:$P$T11$12)
+                  0000b2e6    00000015     g_DeviceUart.obj (.const:.string:$P$T0$4)
+                  0000b2fb    00000001     --HOLE-- [fill = 0]
+                  0000b2fc    00000014     FileTxt.obj (.const:.string:$P$T0$1)
+                  0000b310    00000014     hal_layer_api.obj (.const:.string:$P$T10$11)
+                  0000b324    00000012     g_DeviceNB.obj (.const:.string:$P$T0$3)
+                  0000b336    00000012     hal_layer_api.obj (.const:.string:$P$T6$7)
+                  0000b348    00000011     hal_layer_api.obj (.const:.string:$P$T0$1)
+                  0000b359    00000001     --HOLE-- [fill = 0]
+                  0000b35a    00000011     g_DeviceConfig.obj (.const:.string:$P$T1$4)
+                  0000b36b    00000001     --HOLE-- [fill = 0]
+                  0000b36c    00000011     g_DeviceUart.obj (.const:.string:$P$T2$9)
+                  0000b37d    00000001     --HOLE-- [fill = 0]
+                  0000b37e    00000010     g_DeviceConfig.obj (.const:.string:$P$T0$2)
+                  0000b38e    00000010     hal_layer_api.obj (.const:.string:$P$T4$5)
+                  0000b39e    00000010     hal_layer_api.obj (.const:.string:$P$T7$8)
+                  0000b3ae    00000010     Fatfs.obj (.const:.string)
+                  0000b3be    00000010     g_DeviceUart.obj (.const:.string:USCIModulation)
+                  0000b3ce    00000010     g_DeviceIO.obj (.const:.string)
+                  0000b3de    0000000f     app.obj (.const:.string:$P$T0$1)
+                  0000b3ed    00000001     --HOLE-- [fill = 0]
+                  0000b3ee    0000000e     hal_layer_api.obj (.const:.string:$P$T3$4)
+                  0000b3fc    0000000c     malloc.obj (.const)
+                  0000b408    00000008     g_Dust_Station.obj (.const:.string:Inqure_Noise)
+                  0000b410    00000008     g_Dust_Station.obj (.const:.string:Inqure_PM)
+                  0000b418    00000008     g_Dust_Station.obj (.const:.string:Inqure_WindDirection)
+                  0000b420    00000006     g_DeviceIO.obj (.const:.string:$P$T0$1)
+                  0000b426    00000002     os_flag.obj (.const:.string)
+                  0000b428    00000002     os_mem.obj (.const:.string)
+                  0000b42a    00000002     os_mutex.obj (.const:.string)
+                  0000b42c    00000002     os_q.obj (.const:.string)
+                  0000b42e    00000002     os_sem.obj (.const:.string)
 
-.cinit     0    0000b42e    000000f0     
-                  0000b42e    000000ce     (.cinit..data.load) [load image, compression = rle]
-                  0000b4fc    0000000c     (__TI_handler_table)
-                  0000b508    00000006     (.cinit..bss.load) [load image, compression = zero_init]
-                  0000b50e    00000010     (__TI_cinit_table)
+.cinit     0    0000b430    000000f0     
+                  0000b430    000000ce     (.cinit..data.load) [load image, compression = rle]
+                  0000b4fe    0000000c     (__TI_handler_table)
+                  0000b50a    00000006     (.cinit..bss.load) [load image, compression = zero_init]
+                  0000b510    00000010     (__TI_cinit_table)
 
 .init_array 
 *          0    0000a400    00000000     UNINITIALIZED
@@ -729,14 +729,14 @@ SYSNMI     0    0000fffc    00000002
 
 LINKER GENERATED COPY TABLES
 
-__TI_cinit_table @ 0000b50e records: 2, size/record: 8, table size: 16
-	.data: load addr=0000b42e, load size=000000ce bytes, run addr=000092de, run size=000002a5 bytes, compression=rle
-	.bss: load addr=0000b508, load size=00000006 bytes, run addr=00002400, run size=00006edd bytes, compression=zero_init
+__TI_cinit_table @ 0000b510 records: 2, size/record: 8, table size: 16
+	.data: load addr=0000b430, load size=000000ce bytes, run addr=000092de, run size=000002a5 bytes, compression=rle
+	.bss: load addr=0000b50a, load size=00000006 bytes, run addr=00002400, run size=00006edd bytes, compression=zero_init
 
 
 LINKER GENERATED HANDLER TABLE
 
-__TI_handler_table @ 0000b4fc records: 3, size/record: 4, table size: 12
+__TI_handler_table @ 0000b4fe records: 3, size/record: 4, table size: 12
 	index: 0, handler: __TI_zero_init
 	index: 1, handler: __TI_decompress_rle24
 	index: 2, handler: __TI_decompress_none
@@ -815,8 +815,8 @@ address   name
 0001d01a  Clear_Buffer               
 0001d0ce  Clear_CMD_Buffer           
 0001c6f4  Crc16                      
-0000ab04  CrcHighBlock               
-0000ac04  CrcLowBlock                
+0000ab06  CrcHighBlock               
+0000ac06  CrcLowBlock                
 00000510  DMA0CTL                    
 00000511  DMA0CTL_H                  
 00000510  DMA0CTL_L                  
@@ -903,9 +903,9 @@ address   name
 0001b6ce  Hal_getTransmitPeriod      
 00017c30  Init_FLL                   
 00019d78  InqureSensor               
-0000b406  Inqure_Noise               
-0000b40e  Inqure_PM                  
-0000b416  Inqure_WindDirection       
+0000b408  Inqure_Noise               
+0000b410  Inqure_PM                  
+0000b418  Inqure_WindDirection       
 00009508  LastPowerQuantity          
 000004c4  MAC                        
 000004da  MAC32H                     
@@ -1042,7 +1042,7 @@ address   name
 000092ca  OSTmrUsed                  
 00009204  OSTmrWheelTbl              
 00017096  OSTmr_Init                 
-0000ad04  OSUnMapTbl                 
+0000ad06  OSUnMapTbl                 
 0001ad64  OS_CPU_SR_Restore          
 0001ad5c  OS_CPU_SR_Save             
 0001aa90  OS_EventTaskRdy            
@@ -1569,7 +1569,7 @@ address   name
 00000172  UCSCTL9                    
 00000173  UCSCTL9_H                  
 00000172  UCSCTL9_L                  
-0000b3bc  USCIModulation             
+0000b3be  USCIModulation             
 0000a528  USCI_A0_ISR                
 0000a400  USCI_A1_ISR                
 0000a5a4  USCI_A2_ISR                
@@ -1601,10 +1601,10 @@ address   name
 0000a200  __STACK_END                
 000000a0  __STACK_SIZE               
 000000a0  __SYSMEM_SIZE              
-0000b50e  __TI_CINIT_Base            
-0000b51e  __TI_CINIT_Limit           
-0000b4fc  __TI_Handler_Table_Base    
-0000b508  __TI_Handler_Table_Limit   
+0000b510  __TI_CINIT_Base            
+0000b520  __TI_CINIT_Limit           
+0000b4fe  __TI_Handler_Table_Base    
+0000b50a  __TI_Handler_Table_Limit   
 UNDEFED   __TI_INITARRAY_Base        
 UNDEFED   __TI_INITARRAY_Limit       
 0000a614  __TI_ISR_TRAP              
@@ -1734,7 +1734,7 @@ ffffffff  __c_args__
 000169fa  __mspabi_subf              
 0001a21a  _auto_init_hold_wdt        
 0000a5de  _c_int00_noargs_noexit     
-0000aa02  _ctypes_                   
+0000aa04  _ctypes_                   
 0000956a  _lock                      
 0001d34c  _nop                       
 0000fffe  _reset_vector              
@@ -1837,13 +1837,13 @@ ffffffff  binit
 00017d18  mem_malloc                 
 0001af88  mem_perused                
 00002400  membase                    
-0000b3fe  memblksize                 
+0000b400  memblksize                 
 0001cf40  memccpy                    
 0001cac4  memcpy                     
 00008008  memmapbase                 
 0001cf00  memset                     
-0000b402  memsize                    
-0000b3fa  memtblsize                 
+0000b404  memsize                    
+0000b3fc  memtblsize                 
 0001b4a2  minit                      
 0001ccde  mmcGetResponse             
 0001b1f0  mmcSendCmd                 
@@ -2622,21 +2622,21 @@ address   name
 0000a5f8  USCI_B2_ISR                
 0000a606  USCI_B3_ISR                
 0000a614  __TI_ISR_TRAP              
-0000aa02  _ctypes_                   
-0000ab04  CrcHighBlock               
-0000ac04  CrcLowBlock                
-0000ad04  OSUnMapTbl                 
-0000b3bc  USCIModulation             
-0000b3fa  memtblsize                 
-0000b3fe  memblksize                 
-0000b402  memsize                    
-0000b406  Inqure_Noise               
-0000b40e  Inqure_PM                  
-0000b416  Inqure_WindDirection       
-0000b4fc  __TI_Handler_Table_Base    
-0000b508  __TI_Handler_Table_Limit   
-0000b50e  __TI_CINIT_Base            
-0000b51e  __TI_CINIT_Limit           
+0000aa04  _ctypes_                   
+0000ab06  CrcHighBlock               
+0000ac06  CrcLowBlock                
+0000ad06  OSUnMapTbl                 
+0000b3be  USCIModulation             
+0000b3fc  memtblsize                 
+0000b400  memblksize                 
+0000b404  memsize                    
+0000b408  Inqure_Noise               
+0000b410  Inqure_PM                  
+0000b418  Inqure_WindDirection       
+0000b4fe  __TI_Handler_Table_Base    
+0000b50a  __TI_Handler_Table_Limit   
+0000b510  __TI_CINIT_Base            
+0000b520  __TI_CINIT_Limit           
 0000ffc8  __TI_int36                 
 0000ffca  __TI_int37                 
 0000ffcc  __TI_int38                 
