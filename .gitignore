@@ -1,2 +1,4 @@
 #ignore files and folders
 /Debug
+/.launches
+/.settings

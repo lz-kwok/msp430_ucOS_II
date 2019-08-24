@@ -68,6 +68,8 @@ typedef struct
 	uint8_t  LoRaJoinNET;        //LoRa入网状态
 	uint8_t	 NBStatus;			//NB模组运行状态
 	uint8_t  NBNet;				//NB网络标志位
+	uint8_t  LoRaStatus;		//LoRa模组运行状态
+	uint8_t  LoRaNet;
 
 	float GPSLng_Point;          //GPS经度
 	float GPSLat_Point;          //GPS纬度

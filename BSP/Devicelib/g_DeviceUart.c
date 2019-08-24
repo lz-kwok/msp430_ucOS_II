@@ -459,6 +459,13 @@ __interrupt void USCI_A0_ISR(void)
 				if(aRxNum >= aRxLength)
 					aRxNum = 0;
 #endif //(TRANSMIT_TYPE == NBIoT_BC95_Mode)
+#if(TRANSMIT_TYPE == LoRa_F8L10D_Mode)
+				if((aRxBuff[aRxNum-2] == 0x0D)&&(aRxBuff[aRxNum-1] == 0x0A)){
+					aRxNum = 0;
+					g_Device_check_Response(aRxBuff);
+					memset(aRxBuff,0x0,256);
+					}
+#endif	//(TRANSMIT_TYPE == LoRa_F8L10D_Mode)
 #if(TRANSMIT_TYPE == GPRS_Mode)
 				if((aRxBuff[aRxNum-2] == 0x0D)&&(aRxBuff[aRxNum-1] == 0x0A)){
 					aRxNum = 0;

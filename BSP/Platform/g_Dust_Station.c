@@ -405,9 +405,10 @@ void Terminal_Para_Init(void)
 	// ResetCommunication();    			//模块复位管脚复位
 	g_Device_Usart0_Init(9600);	     	//根据所选通信方式选择初始化波特率   NBIOT
 #elif (TRANSMIT_TYPE == LoRa_F8L10D_Mode)
-	Socket_3V_ON;	         //LoRa  PowerON-P4.3 //传输板上插LoRa模块时供电
-	hal_Delay_ms(100);			 //wj20180511
-	OSBsp.Device.IOControl.ResetWirelesModule();    //模块复位管脚复位
+	// Socket_3V_ON;	         //LoRa  PowerON-P4.3 //传输板上插LoRa模块时供电
+	// hal_Delay_ms(100);			 //wj20180511
+	// OSBsp.Device.IOControl.ResetWirelesModule();    //模块复位管脚复位
+//	g_Device_Usart0_Init(9600);	     	//根据所选通信方式选择初始化波特率   NBIOT
 #if LoRa_QunDeng
 	g_Device_Usart0_Init(115200);      //根据所选通信方式选择初始化波特率   LoRa
 	LoRaDevEui = OSBsp.Device.InnerFlash.innerFLASHRead(9,infor_ChargeAddr);
@@ -418,8 +419,8 @@ void Terminal_Para_Init(void)
 	LoRa_Deveui[29]= LoRaDevEui%100/10 + 0x30;
 	LoRa_Deveui[30]= LoRaDevEui%10 + 0x30;
 #endif
-	g_Device_Usart0_Init(115200);      //根据所选通信方式选择初始化波特率   LoRa
-	InitLoRa_F8L10D();        //初始化LoRa
+	g_Device_Usart0_Init(9600);      //根据所选通信方式选择初始化波特率   LoRa
+//	InitLoRa_F8L10D();        //初始化LoRa
 #elif (TRANSMIT_TYPE == LoRa_OM402_Mode)
 	OSBsp.Device.IOControl.PowerSet(LPModule_Power_On);;	         //LoRa  PowerON-P4.3 //传输板上插LoRa模块时供电
 	hal_Delay_ms(100);			 //wj20180511
