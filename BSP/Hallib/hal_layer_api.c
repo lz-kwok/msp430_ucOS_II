@@ -513,7 +513,7 @@ void Hal_EnterLowPower_Mode(void)
 	OSBsp.Device.IOControl.PowerSet(AIR202_Power_Off);
 #endif
 
-#if (TRANSMIT_TYPE == NBIoT_BC95_Mode)
+#if (TRANSMIT_TYPE == NBIoT_BC95_Mode || TRANSMIT_TYPE == LoRa_F8L10D_Mode )
     // OSBsp.Device.IOControl.PowerSet(LPModule_Power_Off);
     OSBsp.Device.IOControl.PowerSet(GPRS_Power_Off);
     OSBsp.Device.IOControl.PowerSet(SDCARD_Power_Off);

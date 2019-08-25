@@ -6,6 +6,14 @@
 
 #if (TRANSMIT_TYPE == LoRa_F8L10D_Mode)
 
+//断点续传使用
+#define MaxLength	5
+extern uint16_t BackupIndex;
+extern uint16_t StartFile;
+extern uint16_t FullFlag;
+extern char RespFile[10];
+
+
 enum NB_STATUS {
 	LoRa_Power_off = 0,
 	LoRa_Power_on = 1,
@@ -23,7 +31,7 @@ enum NB_STATUS {
 unsigned char LoRa_Config(unsigned char *c , unsigned char m, unsigned char t);
 void g_Device_LoRa_Init(void);
 void g_Device_LoRa_GetJoined(void);
-void g_Device_LoRa_Send(uint32_t *data ,uint8_t length);
+void g_Device_LoRa_Send(uint32_t *data , uint8_t length , uint8_t port);
 void g_Device_LoRa_Receive(void);
 void g_Device_check_Response(char *res);
 

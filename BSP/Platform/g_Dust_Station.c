@@ -319,6 +319,11 @@ void ScadaData_base_Init(void)
 	AppDataPointer->TransMethodData.NBStatus = NB_Power_off;
 	AppDataPointer->TransMethodData.NBNet = 0;
 #endif
+#if (TRANSMIT_TYPE == LoRa_F8L10D_Mode)
+	AppDataPointer->TerminalInfoData.DeviceStatus = DEVICE_STATUS_POWER_OFF;
+	AppDataPointer->TransMethodData.LoRaStatus = LoRa_Power_off;
+	AppDataPointer->TransMethodData.LoRaNet = 0;
+#endif
 }
 
 /*******************************************************************************
@@ -408,7 +413,7 @@ void Terminal_Para_Init(void)
 	// Socket_3V_ON;	         //LoRa  PowerON-P4.3 //传输板上插LoRa模块时供电
 	// hal_Delay_ms(100);			 //wj20180511
 	// OSBsp.Device.IOControl.ResetWirelesModule();    //模块复位管脚复位
-//	g_Device_Usart0_Init(9600);	     	//根据所选通信方式选择初始化波特率   NBIOT
+//	g_Device_Usart0_Init(9600);	     	//根据所选通信方式选择初始化波特率   
 #if LoRa_QunDeng
 	g_Device_Usart0_Init(115200);      //根据所选通信方式选择初始化波特率   LoRa
 	LoRaDevEui = OSBsp.Device.InnerFlash.innerFLASHRead(9,infor_ChargeAddr);

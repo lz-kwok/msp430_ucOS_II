@@ -33,9 +33,14 @@
 
 static int g_has_response = 0;
 static char g_response[256];
-// static unsigned char Singal_data[6]={0};
-// static unsigned char SINR_data[5]={0};
-// static unsigned char ECL_data=0;
+
+//断点续传使用
+uint16_t BackupIndex = 0;
+uint16_t StartFile = 1;
+uint16_t FullFlag = 0;
+char RespFile[10];
+char Data_Backup[70];
+uint8_t ResendData = 0;
 
 //static char TimeString[20] = "20170804 16:00:00";
 /*******************************************************************************
@@ -80,7 +85,7 @@ unsigned char LoRa_Config(unsigned char *c , unsigned char m, unsigned char t)
 *******************************************************************************/
 void g_Device_LoRa_Init(void)
 {
-	if(AppDataPointer->TransMethodData.NBStatus == LoRa_Power_on)
+	if(AppDataPointer->TransMethodData.LoRaStatus == LoRa_Power_on)
 	{
         if(LoRa_Config("AT\r\n",5,5))     //测试AT指令
         {
@@ -91,7 +96,7 @@ void g_Device_LoRa_Init(void)
             AppDataPointer->TransMethodData.LoRaStatus = LoRa_Power_on;
         }
 
-        if(AppDataPointer->TransMethodData.NBStatus == LoRa_Boot)       //申请入网
+        if(AppDataPointer->TransMethodData.LoRaStatus == LoRa_Boot)       //申请入网
         {
             User_Printf("AT+RJN\r\n");
             AppDataPointer->TransMethodData.LoRaStatus = LoRa_Init_Done;
@@ -116,9 +121,9 @@ void g_Device_LoRa_GetJoined(void)
 		// 	AppDataPointer->TransMethodData.NBStatus = NB_Registered;
 		// 	break;
 		// }
-		Clear_Buffer(aRxBuff,&aRxNum);
-		User_Printf("AT+CGPADDR\r\n");
-		g_Printf_dbg("AT+CGPADDR\r\n");
+		// Clear_Buffer(aRxBuff,&aRxNum);
+		// User_Printf("AT+CGPADDR\r\n");
+		// g_Printf_dbg("AT+CGPADDR\r\n");
 		OSTimeDly(1000);
 //		System.Device.Usart2.WriteString(dRxBuff);
 		ii++;
@@ -127,6 +132,7 @@ void g_Device_LoRa_GetJoined(void)
 	if(ii > 60)
 	{
 		g_Printf_dbg("LoRa join Failed!\r\n");
+		OSTimeDly(1000);
 	}
 	AppDataPointer->TransMethodData.LoRaStatus = LoRa_Join_Over;
 	
@@ -134,15 +140,16 @@ void g_Device_LoRa_GetJoined(void)
 /*******************************************************************************
 * 函数名		: g_Device_LoRa_Send
 * 描述	    	: LoRa上报数据
-* 输入参数  	: *data--准备上报内容，length--数据长度
+* 输入参数  	: *data--准备上报内容，length--数据长度,port---端口
 * 返回参数  	: code
 *******************************************************************************/
-void g_Device_LoRa_Send(uint32_t *data ,uint8_t length)
+void g_Device_LoRa_Send(uint32_t *data , uint8_t length , uint8_t port)
 {
 	static unsigned char ii = 0;
 	char buff[15];
+	AppDataPointer->TransMethodData.LoRaSendStatus = 0;
 	Clear_Buffer(aRxBuff,&aRxNum);
-	sprintf(buff,"AT+TXH=%d,",length);
+	sprintf(buff,"AT+TXH=%d,",port);
 	User_Printf(buff);
     // User_Printf("AT+NMGS=34,");
     for(ii=0;ii<length;ii++)
@@ -159,7 +166,18 @@ void g_Device_LoRa_Send(uint32_t *data ,uint8_t length)
     User_Printf("\r\n");
 	OSTimeDly(200);
 }
+void SendLoRaStrHex(uint32_t *data, uint8_t len)
+{
+	static uint8_t ii = 0;
 
+	User_Printf("AT+TXH=15,");
+	User_Printf(data);
+//	for(ii=0;ii<len;ii++)
+//	{
+//	    System.Device.Usart2.WriteData(data[ii]);
+//	}
+	User_Printf("\r\n");
+}
 /*******************************************************************************
 * 函数名		: g_Device_LoRa_Receive
 * 描述	    	: LoRa接收下发数据
@@ -264,8 +282,8 @@ void g_Device_check_Response(char *res)
 	if(Hal_CheckString(res,"+TXDONE"))
     {
 		if(AppDataPointer->TransMethodData.LoRaNet)
-            g_Printf_dbg("Send data to LoRa done...\r\n");
-        AppDataPointer->TransMethodData.LoRaStatus = LoRa_Send_Done;
+            g_Printf_dbg("Send data to model OK...\r\n");
+        // AppDataPointer->TransMethodData.LoRaStatus = LoRa_Send_Done;
 	}else if(Hal_CheckString(res,"AT_BUSY_ERROR"))
     {
 		g_Printf_dbg("internal state is busy...\r\n");
@@ -287,10 +305,14 @@ void g_Device_check_Response(char *res)
 	}else if(Hal_CheckString(res,"ACK"))
     {
 		g_Printf_dbg("Get Server ACK...\r\n");
+		AppDataPointer->TransMethodData.LoRaSendStatus = 1;
 	}
 }
+
 void  TransmitTaskStart (void *p_arg)
 {
+	uint8_t waitTime = 0;
+	uint8_t temp = 0;
     (void)p_arg;   
     OSTimeDlyHMSM(0u, 0u, 0u, 100u);      
     g_Printf_info("%s ... ...\n",__func__);           
@@ -319,28 +341,27 @@ void  TransmitTaskStart (void *p_arg)
 			else if(AppDataPointer->TransMethodData.LoRaStatus == LoRa_Join_Over)
 			{
                  if( AppDataPointer->TerminalInfoData.DeviceStatus == DEVICE_STATUS_POWER_SCAN_OVER){
-                     char *data = Hal_Malloc(512*sizeof(char *));
-                    //  char response[128];
-                     //SeqNumber ++
-					 AppDataPointer->TransMethodData.SeqNumber++;
-					 if(AppDataPointer->TransMethodData.SeqNumber >= 65535)
-					 	AppDataPointer->TransMethodData.SeqNumber = 1;
-					 Send_Buffer[5] = AppDataPointer->TransMethodData.SeqNumber/256;
-					 Send_Buffer[6] = AppDataPointer->TransMethodData.SeqNumber%256;
-					 //Voltage
-					 GetADCValue();
-					 data = MakeJsonBodyData(AppDataPointer);		//组包json并存储SD卡
-                     g_Printf_info("data:%s\r\n",data);
-                    //  memset(response,0x0,128);
-					 
+					char *data = Hal_Malloc(512*sizeof(char *));
+					//  char response[128];
+					//SeqNumber ++
+					AppDataPointer->TransMethodData.SeqNumber++;
+					if(AppDataPointer->TransMethodData.SeqNumber >= 65535)
+						AppDataPointer->TransMethodData.SeqNumber = 1;
+					Send_Buffer[5] = AppDataPointer->TransMethodData.SeqNumber/256;
+					Send_Buffer[6] = AppDataPointer->TransMethodData.SeqNumber%256;
+					//Voltage
+					GetADCValue();
+					data = MakeJsonBodyData(AppDataPointer);		//组包json并存储SD卡
+					g_Printf_info("data:%s\r\n",data);
+					
+					//  memset(response,0x0,128);
 					 //发送数据
 					 if(AppDataPointer->TransMethodData.LoRaNet == 1)
 					 {
-						g_Device_LoRa_Send(Send_Buffer,34);
+						g_Device_LoRa_Send(Send_Buffer,34,15);
 						OSTimeDly(2500);
-						g_Device_LoRa_Receive();
+						g_Device_LoRa_Receive();				
 					 }
-                        
                  }    
             }
 			else if(AppDataPointer->TransMethodData.LoRaStatus == LoRa_Idel)
