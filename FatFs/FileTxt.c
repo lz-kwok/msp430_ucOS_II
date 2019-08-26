@@ -26,7 +26,13 @@
 */
 #include <bsp.h>
 
-
+int16_t i;
+FATFS fs;
+FRESULT res;
+FILINFO fileInfo;
+uint16_t br,bw;
+DIR dir;
+FIL fsrc;
 
 //åˆ›å»ºæ–‡ä»¶è·¯å¾„
 void g_SD_FileName_Creat(const char *docPath,uint8_t *date,char *filename)
@@ -45,10 +51,10 @@ void g_SD_FileName_Creat(const char *docPath,uint8_t *date,char *filename)
 
 void g_SD_File_Write(const char *file_path,const char *dat)
 {
-	FRESULT res;
-	FIL fsrc;
-	FATFS fs;
-	uint16_t bw;
+	// FRESULT res;
+	// FIL fsrc;
+	// FATFS fs;
+	// uint16_t bw;
 
 	g_Printf_dbg("write file to %s......\n\r",file_path);
 	res=f_mount(0, &fs);
@@ -58,7 +64,7 @@ void g_SD_File_Write(const char *file_path,const char *dat)
 		g_Printf_dbg("open file error = %d\n\r",res_s);
 	}else{
 		g_Printf_dbg("open file OK!\n\r");
-		f_lseek(&fsrc,fsrc.fsize);                      //ç§»åŠ¨æŒ‡é’ˆåˆ°æœ«ï¿½?
+		f_lseek(&fsrc,fsrc.fsize);                      //ç§»åŠ¨æŒ‡é’ˆåˆ°æœ«ï¿??
 		res = f_write(&fsrc, dat, strlen(dat), &bw);    /* Write it to the dst file */
 		if(res == FR_OK){
 			uint32_t num_w;
@@ -73,12 +79,152 @@ void g_SD_File_Write(const char *file_path,const char *dat)
 	}
 	f_mount(0,NULL);
 }
+void del_txt(char *direction,char *file_path)//É¾³ýÎÄ¼þ
+{
+	res = f_mount(0, &fs);
+	res = f_opendir(&dir , direction);
+	if(res != FR_OK)
+	{
+		g_Printf_dbg("open dir error\r\n");
 
+	}
+	else
+	{
+		g_Printf_dbg("open dir success\r\n");
+		f_chdir(direction);
+	}
 
+	res = f_unlink(file_path);
+	if(res != FR_OK)
+	{
+		g_Printf_dbg("del file error\r\n");
+	}
+	else
+	{
+		g_Printf_dbg("del file ok\r\n");
+	}
 
+	f_mount(0,NULL);
+}
+//ÏòÖ¸¶¨Ä¿Â¼ÖÐÐ´ÎÄ¼þ
+char Write_ToDirTxt(char *direction,char *file_path,char *dat)
+{
+	char result = 0;
+//	char *path[30] = {"0:/RESP/1.txt"};
+	res = f_mount(0, &fs);
+	res = f_opendir(&dir , direction);
+	if(res != FR_OK)
+	{
+		g_Printf_dbg("open dir error\r\n");
+		res = f_mkdir(direction);
+		if(res != FR_OK)
+		{
+			g_Printf_dbg("make dir error\r\n");
+			result = 0;
+		}
+		else
+		{
+			g_Printf_dbg("make dir success\r\n");
+			res = f_opendir(&dir , direction);
+			f_chdir(direction);
+		}
+	}
+	else
+	{
+		g_Printf_dbg("open dir success\r\n");
+		f_chdir(direction);
+	}
+//	strcpy(path , direction);
+//	strcat(path , file_path);
+	res = f_open(&fsrc,file_path, FA_OPEN_ALWAYS | FA_WRITE);
 
+	if(res != FR_OK)
+	{
+		g_Printf_dbg("open file error\r\n");
+		result = 0;
+	}
+	else
+	{
+		g_Printf_dbg("open file OK!\r\n");
+		f_lseek(&fsrc,fsrc.fsize);                     		 // ÒÆ¶¯Ö¸Õëµ½Ä©Î²
+		res = f_write(&fsrc, dat, strlen(dat), &bw);         // Write it to the dst file
+//		res = f_write(&fsrc, "\r\n", 2, &bw);         // Write it to the dst file
+//		if(res == FR_OK)
+//		{
+//			g_Printf_dbg("write data ok! \r\n");
+//		}
+//		else
+//		{
+//			g_Printf_dbg("write data error \r\n");
+//		}
+		/*close file */
+		f_close(&fsrc);
+		result = 1;
+	}
+	f_mount(0,NULL);
+	return result;
+}
+//¶ÁÈ¡ÎÄ¼þÖÐ×Ö·û´®
+char Get_String(char *direction,char *file_path,char *buffer,int len)
+{
+	char result = 0;
+	res = f_mount(0, &fs);
+	res = f_opendir(&dir , direction);
+	if(res != FR_OK)
+	{
+		g_Printf_dbg("open dir error\r\n");
+		result = 0;
+	}
+	else
+	{
+		g_Printf_dbg("open dir success\r\n");
+		f_chdir(direction);
+	}
 
+	res = f_open(&fsrc,file_path, FA_OPEN_ALWAYS | FA_READ);
 
+	if(res != FR_OK)
+	{
+		g_Printf_dbg("open file error\r\n");
+		result = 0;
+	}
+	else
+	{
+		g_Printf_dbg("open file OK!\r\n");
+//		f_lseek(&fsrc,fsrc.fsize);                     		 // ÒÆ¶¯Ö¸Õëµ½Ä©Î²
+//		res = f_gets(buffer, len , &fsrc);         // Write it to the dst file
+		if(f_gets(buffer, len , &fsrc) != NULL)
+		{
+			g_Printf_dbg("f_gets ok \r\n");
+			g_Printf_dbg(buffer);
+			result = 1;
 
+		}
+		else
+		{
+			g_Printf_dbg("f_gets error\r\n");
 
+			result = 2;			//ÓÃÓÚÉ¾³ý±êÖ¾
+//			f_chdir(direction);
+		}
+		/*close file */
+		f_close(&fsrc);
+		if(result == 2)
+		{
+			result = 0;			//É¾³ýºó·µ»Ø0£¬Ã»ÓÐ»ñÈ¡µ½×Ö·û´®
+			res=f_unlink ((char *)file_path);
+			if(res != FR_OK)
+			{
+				g_Printf_dbg("del file error\r\n");
+			}
+			else
+			{
+				g_Printf_dbg("del file ok\r\n");
+			}
+		}
+
+	}
+	f_mount(0,NULL);
+	return result;
+}
 

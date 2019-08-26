@@ -166,16 +166,13 @@ void g_Device_LoRa_Send(uint32_t *data , uint8_t length , uint8_t port)
     User_Printf("\r\n");
 	OSTimeDly(200);
 }
-void SendLoRaStrHex(uint32_t *data, uint8_t len)
+void SendLoRaStrHex(char *data, uint8_t len)
 {
 	static uint8_t ii = 0;
-
+	AppDataPointer->TransMethodData.LoRaSendStatus = 0;
+	Clear_Buffer(aRxBuff,&aRxNum);
 	User_Printf("AT+TXH=15,");
 	User_Printf(data);
-//	for(ii=0;ii<len;ii++)
-//	{
-//	    System.Device.Usart2.WriteData(data[ii]);
-//	}
 	User_Printf("\r\n");
 }
 /*******************************************************************************
@@ -308,7 +305,133 @@ void g_Device_check_Response(char *res)
 		AppDataPointer->TransMethodData.LoRaSendStatus = 1;
 	}
 }
+/*******************************************************************************
+* 函数名            : CreatFileNum
+* 描述	  : 生成存储文件名称
+* 输入参数  : x	1——序号加；0——序号减
+* 返回参数  : 无
+*******************************************************************************/
+void CreatFileNum(char x)
+{
+  if(x ==1)	//序号加
+  {
+    if(FullFlag == 0)
+    {
+		BackupIndex++;
+		if(BackupIndex > MaxLength)
+		{
+			BackupIndex = 1;
+			StartFile = BackupIndex + 1;
+			FullFlag = 1;
+		}
+    }
+    else
+    {
+		BackupIndex ++;
+		if(BackupIndex > MaxLength)
+		{
+			BackupIndex = 1;
+		}
+		StartFile = BackupIndex + 1;
+		if(StartFile > MaxLength)
+		{
+			StartFile = 1;
+		}
+    }
+  }
+  else			//序号减
+  {
+      if(FullFlag == 1)
+      {
+		BackupIndex--;
+		if(BackupIndex == 0)
+		{
+			BackupIndex = MaxLength;
+			FullFlag = 0;
+		}
+      }
+      else
+      {
+//	  if(BackupIndex >= StartFile)
+	  {
+	      if(BackupIndex == StartFile)
+	      {
+			BackupIndex = 0;
+			StartFile = 1;
+	      }
+	      else	//BackupIndex ！= StartFile 只能是大于关系
+	      {
+		  	BackupIndex --;
+	      }
+	  }
+      }
+  }
+}
+void WriteStoreData(void)
+{
+	uint8_t tempBuffer[20];
+	uint8_t cacheBuf[7];
+	CreatFileNum(1);		//参数1   BackupIndex++;
+	ltoa( (long)BackupIndex , RespFile);
+	strcat(RespFile , ".txt");
+	if(FullFlag)		//循环时需要先删除原来文件
+	{
+		del_txt("0:/INDEX",RespFile);
+		sprintf(tempBuffer,"Del file:%s\r\n",RespFile);
+		g_Printf_dbg(tempBuffer);
+	}
+	if(Write_ToDirTxt("0:/INDEX",RespFile,Data_Backup))			//临时存储，用于补发数据,需要存储成功
+	{
+		cacheBuf[0] = BackupIndex/256;
+		cacheBuf[1] = BackupIndex%256;
+		cacheBuf[2] = StartFile/256;
+		cacheBuf[3] = StartFile%256;
+		cacheBuf[4] = FullFlag%256;
+		OSBsp.Device.InnerFlash.FlashRsvWrite(cacheBuf,5,infor_ChargeAddr,18);	//存储成功后保存文件名序号至Flash
+		g_Printf_dbg(Data_Backup);
+		g_Printf_dbg(RespFile);
+		g_Printf_dbg("Write jsonResp to SD\r\n");
+	}
+	else			//若存储失败则退回原来序号
+	{
+		if(FullFlag==0)
+		{
+			if(BackupIndex >= 1)
+				BackupIndex --;
+		}
+		else
+		{
+			if(BackupIndex = 1)
+				BackupIndex = MaxLength;	//超过一轮需转回最大值
+			else
+				BackupIndex --;
+		}
 
+	}
+}
+void GetStoreData(void)
+{
+	uint8_t temp = 0;
+	while(BackupIndex >=1)
+	{
+		ltoa( (long)BackupIndex , RespFile);
+		strcat(RespFile , ".txt");
+		temp = Get_String("0:/INDEX" , RespFile , Data_Backup , 70);
+		if( temp == 1)		//没取到字符串
+		{
+			BackupIndex--;
+			ResendData = 1;		//补发数据标志位
+			Data_Backup[68] = '\0';
+			AppDataPointer->TransMethodData.LoRaStatus = LoRa_Join_Over;
+			break;		//退出循环，准备发送数据
+		}
+		else
+		{
+			BackupIndex--;
+		}
+	}
+	
+}
 void  TransmitTaskStart (void *p_arg)
 {
 	uint8_t waitTime = 0;
@@ -340,29 +463,50 @@ void  TransmitTaskStart (void *p_arg)
 			}
 			else if(AppDataPointer->TransMethodData.LoRaStatus == LoRa_Join_Over)
 			{
-                 if( AppDataPointer->TerminalInfoData.DeviceStatus == DEVICE_STATUS_POWER_SCAN_OVER){
-					char *data = Hal_Malloc(512*sizeof(char *));
-					//  char response[128];
-					//SeqNumber ++
-					AppDataPointer->TransMethodData.SeqNumber++;
-					if(AppDataPointer->TransMethodData.SeqNumber >= 65535)
-						AppDataPointer->TransMethodData.SeqNumber = 1;
-					Send_Buffer[5] = AppDataPointer->TransMethodData.SeqNumber/256;
-					Send_Buffer[6] = AppDataPointer->TransMethodData.SeqNumber%256;
-					//Voltage
-					GetADCValue();
-					data = MakeJsonBodyData(AppDataPointer);		//组包json并存储SD卡
-					g_Printf_info("data:%s\r\n",data);
-					
+				if( AppDataPointer->TerminalInfoData.DeviceStatus == DEVICE_STATUS_POWER_SCAN_OVER)
+				{
+					if(ResendData == 0)		//正常上报数据,需要累加SeqNum,采集电压，本地存储
+					{
+						char *data = Hal_Malloc(512*sizeof(char *));
+						//  char response[128];
+						//SeqNumber ++
+						AppDataPointer->TransMethodData.SeqNumber++;
+						if(AppDataPointer->TransMethodData.SeqNumber >= 65535)
+							AppDataPointer->TransMethodData.SeqNumber = 1;
+						Send_Buffer[5] = AppDataPointer->TransMethodData.SeqNumber/256;
+						Send_Buffer[6] = AppDataPointer->TransMethodData.SeqNumber%256;
+						//Voltage
+						GetADCValue();
+						data = MakeJsonBodyData(AppDataPointer);		//组包json并存储SD卡
+						g_Printf_info("data:%s\r\n",data);
+					}
 					//  memset(response,0x0,128);
-					 //发送数据
-					 if(AppDataPointer->TransMethodData.LoRaNet == 1)
-					 {
-						g_Device_LoRa_Send(Send_Buffer,34,15);
-						OSTimeDly(2500);
-						g_Device_LoRa_Receive();				
-					 }
-                 }    
+					//发送数据
+					if(AppDataPointer->TransMethodData.LoRaNet == 1)
+					{
+						if(ResendData == 1)		//补发数据
+						{
+							SendLoRaStrHex(Data_Backup,68);
+						}
+						else					//正常上报数据
+						{
+							g_Device_LoRa_Send(Send_Buffer,34,15);
+						}
+						OSTimeDly(2500);		//等待5s
+						g_Device_LoRa_Receive();	//查询有无下发数据
+						if(AppDataPointer->TransMethodData.LoRaSendStatus == 1)	//确认帧发送成功,发送数据前会置0
+						{
+							GetStoreData();
+						}
+					}
+					else
+					{
+						//存储数据等待下次补传
+						WriteStoreData();
+						AppDataPointer->TransMethodData.LoRaStatus = LoRa_Idel;
+					}
+					
+				}    
             }
 			else if(AppDataPointer->TransMethodData.LoRaStatus == LoRa_Idel)
 			{
