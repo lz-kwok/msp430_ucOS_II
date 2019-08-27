@@ -114,20 +114,10 @@ void g_Device_LoRa_GetJoined(void)
 	uint8_t ii = 0;
 	//等待注册成功信息
 	//joined
-	while ((AppDataPointer->TransMethodData.LoRaNet == 0) & (ii < 60))     //等待2min
+	while ((AppDataPointer->TransMethodData.LoRaNet == 0) & (ii < 30))     //等待1min
 	{
-		// if(String_Chk(aRxBuff,"+QLWEVTIND:0") == 1 && String_Chk(aRxBuff,"+QLWEVTIND:3") ==1)
-		// {
-		// 	AppDataPointer->TransMethodData.NBStatus = NB_Registered;
-		// 	break;
-		// }
-		// Clear_Buffer(aRxBuff,&aRxNum);
-		// User_Printf("AT+CGPADDR\r\n");
-		// g_Printf_dbg("AT+CGPADDR\r\n");
 		OSTimeDly(1000);
-//		System.Device.Usart2.WriteString(dRxBuff);
 		ii++;
-
 	}
 	if(ii > 60)
 	{
@@ -438,19 +428,18 @@ void  TransmitTaskStart (void *p_arg)
 	uint8_t temp = 0;
     (void)p_arg;   
     OSTimeDlyHMSM(0u, 0u, 0u, 100u);      
-    g_Printf_info("%s ... ...\n",__func__);           
+    g_Printf_info("%s ... ...\n",__func__);      
     while (DEF_TRUE) {               /* Task body, always written as an infinite loop.       */
         if(Hal_getCurrent_work_Mode() == 0){
             if(AppDataPointer->TransMethodData.LoRaStatus == LoRa_Power_off)
 			{
-				//NB-IoT 第一次开机时对NB上电操作，后续进入低功耗不关电
-				// g_Printf_dbg("LoRa Power ON\r\n");
-                OSBsp.Device.IOControl.PowerSet(LPModule_Power_On);		//打开LoRa电源
+				//LoRa 第一次开机时对NB上电操作，后续进入低功耗不关电
+            	OSBsp.Device.IOControl.PowerSet(LPModule_Power_On);		//打开LoRa电源
 				//reset脚电平
-                OSTimeDly(5000);
-                // OSBsp.Device.IOControl.PowerSet(AIR202_Power_On);
+                OSTimeDly(5000);				
                 AppDataPointer->TransMethodData.LoRaStatus = LoRa_Power_on;
 				g_Printf_dbg("LoRa Power ON\r\n");
+				
                 
             }
 			else if(AppDataPointer->TransMethodData.LoRaStatus == LoRa_Power_on)

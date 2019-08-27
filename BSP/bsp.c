@@ -140,7 +140,7 @@ static void  BSP_OSTickInit(void)
 
 static void BSP_OSClockInit(void){
     // Use the REFO oscillator as the FLL reference, and also for ACLK
-    UCSCTL3 = (UCSCTL3 & ~(SELREF_7)) | (SELREF__REFOCLK);   //璁剧疆FLL鍙傝�鏃堕挓涓篟EFOCLK(鍐呴儴32.768kHz鏅舵尟)锛涘綋鏈塜T2,閫夋嫨XT2鍚﹀垯閫塕EFOCLK
+    UCSCTL3 = (UCSCTL3 & ~(SELREF_7)) | (SELREF__REFOCLK);   //璁剧疆FLL鍙傝�鏃堕挓涓篟EFOCLK(鍐呴�?32.768kHz鏅舵�?)锛涘綋鏈塜T2,閫夋嫨XT2鍚﹀垯閫塕EFOCLK
     UCSCTL4 = (UCSCTL4 & ~(SELA_7)) | (SELA__REFOCLK);       //ACLK鍙傝�鏃堕挓婧愰�鎷╂帶鍒讹紱褰撴湁XT2,閫夋嫨XT2鍚﹀垯閫塂COCLKDIV
     // Start the FLL, which will drive MCLK (not the crystal)
     Init_FLL(BSP_CPU_CLK_FREQ/1000, BSP_CPU_CLK_FREQ/32768);
