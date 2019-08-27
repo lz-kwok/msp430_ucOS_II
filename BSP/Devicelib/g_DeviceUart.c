@@ -442,7 +442,7 @@ void UartRecTaskStart(void *p_arg)
 }
 
 
-//------USCI_A0涓柇鏈嶅姟鏈嶅姟鍑芥暟-------------------------------------------------+
+//------USCI_A0中断服务函数 无线通信模组接口------------------------------------------------+
 #pragma vector=USCI_A0_VECTOR
 __interrupt void USCI_A0_ISR(void)
 {
@@ -487,7 +487,7 @@ __interrupt void USCI_A0_ISR(void)
 }
 
 
-//------USCI_A1涓柇鏈嶅姟鏈嶅姟鍑芥暟-------------------------------------------------+
+//------USCI_A1中断服务函数 配件232/484/GPS模组接口-------------------------------------------------+
 #pragma vector=USCI_A1_VECTOR
 __interrupt void USCI_A1_ISR(void)
 {
@@ -531,7 +531,7 @@ __interrupt void USCI_A1_ISR(void)
 		default: break;
 	}
 }
-//------USCI_A2涓柇鏈嶅姟鏈嶅姟鍑芥暟-------------------------------------------------+
+//------USCI_A2中断服务函数 Debug接口------------------------------------------------+
 #pragma vector=USCI_A2_VECTOR
 __interrupt void USCI_A2_ISR(void)
 {
@@ -544,11 +544,11 @@ __interrupt void USCI_A2_ISR(void)
 			{
 				if(cRxNum < cRxLength){
 					cRxBuff[cRxNum++] = UCA2RXBUF;
-					// if(cRxNum == ComData_MiniSize){
-					// 	OSIntEnter();
-					// 	g_Device_Config_QueuePost(G_CLIENT_CMD,(void *)"ClientCMD");
-					// 	OSIntExit();	
-					// }	
+					if(cRxNum == ComData_MiniSize){
+						OSIntEnter();
+						g_Device_Config_QueuePost(G_CLIENT_CMD,(void *)"ClientCMD");
+						OSIntExit();	
+					}	
 				}else{
 					cRxNum = 0;
 				}
@@ -558,7 +558,7 @@ __interrupt void USCI_A2_ISR(void)
 		default: break;
 	}
 }
-//------USCI_A3涓柇鏈嶅姟鏈嶅姟鍑芥暟-------------------------------------------------+
+//------USCI_A3中断服务函数 传感器采集接口-----------------------------------------------+
 #pragma vector=USCI_A3_VECTOR
 __interrupt void USCI_A3_ISR(void)
 {
@@ -566,7 +566,7 @@ __interrupt void USCI_A3_ISR(void)
 	{
 		case 0:break;                             // Vector 0 - no interrupt
 		case 2:                                   // Vector 2 - RXIFG
-		    __bic_SR_register_on_exit(LPM0_bits);	//閫�嚭浣庡姛鑰�
+		    __bic_SR_register_on_exit(LPM0_bits);	//退出中断
 			while(!(UCA3IFG&UCTXIFG));            // USCI_A3 TX buffer ready?
 			{
 				TA1R=0;
