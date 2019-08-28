@@ -496,8 +496,15 @@ void  TransmitTaskStart (void *p_arg)
 						g_Device_LoRa_Receive();	//查询有无下发数据
 						if(AppDataPointer->TransMethodData.LoRaSendStatus == 1)	//确认帧发送成功,发送数据前会置0
 						{
-							GetStoreData();
+							if(BackupIndex >=1)
+								GetStoreData();
 						}
+						else		//发送失败保存数据，进入Idel态
+						{
+							WriteStoreData();
+							AppDataPointer->TransMethodData.LoRaStatus = LoRa_Idel;
+						}
+						
 					}
 					else
 					{

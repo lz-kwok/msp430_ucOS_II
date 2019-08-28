@@ -544,11 +544,11 @@ __interrupt void USCI_A2_ISR(void)
 			{
 				if(cRxNum < cRxLength){
 					cRxBuff[cRxNum++] = UCA2RXBUF;
-					if(cRxNum == ComData_MiniSize){
-						OSIntEnter();
-						g_Device_Config_QueuePost(G_CLIENT_CMD,(void *)"ClientCMD");
-						OSIntExit();	
-					}	
+					// if(cRxNum == ComData_MiniSize){
+					// 	OSIntEnter();
+					// 	g_Device_Config_QueuePost(G_CLIENT_CMD,(void *)"ClientCMD");
+					// 	OSIntExit();	
+					// }	
 				}else{
 					cRxNum = 0;
 				}

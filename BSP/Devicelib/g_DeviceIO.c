@@ -83,10 +83,10 @@ static void Power(ControlPower type)
 			P4OUT &=~BIT0;
 		break;
 		case LPModule_Power_On:
-			P4OUT &= BIT3;	//打开Socket_3V3 //传输板上插LoRa，NB模块时供电
+			P4OUT &=~BIT3;	//打开Socket_3V3 //传输板上插LoRa，NB模块时供电
 		break;
 		case LPModule_Power_Off:
-			P4OUT |=~BIT3;	//关闭Socket_3V3 //传输板上插LoRa，NB模块时掉电
+			P4OUT |= BIT3;	//关闭Socket_3V3 //传输板上插LoRa，NB模块时掉电
 		break;
 		case GPRS_Power_On:
 			P4OUT |= BIT2;	//打开Socket_5V //传输板上插GPRS模块时供电
