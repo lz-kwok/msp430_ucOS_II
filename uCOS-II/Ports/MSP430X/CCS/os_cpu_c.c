@@ -22,6 +22,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <g_DevicePrintf.h>
+//#include <hal_layer_api.h>
 /*
 *********************************************************************************************************
 *                                       OS INITIALIZATION HOOK

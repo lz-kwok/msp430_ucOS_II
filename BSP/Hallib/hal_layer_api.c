@@ -513,7 +513,7 @@ void Hal_EnterLowPower_Mode(void)
 	OSBsp.Device.IOControl.PowerSet(AIR202_Power_Off);
 #endif
 
-#if (TRANSMIT_TYPE == NBIoT_BC95_Mode)
+#if (TRANSMIT_TYPE == NBIoT_BC95_Mode || TRANSMIT_TYPE == LoRa_F8L10D_Mode )
     // OSBsp.Device.IOControl.PowerSet(LPModule_Power_Off);
     OSBsp.Device.IOControl.PowerSet(GPRS_Power_Off);
     OSBsp.Device.IOControl.PowerSet(SDCARD_Power_Off);
@@ -545,6 +545,15 @@ void Hal_ExitLowPower_Mode(void)
 #endif
 #if (TRANSMIT_TYPE == NBIoT_BC95_Mode)
     AppDataPointer->TransMethodData.NBStatus = NB_Registered;
+#endif
+#if (TRANSMIT_TYPE == LoRa_F8L10D_Mode)
+    if(AppDataPointer->TransMethodData.LoRaNet)
+        AppDataPointer->TransMethodData.LoRaStatus = LoRa_Join_Over;
+    else    //进低功耗前入网失败，出低功耗后继续入网
+    {
+        AppDataPointer->TransMethodData.LoRaStatus = LoRa_Power_on;
+    }
+        
 #endif
 }
 
