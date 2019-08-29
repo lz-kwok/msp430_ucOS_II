@@ -97,11 +97,11 @@ void del_txt(char *direction,char *file_path)//É¾³ýÎÄ¼þ
 	res = f_unlink(file_path);
 	if(res != FR_OK)
 	{
-		g_Printf_dbg("del file error\r\n");
+		g_Printf_dbg("del file %s error\r\n",file_path);
 	}
 	else
 	{
-		g_Printf_dbg("del file ok\r\n");
+		g_Printf_dbg("del file %s  ok\r\n",file_path);
 	}
 
 	f_mount(0,NULL);

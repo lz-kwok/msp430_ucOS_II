@@ -6,6 +6,13 @@
 
 #if (TRANSMIT_TYPE == NBIoT_BC95_Mode)
 
+//断点续传使用
+#define MaxLength	5
+extern uint16_t BackupIndex;
+extern uint16_t StartFile;
+extern uint8_t FullFlag;
+extern char RespFile[10];
+
 enum NB_STATUS {
 	NB_Power_off = 0,
 	NB_Power_on = 1,

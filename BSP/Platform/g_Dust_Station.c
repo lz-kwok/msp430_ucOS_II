@@ -369,8 +369,17 @@ void Terminal_Para_Init(void)
 	App.Data.TerminalInfoData.Version = Hal_getFirmwareVersion();       //软件版本
 	/************************SendPeriod******************************************/
 	App.Data.TerminalInfoData.SendPeriod = Hal_getTransmitPeriod();		//发送周期
+	App.Data.TerminalInfoData.SendPeriod = 2;		//测试用
 	/************************TerminalIndex 终端类型******************************************/
 	App.Data.TerminalInfoData.DeviceType = PRODUCT_TYPE;
+
+	//断点续传存储值
+	//BackupIndex
+	BackupIndex = Hal_getBackupIndex();
+	//StartFile
+	StartFile = Hal_getStartFile();	
+	//FullFlag
+	FullFlag = Hal_getFullFlag();
 
 #if (TRANSMIT_TYPE == GPRS_Mode)
 	#ifdef SIM800C

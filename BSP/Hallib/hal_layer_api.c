@@ -422,7 +422,7 @@ uint32_t Hal_getSerialNumber(void)
     return temp;
 }
 
-uint32_t Hal_getTransmitPeriod(void)
+uint8_t Hal_getTransmitPeriod(void)
 {
     uint32_t temp =0;
     temp = OSBsp.Device.InnerFlash.innerFLASHRead(11,infor_ChargeAddr);
@@ -432,6 +432,40 @@ uint32_t Hal_getTransmitPeriod(void)
         
     g_Printf_info("%s %d\n",__func__,temp);
     return temp;
+}
+
+uint16_t Hal_getBackupIndex(void)
+{
+    uint32_t temp =0;
+    temp = OSBsp.Device.InnerFlash.innerFLASHRead(18,infor_ChargeAddr);
+	temp = temp<<8;
+	temp += OSBsp.Device.InnerFlash.innerFLASHRead(19,infor_ChargeAddr);
+    if(temp == 0xFFFF)
+        temp = 0;
+    g_Printf_info("%s %d\n",__func__,temp);
+    return (uint16_t)temp;
+}
+
+uint16_t Hal_getStartFile(void)
+{
+    uint32_t temp =0;
+    temp = OSBsp.Device.InnerFlash.innerFLASHRead(20,infor_ChargeAddr);
+	temp = temp<<8;
+	temp += OSBsp.Device.InnerFlash.innerFLASHRead(21,infor_ChargeAddr);
+    if(temp == 0xFFFF)
+        temp = 0;
+    g_Printf_info("%s %d\n",__func__,temp);
+    return (uint16_t)temp;
+}
+
+uint8_t Hal_getFullFlag(void)
+{
+    uint32_t temp =0;
+    temp = OSBsp.Device.InnerFlash.innerFLASHRead(22,infor_ChargeAddr);
+    if(temp == 0xFF)
+        temp = 0;
+    g_Printf_info("%s %d\n",__func__,temp);
+    return (uint8_t)temp;
 }
 
 #ifdef AIR202
@@ -544,7 +578,7 @@ void Hal_ExitLowPower_Mode(void)
     AppDataPointer->TransMethodData.GPRSStatus = GPRS_Power_off;
 #endif
 #if (TRANSMIT_TYPE == NBIoT_BC95_Mode)
-    AppDataPointer->TransMethodData.NBStatus = NB_Registered;
+    AppDataPointer->TransMethodData.NBStatus = NB_Init_Done;
 #endif
 #if (TRANSMIT_TYPE == LoRa_F8L10D_Mode)
     if(AppDataPointer->TransMethodData.LoRaNet)

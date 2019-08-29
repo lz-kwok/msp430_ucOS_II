@@ -41,6 +41,7 @@ uint16_t FullFlag = 0;
 char RespFile[10];
 char Data_Backup[70];
 uint8_t ResendData = 0;
+uint8_t cacheBuf[7];
 
 //static char TimeString[20] = "20170804 16:00:00";
 /*******************************************************************************
@@ -158,7 +159,7 @@ void g_Device_LoRa_Send(uint32_t *data , uint8_t length , uint8_t port)
 }
 void SendLoRaStrHex(char *data, uint8_t len)
 {
-	static uint8_t ii = 0;
+
 	AppDataPointer->TransMethodData.LoRaSendStatus = 0;
 	Clear_Buffer(aRxBuff,&aRxNum);
 	User_Printf("AT+TXH=15,");
@@ -357,6 +358,27 @@ void CreatFileNum(char x)
       }
   }
 }
+void Hex2Str(unsigned char *d,uint32_t *p,unsigned char Len, unsigned char offset)
+{
+	unsigned char i;
+	for(i = 0; i<Len;i++)
+	{
+		d[2*i + offset] = (uint8_t)p[i]>>4;
+		d[2*i+1 + offset] = (uint8_t)p[i]&0xf;
+	}
+	for(i = 0 + offset; i<Len*2 + offset;i++)
+	{
+	//	dst[i] = HexToChar(str[i]);
+		if (d[i] < 10)
+		{
+			d[i] = d[i] + '0';
+		}
+		else
+		{
+			d[i] = d[i] -10 +'A';
+		}
+	}
+}
 void WriteStoreData(void)
 {
 	uint8_t tempBuffer[20];
@@ -380,7 +402,7 @@ void WriteStoreData(void)
 		OSBsp.Device.InnerFlash.FlashRsvWrite(cacheBuf,5,infor_ChargeAddr,18);	//存储成功后保存文件名序号至Flash
 		g_Printf_dbg(Data_Backup);
 		g_Printf_dbg(RespFile);
-		g_Printf_dbg("Write jsonResp to SD\r\n");
+		g_Printf_dbg("Write backup to SD\r\n");
 	}
 	else			//若存储失败则退回原来序号
 	{
@@ -391,7 +413,7 @@ void WriteStoreData(void)
 		}
 		else
 		{
-			if(BackupIndex = 1)
+			if(BackupIndex == 1)
 				BackupIndex = MaxLength;	//超过一轮需转回最大值
 			else
 				BackupIndex --;
@@ -424,8 +446,8 @@ void GetStoreData(void)
 }
 void  TransmitTaskStart (void *p_arg)
 {
-	uint8_t waitTime = 0;
-	uint8_t temp = 0;
+//	uint8_t waitTime = 0;
+//	uint8_t temp = 0;
     (void)p_arg;   
     OSTimeDlyHMSM(0u, 0u, 0u, 100u);      
     g_Printf_info("%s ... ...\n",__func__);      
@@ -454,6 +476,7 @@ void  TransmitTaskStart (void *p_arg)
 			{
 				if( AppDataPointer->TerminalInfoData.DeviceStatus == DEVICE_STATUS_POWER_SCAN_OVER)
 				{
+					g_Printf_info("Scan over,data uploading\r\n");
 					if(ResendData == 0)		//正常上报数据,需要累加SeqNum,采集电压，本地存储
 					{
 						char *data = Hal_Malloc(512*sizeof(char *));
@@ -468,6 +491,7 @@ void  TransmitTaskStart (void *p_arg)
 						GetADCValue();
 						data = MakeJsonBodyData(AppDataPointer);		//组包json并存储SD卡
 						g_Printf_info("data:%s\r\n",data);
+						Hex2Str(Data_Backup,Send_Buffer,34,0);
 					}
 					//  memset(response,0x0,128);
 					//发送数据
@@ -485,7 +509,27 @@ void  TransmitTaskStart (void *p_arg)
 						g_Device_LoRa_Receive();	//查询有无下发数据
 						if(AppDataPointer->TransMethodData.LoRaSendStatus == 1)	//确认帧发送成功,发送数据前会置0
 						{
-							GetStoreData();
+							if(ResendData)
+							{
+								ResendData = 0;
+								del_txt("0:/INDEX",RespFile);				//删除临时存储，同时更改存储BackupIndex值
+								CreatFileNum(0);		//参数0   BackupIndex++;
+								cacheBuf[0] = BackupIndex/256;
+								cacheBuf[1] = BackupIndex%256;
+								cacheBuf[2] = StartFile/256;
+								cacheBuf[3] = StartFile%256;
+								cacheBuf[4] = FullFlag;
+								OSBsp.Device.InnerFlash.FlashRsvWrite(cacheBuf,5,infor_ChargeAddr,18);
+							}	
+							if(BackupIndex >=1)
+								GetStoreData();
+							else
+								AppDataPointer->TransMethodData.LoRaStatus = LoRa_Idel;
+						}
+						else
+						{
+							WriteStoreData();
+							AppDataPointer->TransMethodData.LoRaStatus = LoRa_Idel;
 						}
 					}
 					else

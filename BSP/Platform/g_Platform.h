@@ -68,6 +68,7 @@ typedef struct
 	uint8_t  LoRaJoinNET;        //LoRa入网状态
 	uint8_t	 NBStatus;			//NB模组运行状态
 	uint8_t  NBNet;				//NB网络标志位
+	uint8_t  NBSendStatus;		//NB发送状态，发送后以OK位判断，收到OK即发送成功
 	uint8_t  LoRaStatus;		//LoRa模组运行状态
 	uint8_t  LoRaNet;			//LoRa网络状态
 	uint8_t	 LoRaSendStatus;	//LoRa发送状态，确认帧使用，发送数据收到ACK后置1
