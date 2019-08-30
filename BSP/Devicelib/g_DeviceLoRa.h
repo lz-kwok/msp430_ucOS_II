@@ -7,7 +7,7 @@
 #if (TRANSMIT_TYPE == LoRa_F8L10D_Mode)
 
 //断点续传使用
-#define MaxLength	5
+#define MaxLength	100
 extern uint16_t BackupIndex;
 extern uint16_t StartFile;
 extern uint16_t FullFlag;

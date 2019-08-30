@@ -369,7 +369,6 @@ void Terminal_Para_Init(void)
 	App.Data.TerminalInfoData.Version = Hal_getFirmwareVersion();       //软件版本
 	/************************SendPeriod******************************************/
 	App.Data.TerminalInfoData.SendPeriod = Hal_getTransmitPeriod();		//发送周期
-	App.Data.TerminalInfoData.SendPeriod = 2;		//测试用
 	/************************TerminalIndex 终端类型******************************************/
 	App.Data.TerminalInfoData.DeviceType = PRODUCT_TYPE;
 
