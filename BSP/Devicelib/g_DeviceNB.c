@@ -566,7 +566,7 @@ void GetStoreData(void)
 		}
 		else			//没取到字符串
 		{
-			BackupIndex--;
+			CreatFileNum(0);		//参数0   BackupIndex--;
 		}
 	}
 	

@@ -290,6 +290,7 @@ char *MakeJsonBodyData(DataStruct *DataPointer)
 
 	g_SD_FileName_Creat("0:/",date,filestore);
 	g_SD_File_Write(filestore,p);
+	g_SD_File_Write(filestore,"\r\n");		//写入回车换行，查看数据清晰
 
     return p;
 }

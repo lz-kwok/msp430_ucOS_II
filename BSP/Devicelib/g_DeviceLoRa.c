@@ -429,17 +429,16 @@ void GetStoreData(void)
 		ltoa( (long)BackupIndex , RespFile);
 		strcat(RespFile , ".txt");
 		temp = Get_String("0:/INDEX" , RespFile , Data_Backup , 70);
-		if( temp == 1)		//没取到字符串
+		if( temp == 1)		//到字符串
 		{
-			BackupIndex--;
 			ResendData = 1;		//补发数据标志位
 			Data_Backup[68] = '\0';
 			AppDataPointer->TransMethodData.LoRaStatus = LoRa_Join_Over;
 			break;		//退出循环，准备发送数据
 		}
-		else
+		else				//没取到字符串，递减BackupIndex，然后继续查询
 		{
-			BackupIndex--;
+			CreatFileNum(0);		//参数0   BackupIndex--;
 		}
 	}
 	
@@ -513,7 +512,7 @@ void  TransmitTaskStart (void *p_arg)
 							{
 								ResendData = 0;
 								del_txt("0:/INDEX",RespFile);				//删除临时存储，同时更改存储BackupIndex值
-								CreatFileNum(0);		//参数0   BackupIndex++;
+								CreatFileNum(0);		//参数0   BackupIndex--;
 								cacheBuf[0] = BackupIndex/256;
 								cacheBuf[1] = BackupIndex%256;
 								cacheBuf[2] = StartFile/256;
