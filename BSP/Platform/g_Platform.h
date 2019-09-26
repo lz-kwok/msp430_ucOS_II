@@ -4,6 +4,10 @@
 #include <stdint.h>
 #include <hal_device.h>
 
+enum DEVICE_STATUS_FIRSTRUN {
+	DEVICE_STATUS_FIRSTRUN_BEGIN = 0x01, 
+	DEVICE_STATUS_FIRSTRUN_OVER = 0x02,
+};
 
 enum DEVICE_STATUS_e {
 	DEVICE_STATUS_POWER_OFF = 0x01, 
@@ -11,19 +15,37 @@ enum DEVICE_STATUS_e {
 	DEVICE_STATUS_POWER_SCAN_OVER = 0x03,
 };
 
-typedef struct
-{
-	uint8_t  Second;
-	uint8_t  Minute;
-	uint8_t  Hour;
-	uint8_t  Day;
-	uint8_t  Week;
-	uint8_t  Month;
-	uint32_t Year;
-}RtcStruct;
+enum SENSOR_STATUS_READFLASH {
+	SENSOR_STATUS_READFLASH_NOTYET = 0x01,           //未读取Flash中存储的传感器状态
+	SENSOR_STATUS_READFLASH_ALREADY = 0x02,          //准备好读取Flash中存储的传感器状态
+	SENSOR_STATUS_READFLASH_OK = 0x03,               //成功读取Flash中存储的传感器状态
+};
+
+enum SENSOR_STATUS_WRITEFLASH {
+	SENSOR_STATUS_WRITEFLASH_NOTYET = 0x01,          //未写入Flash中存储的传感器状态
+	SENSOR_STATUS_WRITEFLASH_ALREADY = 0x02,         //准备好写入Flash中存储的传感器状态
+};
+
+enum SENSOR_STATUS_WRITEFLASH_PRINTF {
+	SENSOR_STATUS_WRITEFLASH_PRINTF_ENABLE = 0x01,   //Flash中存储的传感器状态允许打印
+	SENSOR_STATUS_WRITEFLASH_PRINTF_DISABLE = 0x02,  //Flash中存储的传感器状态不允许打印
+};
+
+// typedef struct
+// {
+// 	uint8_t  Second;
+// 	uint8_t  Minute;
+// 	uint8_t  Hour;
+// 	uint8_t  Day;
+// 	uint8_t  Week;
+// 	uint8_t  Month;
+// 	uint32_t Year;
+// }RtcStruct;
 
 typedef struct
 {
+	char DeviceFirstRunStatus;          //设备首次运行状态
+
 	double    Longitude;                //地理位置经度
 	double    Latitude;                 //地理位置纬度
 	double    Altitude;                 //海拔高度
@@ -42,7 +64,13 @@ typedef struct
 	float    BATVoltage;                //电池电压   //2.75-4.2V
 	uint16_t LoraDeveui;				//LoRa Deveui
 
+	char SensorFlashReadStatus;         //传感器Flash读取存储状态
+	char SensorFlashWriteStatus;        //传感器Flash写入存储状态
+	char SensorFlashWriteStatusPrintf;  //传感器Flash写入存储状态
 	uint16_t SensorStatus;              //传感器状态
+	uint16_t SensorStatusSimulation;    //传感器数据模拟状态
+	uint16_t SensorStatusSimulation_Old; //传感器数据上一组模拟状态
+
 	char DeviceStatus;
 	char ProductKey[32];
 	char DeviceName[32];
@@ -198,21 +226,21 @@ typedef struct
 {
 	float Temperature;		     //室外温度         -40~60.0      ℃
 	float Humidity;				 //室外湿度          0~100.0   %
-	uint32_t Illumination;       //光照                        0~200000  Lux
-	float H2S;			         //H2S       0~30.0   ppm
-	float NH3;		             //NH3       0~30.0   ppm
+	uint32_t Illumination;       //光照             0~200000  Lux
+	float H2S;			         //H2S              0~30.0   ppm
+	float NH3;		             //NH3              0~30.0   ppm
 }NoxiousGasPlatform;      //有害气体监测平台
 
 typedef struct
 {
-	float Temperature;		     //室外温度                 -40~60.0      ℃
-	float Humidity;				 //室外湿度                 0~100.0   %
-	uint32_t Illumination;       //光照                        0~200000  Lux
+	float Temperature;		     //室外温度                -40~60.0      ℃
+	float Humidity;				 //室外湿度                0~100.0   %
+	uint32_t Illumination;       //光照                    0~200000  Lux
 	float SoilTemp;				 //土壤温度                -20~80.00    ℃
-	float SoilHum;		         //土壤水分（湿度）   0~100.00   %
+	float SoilHum;		         //土壤水分（湿度）         0~100.00   %
 	uint16_t SoilConductivity;	 //土壤电导率              0~20000   us/cm
-	uint16_t CO2;		         //CO2          0~5000    ppm
-}WetherSoilPlatform;      //气象土壤监测平台
+	uint16_t CO2;		         //CO2                    0~5000    ppm
+}WetherSoilPlatform;             //气象土壤监测平台
 
 typedef struct
 {
@@ -224,7 +252,7 @@ typedef struct
 	float SoilTemp;				 //土壤温度                -20~80.00    ℃
 	float SoilHum;		         //土壤水分（湿度）   0~100.00   %
 	uint16_t SoilConductivity;	 //土壤电导率              0~20000   us/cm
-}PlantingPlatform;         //农作种植环境监测平台
+}PlantingPlatform;               //农作种植环境监测平台
 
 typedef struct
 {
@@ -290,7 +318,7 @@ typedef struct
 	CLCupboardPlatform         CLCupboardData;
 
 //  以下为系统保留数据，系统层直接使用
-    RtcStruct Rtc;
+    // RtcStruct                  RtcData;
 
 
 }DataStruct;
@@ -310,7 +338,10 @@ extern DataStruct *AppDataPointer;
 
 extern uint32_t SensorCahe;
 extern uint32_t sSensorCahe;
-extern uint32_t Send_Buffer[34];
+
+// extern uint8_t Send_Buffer[34];
+// extern uint32_t Send_Buffer[34];
+extern uint32_t Send_Buffer[60];
 
 void InqureSensor(void);
 char *MakeJsonBodyData(DataStruct *DataPointer);

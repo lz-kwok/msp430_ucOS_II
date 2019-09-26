@@ -34,7 +34,8 @@ uint16_t BackupIndex = 0;
 uint16_t StartFile = 1;
 uint8_t FullFlag = 0;
 char RespFile[10];
-char Data_Backup[70];
+// char Data_Backup[70];
+char Data_Backup[120];
 uint8_t ResendData = 0;
 uint8_t cacheBuf[7];
 
@@ -199,7 +200,7 @@ void g_Device_NB_Send(uint32_t *data ,uint8_t length)
         }
         else
         {
-        	User_Printf("%X",data[ii] & 0xff);				// & 0xff防止出现数据溢出
+        	User_Printf("%X",data[ii] & 0xff);			// & 0xff防止出现数据溢出
         }
     }
     User_Printf("\r\n");
@@ -484,27 +485,30 @@ void CreatFileNum(char x)
       }
   }
 }
-void Hex2Str(unsigned char *d,uint32_t *p,unsigned char Len, unsigned char offset)
-{
-	unsigned char i;
-	for(i = 0; i<Len;i++)
-	{
-		d[2*i + offset] = (uint8_t)p[i]>>4;
-		d[2*i+1 + offset] = (uint8_t)p[i]&0xf;
-	}
-	for(i = 0 + offset; i<Len*2 + offset;i++)
-	{
-	//	dst[i] = HexToChar(str[i]);
-		if (d[i] < 10)
-		{
-			d[i] = d[i] + '0';
-		}
-		else
-		{
-			d[i] = d[i] -10 +'A';
-		}
-	}
-}
+
+// // void Hex2Str(unsigned char *d,uint32_t *p,unsigned char Len, unsigned char offset)
+// void Hex2Str(unsigned char *d,uint8_t *p,unsigned char Len, unsigned char offset)
+// {
+// 	unsigned char i;
+// 	for(i = 0; i<Len;i++)
+// 	{
+// 		d[2*i + offset] = (uint8_t)p[i]>>4;
+// 		d[2*i+1 + offset] = (uint8_t)p[i]&0xf;
+// 	}
+// 	for(i = 0 + offset; i<Len*2 + offset;i++)
+// 	{
+// 	//	dst[i] = HexToChar(str[i]);
+// 		if (d[i] < 10)
+// 		{
+// 			d[i] = d[i] + '0';
+// 		}
+// 		else
+// 		{
+// 			d[i] = d[i] -10 +'A';
+// 		}
+// 	}
+// }
+
 void WriteStoreData(void)
 {
 	uint8_t tempBuffer[20];
@@ -577,7 +581,7 @@ void  TransmitTaskStart (void *p_arg)
     (void)p_arg;   
     OSTimeDlyHMSM(0u, 0u, 0u, 100u);      
     g_Printf_info("%s ... ...\n",__func__);           
-    while (DEF_TRUE) {               /* Task body, always written as an infinite loop.       */
+    while (DEF_TRUE) {               /* Task body, always written as an infinite loop.*/
         if(Hal_getCurrent_work_Mode() == 0){
             if(AppDataPointer->TransMethodData.NBStatus == NB_Power_off)
 			{
@@ -609,9 +613,14 @@ void  TransmitTaskStart (void *p_arg)
 						char *data = Hal_Malloc(512*sizeof(char *));
 						char response[128];
 						//SeqNumber ++
-						AppDataPointer->TransMethodData.SeqNumber++;
-						if(AppDataPointer->TransMethodData.SeqNumber >= 65535)
-						AppDataPointer->TransMethodData.SeqNumber = 1;
+						if(App.Data.TerminalInfoData.DeviceFirstRunStatus == DEVICE_STATUS_FIRSTRUN_BEGIN) {
+							App.Data.TerminalInfoData.DeviceFirstRunStatus = DEVICE_STATUS_FIRSTRUN_OVER;
+							App.Data.TransMethodData.SeqNumber = 0;
+						}else {
+							App.Data.TransMethodData.SeqNumber++;
+							if(AppDataPointer->TransMethodData.SeqNumber >= 65535)
+								AppDataPointer->TransMethodData.SeqNumber = 1;
+						}
 						Send_Buffer[5] = AppDataPointer->TransMethodData.SeqNumber/256;
 						Send_Buffer[6] = AppDataPointer->TransMethodData.SeqNumber%256;
 						//Voltage
@@ -620,20 +629,22 @@ void  TransmitTaskStart (void *p_arg)
 						g_Printf_info("data:%s\r\n",data);
 						memset(response,0x0,128);
 						//检查信号质量
+						Hex2Str(Data_Backup,Send_Buffer,60,0);					
+						g_Printf_info("Hexdata:%s\r\n",Data_Backup);    //打印输出16进制发送数据
 						g_Device_NBSignal();
-						Hex2Str(Data_Backup,Send_Buffer,34,0);
+						// Hex2Str(Data_Backup,Send_Buffer,34,0);
 					}
 					//发送数据
 					if(AppDataPointer->TransMethodData.NBNet == 1)
 					{
 						if(ResendData == 1)		//补发数据
 						{
-							g_Device_NB_Send_Str(Data_Backup,34);
+							g_Device_NB_Send_Str(Data_Backup,120);
 							// ResendData = 0;
 						}
 						else					//正常上报数据
 						{
-							g_Device_NB_Send(Send_Buffer,34);
+							g_Device_NB_Send(Send_Buffer,60);
 						}
 						
 						OSTimeDly(2500);	//等待5s

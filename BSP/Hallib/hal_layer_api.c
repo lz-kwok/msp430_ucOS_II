@@ -1,4 +1,4 @@
-/*
+﻿/*
 *********************************************************************************************************
 *
 *                          (c) Copyright 2003-2014; Micrium, Inc.; Weston, FL
@@ -77,6 +77,85 @@ static Mutex_t gMutex = null;
 static uint32_t mLastTimems = 0;
 static struct hal_timeval mTimeVal;
 
+/*
+// C prototype : void Hex2Str(unsigned char *pbDest,uint32_t *pbSrc,unsigned char Len, unsigned char offset)
+// parameter(s): [OUT] pbDest - 存放目标字符串
+//	             [IN]  pbSrc  - 输入16进制数的起始地址
+//	             [IN]  Len    - 16进制数的字节数
+//	             [IN]  offset - 字节在存放目标字符串的偏移
+// return value: None
+// remarks : 将16进制数转化为字符串
+*/
+// void Hex2Str(unsigned char *pbDest,uint8_t *pbSrc,unsigned char Len, unsigned char offset)
+void Hex2Str(unsigned char *pbDest,uint32_t *pbSrc,unsigned char Len, unsigned char offset)
+{
+	unsigned char i;
+	for(i = 0; i<Len;i++)
+	{
+		pbDest[2*i + offset] = (uint8_t)pbSrc[i]>>4;
+		pbDest[2*i+1 + offset] = (uint8_t)pbSrc[i]&0xf;
+	}
+	for(i = 0+offset;i < Len*2+offset;i++)
+	{
+		if (pbDest[i] < 10)
+		{
+			pbDest[i] = pbDest[i] + '0';
+		}
+		else
+		{
+			pbDest[i] = pbDest[i] -10 +'A';
+		}
+	}
+}
+
+
+uint8_t HexToBCD(uint8_t hex)
+{
+	uint8_t temp;
+	temp = hex/10*16 + hex%10;
+	return temp;
+}
+
+
+//Itoa函数
+char* Itoa(int val,char* dst,int radix)
+{
+    char *_pdst = dst;   
+    if (!val)//允许val等于0 
+    {
+        *_pdst = '0';
+        *++_pdst = '\0';
+        return dst;
+    }           
+    if(val <0)
+    {
+        *_pdst++ = '-';
+        val = -val;
+    }
+    char *_first = _pdst;     
+    char _cov;           
+    unsigned int _rem;   
+    while(val > 0)
+    {
+        _rem = (unsigned int)(val % radix);
+        val /= radix;//每次计算一位 ，从低到高
+        if  (_rem > 9)//16进制
+            *_pdst++ = (char)(_rem - 10 + 'a'); 
+        else
+            *_pdst++ = (char)(_rem + '0');      
+    }      
+    *_pdst-- = '\0';
+    do{ //由于数据是地位到高位储存的，需要转换位置
+        _cov = *_pdst;
+        *_pdst = *_first;
+        *_first = _cov;
+        _pdst--;
+        _first++;        
+    }while(_first < _pdst);  
+    return dst;
+}
+
+
 /*******************************************************************************
 * Function Name  : Crc16(uint8_t *bufferpoint,int16_t sum)
 * Description    : X^16 + X^15 + X^2 +1
@@ -124,6 +203,7 @@ void Hal_Free(void *ptr)
 {
     if (ptr != NULL)
         free(ptr);
+    g_Printf_dbg("malloc free ok\r\n");    
 }
 
 int Hal_ThreadCreate(void (*func)(void *p_arg), void *funcname,OS_STK *TaskStk, int priority)
@@ -381,56 +461,77 @@ int Hal_getProductName(char *proName)
 #endif
 }
 
-
-uint32_t Hal_getDeviceID(void)
-{
-    uint32_t temp =0;
-    temp = OSBsp.Device.InnerFlash.innerFLASHRead(0,infor_ChargeAddr);
-	temp = temp<<8;
-	temp += OSBsp.Device.InnerFlash.innerFLASHRead(1,infor_ChargeAddr);
-    g_Printf_info("%s %d\n",__func__,temp);
-    return temp;
-}
-
 uint32_t Hal_getManufactureDate(void)
 {
     uint32_t temp =0;
-    temp = OSBsp.Device.InnerFlash.innerFLASHRead(4,infor_ChargeAddr);
+    temp = OSBsp.Device.InnerFlash.innerFLASHRead(0,infor_ChargeAddr);
 	temp = temp*100;
-	temp += OSBsp.Device.InnerFlash.innerFLASHRead(5,infor_ChargeAddr);
+	temp += OSBsp.Device.InnerFlash.innerFLASHRead(1,infor_ChargeAddr);
 	temp = temp*100;
-	temp += OSBsp.Device.InnerFlash.innerFLASHRead(6,infor_ChargeAddr);
-    g_Printf_info("%s %d\n",__func__,temp);
+	temp += OSBsp.Device.InnerFlash.innerFLASHRead(2,infor_ChargeAddr);
+    g_Printf_info("%s %d\r\n",__func__,temp);
+    return temp;
+}
+
+uint32_t Hal_getSerialNumber(void)
+{
+    uint32_t temp = 0,temp1 = 0;
+    temp = OSBsp.Device.InnerFlash.innerFLASHRead(3,infor_ChargeAddr);
+    temp = temp<<16;
+    temp1 = OSBsp.Device.InnerFlash.innerFLASHRead(4,infor_ChargeAddr);
+	temp1 = temp1<<8;
+	temp += temp1 + OSBsp.Device.InnerFlash.innerFLASHRead(5,infor_ChargeAddr);
+    g_Printf_info("%s %d\r\n",__func__,temp);
+    return temp;
+}
+
+uint32_t Hal_getDeviceID(void)
+{
+    uint32_t temp = 0,temp1 = 0;
+    temp = OSBsp.Device.InnerFlash.innerFLASHRead(6,infor_ChargeAddr);
+    temp = temp<<16;
+    temp1 = OSBsp.Device.InnerFlash.innerFLASHRead(7,infor_ChargeAddr);
+	temp1 = temp1<<8;
+	temp += temp1 + OSBsp.Device.InnerFlash.innerFLASHRead(8,infor_ChargeAddr);
+    g_Printf_info("%s %d\r\n",__func__,temp);
     return temp;
 }
 
 uint32_t Hal_getFirmwareVersion(void)
 {
     uint32_t temp =0;
-    temp = OSBsp.Device.InnerFlash.innerFLASHRead(1,infor_BootAddr);
-    g_Printf_info("%s %d\n",__func__,temp);
+    temp = OSBsp.Device.InnerFlash.innerFLASHRead(14,infor_BootAddr);
+    g_Printf_info("%s %d\r\n",__func__,temp);
     return temp;
 }
 
-uint32_t Hal_getSerialNumber(void)
-{
-    uint32_t temp =0;
-    temp = OSBsp.Device.InnerFlash.innerFLASHRead(2,infor_ChargeAddr);
-	temp = temp<<8;
-	temp += OSBsp.Device.InnerFlash.innerFLASHRead(3,infor_ChargeAddr);
-    g_Printf_info("%s %d\n",__func__,temp);
-    return temp;
-}
-
-uint8_t Hal_getTransmitPeriod(void)
+uint32_t Hal_getTransmitPeriod(void)
 {
     uint32_t temp =0;
     temp = OSBsp.Device.InnerFlash.innerFLASHRead(11,infor_ChargeAddr);
-    if(temp>=120 && temp<=5){
-        temp = 5;           
+	temp = temp<<8;
+	temp += OSBsp.Device.InnerFlash.innerFLASHRead(12,infor_ChargeAddr);
+    if(temp>360 && temp<=5){
+        temp = 15;           
+    }     
+    g_Printf_info("%s %d\r\n",__func__,temp);
+    return temp;
+}
+
+uint32_t Hal_getSensorFlashStatus(void)
+{
+    uint8_t str[12];
+    uint32_t temp =0;
+    temp = OSBsp.Device.InnerFlash.innerFLASHRead(21,infor_ChargeAddr);
+	temp = temp<<8;
+	temp += OSBsp.Device.InnerFlash.innerFLASHRead(22,infor_ChargeAddr);
+    if(AppDataPointer->TerminalInfoData.SensorFlashWriteStatusPrintf == SENSOR_STATUS_WRITEFLASH_PRINTF_ENABLE) {
+        AppDataPointer->TerminalInfoData.SensorFlashWriteStatusPrintf = SENSOR_STATUS_WRITEFLASH_PRINTF_DISABLE;
+        // g_Printf_info("%s %x\n",__func__,temp);
+
+        Itoa(temp,str,2); //2进制输出
+        g_Printf_info("%s binary format: %0s\r\n",__func__,str);
     }
-        
-    g_Printf_info("%s %d\n",__func__,temp);
     return temp;
 }
 
@@ -472,9 +573,9 @@ uint8_t Hal_getFullFlag(void)
 int Hal_getProductKey(char *produckey)
 {
     uint32_t keyLen =0;
-    keyLen = OSBsp.Device.InnerFlash.innerFLASHRead(13,infor_ChargeAddr);
+    keyLen = OSBsp.Device.InnerFlash.innerFLASHRead(64,infor_ChargeAddr);
 	if(keyLen == 0xff){
-        g_Printf_info(("please set aliIot ProductKey first\n"));
+        g_Printf_info(("please set aliIot ProductKey first\r\n"));
 		return -1;
 	}
     char midTem[PRODUCT_KEY_LEN];
@@ -482,7 +583,7 @@ int Hal_getProductKey(char *produckey)
 	memset(produckey,0x0,sizeof(produckey));
 	memset(midTem,0x0,PRODUCT_KEY_LEN);
 	for(i=0;i<keyLen;i++)
-		midTem[i] = OSBsp.Device.InnerFlash.innerFLASHRead(14+i,infor_ChargeAddr);
+		midTem[i] = OSBsp.Device.InnerFlash.innerFLASHRead(65+i,infor_ChargeAddr);
     
     strncpy(produckey, midTem, keyLen);
     
@@ -492,9 +593,9 @@ int Hal_getProductKey(char *produckey)
 int Hal_getDeviceName(char *devName)
 {
     uint32_t nameLen =0;
-    nameLen = OSBsp.Device.InnerFlash.innerFLASHRead(32,infor_ChargeAddr);
+    nameLen = OSBsp.Device.InnerFlash.innerFLASHRead(80,infor_ChargeAddr);
 	if(nameLen == 0xff){
-        g_Printf_info("please set aliIot DeviceName first\n");
+        g_Printf_info("please set aliIot DeviceName first\r\n");
 		return -1;
 	}
     char midTem[DEVICE_NAME_LEN];
@@ -502,7 +603,7 @@ int Hal_getDeviceName(char *devName)
 	memset(devName,0x0,sizeof(devName));
 	memset(midTem,0x0,DEVICE_NAME_LEN);
 	for(i=0;i<nameLen;i++)
-		midTem[i] = OSBsp.Device.InnerFlash.innerFLASHRead(33+i,infor_ChargeAddr);
+		midTem[i] = OSBsp.Device.InnerFlash.innerFLASHRead(81+i,infor_ChargeAddr);
     
     strncpy(devName, midTem, nameLen);
     
@@ -512,9 +613,9 @@ int Hal_getDeviceName(char *devName)
 int Hal_getDeviceSecret(char *devSecret)
 {
     uint32_t SecretLen =0;
-    SecretLen = OSBsp.Device.InnerFlash.innerFLASHRead(64,infor_ChargeAddr);
+    SecretLen = OSBsp.Device.InnerFlash.innerFLASHRead(100,infor_ChargeAddr);
 	if(SecretLen == 0xff){
-        g_Printf_info("please set aliIot DeviceSecret first\n");
+        g_Printf_info("please set aliIot DeviceSecret first\r\n");
 		return -1;
 	}
     char midTem[DEVICE_SECRET_LEN];
@@ -522,7 +623,7 @@ int Hal_getDeviceSecret(char *devSecret)
 	memset(devSecret,0x0,sizeof(devSecret));
 	memset(midTem,0x0,DEVICE_SECRET_LEN);
 	for(i=0;i<SecretLen;i++)
-		midTem[i] = OSBsp.Device.InnerFlash.innerFLASHRead(65+i,infor_ChargeAddr);
+		midTem[i] = OSBsp.Device.InnerFlash.innerFLASHRead(101+i,infor_ChargeAddr);
     
     strncpy(devSecret, midTem, SecretLen);
     
@@ -534,36 +635,36 @@ int Hal_getDeviceSecret(char *devSecret)
 void Hal_EnterLowPower_Mode(void)
 {
     static int m = 0;
-    g_Printf_info("Enter Low Power !\r\n");
+    g_Printf_info("Enter Low Power!\r\n");
     hal_Delay_ms(100);
 #if (TRANSMIT_TYPE == GPRS_Mode)
+    // OSBsp.Device.IOControl.PowerSet(Max485_Power_Off);
+    OSBsp.Device.IOControl.PowerSet(BaseBoard_Power_Off);
+    // OSBsp.Device.IOControl.PowerSet(Sensor_Power_Off);
+    // OSBsp.Device.IOControl.PowerSet(SDCard_Power_Off);
+    OSBsp.Device.IOControl.PowerSet(AIR202_Power_Off);
     OSBsp.Device.IOControl.PowerSet(LPModule_Power_Off);
-    OSBsp.Device.IOControl.PowerSet(GPRS_Power_Off);
-    OSBsp.Device.IOControl.PowerSet(SDCARD_Power_Off);
-    OSBsp.Device.IOControl.PowerSet(GPS_Power_Off);
-    OSBsp.Device.IOControl.PowerSet(BaseBoard_Power_Off);
-	OSBsp.Device.IOControl.PowerSet(SenSor_Power_Off);    		
-	OSBsp.Device.IOControl.PowerSet(Motor_Power_Off);      		
-	OSBsp.Device.IOControl.PowerSet(AIR202_Power_Off);
+    OSBsp.Device.IOControl.PowerSet(Motor_Power_Off);
 #endif
-
 #if (TRANSMIT_TYPE == NBIoT_BC95_Mode || TRANSMIT_TYPE == LoRa_F8L10D_Mode )
-    // OSBsp.Device.IOControl.PowerSet(LPModule_Power_Off);
-    OSBsp.Device.IOControl.PowerSet(GPRS_Power_Off);
-    OSBsp.Device.IOControl.PowerSet(SDCARD_Power_Off);
-    OSBsp.Device.IOControl.PowerSet(GPS_Power_Off);
+    // OSBsp.Device.IOControl.PowerSet(Max485_Power_Off);
     OSBsp.Device.IOControl.PowerSet(BaseBoard_Power_Off);
-	OSBsp.Device.IOControl.PowerSet(SenSor_Power_Off);    		
-	OSBsp.Device.IOControl.PowerSet(Motor_Power_Off);      		
-	// OSBsp.Device.IOControl.PowerSet(AIR202_Power_Off);
+    // OSBsp.Device.IOControl.PowerSet(Sensor_Power_Off);
+    // OSBsp.Device.IOControl.PowerSet(SDCard_Power_Off);
+    OSBsp.Device.IOControl.PowerSet(AIR202_Power_Off);
+    // OSBsp.Device.IOControl.PowerSet(LPModule_Power_Off);
+    OSBsp.Device.IOControl.PowerSet(Motor_Power_Off);	
 #endif
-    
+   
+    AppDataPointer->TransMethodData.GPRSNet = 0;        //ML 20190829
+    AppDataPointer->TransMethodData.GPRSAttached = 0;
+
     gManager.systemLowpower = 1;
     LED_OFF;
-    WDTCTL = WDTPW + WDTHOLD;       //CloseWatchDog
+    WDTCTL = WDTPW + WDTHOLD;             //CloseWatchDog
     SFRIE1 &= 0;
     for(m=0;m<1000;m++);
-    __bis_SR_register(LPM0_bits + GIE);
+    __bis_SR_register(LPM0_bits + GIE);   //进入低功耗
 }
 
 void Hal_ExitLowPower_Mode(void)
@@ -571,8 +672,9 @@ void Hal_ExitLowPower_Mode(void)
     hal_Delay_ms(100);
     g_Printf_info("Exit Low Power!\r\n");
     gManager.systemLowpower = 0;
-    OSBsp.Device.IOControl.PowerSet(BaseBoard_Power_On);
-    OSBsp.Device.IOControl.PowerSet(SenSor_Power_On);
+    // OSBsp.Device.IOControl.PowerSet(BaseBoard_Power_On);
+    // OSBsp.Device.IOControl.PowerSet(Sensor_Power_On);
+    // OSBsp.Device.IOControl.PowerSet(Max485_Power_On);
     AppDataPointer->TerminalInfoData.DeviceStatus = DEVICE_STATUS_POWER_OFF;
 #if (TRANSMIT_TYPE == GPRS_Mode)
     AppDataPointer->TransMethodData.GPRSStatus = GPRS_Power_off;
@@ -587,7 +689,6 @@ void Hal_ExitLowPower_Mode(void)
     {
         AppDataPointer->TransMethodData.LoRaStatus = LoRa_Power_on;
     }
-        
 #endif
 }
 

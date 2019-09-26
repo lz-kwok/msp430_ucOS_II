@@ -27,6 +27,12 @@
 #include <bsp.h>
 
 static uint32_t g_MinuteTick = 0;
+static uint32_t g_MinuteTimeTick = 0;
+static uint32_t g_HourTimeTick = 0;
+static uint32_t g_DayTimeTick = 0;
+
+RtcStruct Rtctime;
+
 
 //***********************************************************************
 //                      DS1302_write_byte
@@ -116,7 +122,7 @@ static uint8_t DS1302_read_byte(uint8_t addr)
 }
 
 //***********************************************************************
-//                   ??S302?????????
+//                   向DS302写入时钟数据
 //***********************************************************************
 void DS1302_write_time(uint8_t *data,uint8_t dataType)
 {
@@ -127,11 +133,11 @@ void DS1302_write_time(uint8_t *data,uint8_t dataType)
 		case RealTime:{
 			DS1302_write_byte(DS1302_year_add,data[1]);	//?� 
 			DS1302_write_byte(DS1302_month_add,data[2]);	//?�
-			DS1302_write_byte(DS1302_date_add,data[3]);	//?�
+			DS1302_write_byte(DS1302_day_add,data[3]);	//?�
 			DS1302_write_byte(DS1302_hr_add,data[4]);		//?�
 			DS1302_write_byte(DS1302_min_add,data[5]);	//?�
 			DS1302_write_byte(DS1302_sec_add,data[6]);	//?�
-			DS1302_write_byte(DS1302_day_add,data[7]);	//?�
+			DS1302_write_byte(DS1302_week_add,data[7]);	//?�
 		}
 		break;
 		case AlarmData:{
@@ -158,11 +164,11 @@ void DS1302_read_time(uint8_t *data,uint8_t dataType)
 		case RealTime:{
 			data[1]=DS1302_read_byte(DS1302_year_add);	    //?�
 			data[2]=DS1302_read_byte(DS1302_month_add);	    //?�
-			data[3]=DS1302_read_byte(DS1302_date_add);	    //?�
+			data[3]=DS1302_read_byte(DS1302_day_add);	    //?�
 			data[4]=DS1302_read_byte(DS1302_hr_add);		    //?�
 			data[5]=DS1302_read_byte(DS1302_min_add);		    //?�
 			data[6]=(DS1302_read_byte(DS1302_sec_add))&0x7F;  //?�
-			data[7]=DS1302_read_byte(DS1302_day_add);		    //?�
+			data[7]=DS1302_read_byte(DS1302_week_add);		    //?�
 		}
 		break;
 		case AlarmData:{
@@ -197,27 +203,45 @@ void g_Device_ExtRTC_Init(void)
 //***********************************************************************
 void g_Device_RTCstring_Creat(uint8_t *datetime,char *t_str)
 {
-	// t_str[0]=((datetime[0]>>4)&0x0f)+0x30;	    //year
-	// t_str[1]=(datetime[0]&0x0f)+0x30;   	    //
-	t_str[0]='2';	    //year
-	t_str[1]='0';   	    //
+	t_str[0]='2';	                            //year
+	t_str[1]='0';   	                        //
 	t_str[2]=((datetime[1]>>4)&0x0f)+0x30;	    //
 	t_str[3]=(datetime[1]&0x0f)+0x30;			//
+    t_str[4]='-';                               //-
+	t_str[5]=((datetime[2]>>4)&0x0f)+0x30;		//month
+	t_str[6]=(datetime[2]&0x0f)+0x30; 			//
+	t_str[7]='-';                               //-
+	t_str[8]=((datetime[3]>>4)&0x0f)+0x30;		//day
+	t_str[9]=(datetime[3]&0x0f)+0x30; 			//
+	t_str[10]=' ';
+	t_str[11]=((datetime[4]>>4)&0x0f)+0x30;		//hour
+	t_str[12]=(datetime[4]&0x0f)+0x30; 			//
+	t_str[13]=':';
+	t_str[14]=((datetime[5]>>4)&0x0f)+0x30;	 	//min
+	t_str[15]=(datetime[5]&0x0f)+0x30; 		    //
+	t_str[16]=':';
+	t_str[17]=((datetime[6]>>4)&0x0f)+0x30;	    //sec
+	t_str[18]=(datetime[6]&0x0f)+0x30; 			//
 
-	t_str[4]=((datetime[2]>>4)&0x0f)+0x30;		//month
-	t_str[5]=(datetime[2]&0x0f)+0x30; 			//
-	
-	t_str[6]=((datetime[3]>>4)&0x0f)+0x30;		//day
-	t_str[7]=(datetime[3]&0x0f)+0x30; 			//
-	t_str[8]=' ';
-	t_str[9]=((datetime[4]>>4)&0x0f)+0x30;		 //hour
-	t_str[10]=(datetime[4]&0x0f)+0x30; 			 //
-	t_str[11]=':';
-	t_str[12]=((datetime[5]>>4)&0x0f)+0x30;	 	 //min
-	t_str[13]=(datetime[5]&0x0f)+0x30; 			 //
-	t_str[14]=':';
-	t_str[15]=((datetime[6]>>4)&0x0f)+0x30;	     //sec
-	t_str[16]=(datetime[6]&0x0f)+0x30; 			 //
+	// App.Data.RtcData.Year = 2000 + datetime[1];
+	// App.Data.RtcData.Month = datetime[2];
+	// App.Data.RtcData.Day = datetime[3];
+	// App.Data.RtcData.Hour = datetime[4];
+	// App.Data.RtcData.Minute = datetime[5];
+	// App.Data.RtcData.Second = datetime[6];
+
+	Rtctime.Year = 2000 + ((datetime[1]>>4)&0x0f)*10 + (datetime[1]&0x0f);
+	Rtctime.Month = ((datetime[2]>>4)&0x0f)*10 + (datetime[2]&0x0f);
+	Rtctime.Day = ((datetime[3]>>4)&0x0f)*10 + (datetime[3]&0x0f);
+	Rtctime.Hour = ((datetime[4]>>4)&0x0f)*10 + (datetime[4]&0x0f);
+	Rtctime.Minute = ((datetime[5]>>4)&0x0f)*10 + (datetime[5]&0x0f);
+	Rtctime.Second = ((datetime[6]>>4)&0x0f)*10 + (datetime[6]&0x0f);
+
+	UnixTimeStamp = covBeijing2UnixTimeStp(&Rtctime);
+	Send_Buffer[35] = (UnixTimeStamp>>24) & 0xFF;
+	Send_Buffer[36] = (UnixTimeStamp>>16) & 0xFF;
+	Send_Buffer[37] = (UnixTimeStamp>>8) & 0xFF;
+	Send_Buffer[38] = UnixTimeStamp & 0xFF;
 }
 
 void g_Device_InnerRTC_Init(void)
@@ -264,6 +288,135 @@ void Read_info_RTC(uint8_t *time)
     time[5] = RTCSEC;
 }
 
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+static uint8_t month_day[12]={31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}; //平年 
+static uint8_t Leap_month_day[12]={31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}; //闰年 
+const uint16_t dayPerYear[4] = {365, 365, 365, 366};
+uint32_t UnixTimeStamp=0;
+
+
+
+
+// 判断是否是闰年 
+// year: 需要判断的年 
+// return：1：闰年
+//	  	   0: 平年 
+uint8_t isLeapYear(uint16_t year)
+{
+	uint8_t res=0;
+	
+	if(year%4 == 0) // 能够被4整除 
+	{
+		if((year%100 == 0) && (year%400 != 0))	//能够被100整除，但是不能够被400整除 
+		{
+			res = 0;
+		}
+		else
+		{
+			res = 1;
+		}
+	}
+	return res;
+}
+
+// 将Unix时间戳转换为北京时间
+// unixTime: 需要判断的Unix时间戳 
+// *tempBeijing:返回的北京时间
+// return：none
+// note：没对输入参数正确性做判断
+void covUnixTimeStp2Beijing(uint32_t unixTime, RtcStruct *tempBeijing)
+{
+    uint32_t totleDaynum=0, totleSecNum=0;
+    uint16_t remainDayofYear, tempDay=0;
+    uint8_t *pr, tempYear=0;
+    
+ 
+    totleDaynum = unixTime/(24*60*60); //总天数(注意加括号)
+    totleSecNum = unixTime%(24*60*60); //当天剩余的秒速
+ 
+    memset(tempBeijing, 0x00, sizeof(RtcStruct));
+    //1.计算哪一年
+    tempBeijing->Year = 1970 + (totleDaynum/FOURYEARDAY)*4;
+    remainDayofYear = totleDaynum%FOURYEARDAY+1;
+    while(remainDayofYear >= dayPerYear[tempYear]){
+        remainDayofYear -= dayPerYear[tempYear];
+        tempBeijing->Year++;
+        tempYear++;
+    }
+    
+    //2.计算哪一月的哪一天
+    pr = isLeapYear(tempBeijing->Year)?Leap_month_day:month_day;
+    while(remainDayofYear > *(pr+tempBeijing->Month))
+    {
+		remainDayofYear -= *(pr+tempBeijing->Month);
+        tempBeijing->Month++;
+    }
+    tempBeijing->Month++; //month
+    tempBeijing->Day = remainDayofYear; //day
+  
+    //3.计算当天时间
+    tempBeijing->Hour = totleSecNum/3600;
+    tempBeijing->Minute = (totleSecNum%3600)/60; //error：变量搞错
+    tempBeijing->Second = (totleSecNum%3600)%60;
+ 
+    //4.时区调整
+    tempBeijing->Hour +=TIMEZONE; 
+    if(tempBeijing->Hour>23){
+        tempBeijing->Hour -= 24;
+        tempBeijing->Day++;
+    }
+}
+ 
+// 将北京时间转换为Unix时间戳 
+// year: 需要判断的年 
+// return：Unix时间戳（从1970/1/1 00:00:00 到现在的秒数) 
+// note：没对输入参数正确性做判断
+uint32_t covBeijing2UnixTimeStp(RtcStruct *beijingTime)
+{
+	uint32_t daynum=0,secNum=0,secDayNum=0,secHourNum=0,secMinNum=0,secSecNum=0; //保存北京时间到起始时间的天数
+	uint16_t tempYear=1970, tempMonth=0;
+ 
+ 
+	//1.年的天数 
+	while(tempYear < beijingTime->Year) 
+	{
+		if(isLeapYear(tempYear)){
+			daynum += 366;
+		}
+		else{
+			daynum += 365;
+		}
+		tempYear++;
+	}
+	//2.月的天数
+ 	while(tempMonth < (beijingTime->Month-1)) 
+ 	{
+        if(isLeapYear(beijingTime->Year)){ //闰年
+            daynum += Leap_month_day[tempMonth];
+        }
+        else{
+		    daynum += month_day[tempMonth];
+        }
+		tempMonth++;
+	}
+    //3.天数
+	daynum += (beijingTime->Day)-1;
+ 
+    //4.时分秒
+    secDayNum = daynum*24*60*60; //s    
+    secHourNum = (beijingTime->Hour)*60*60;    
+    secMinNum = (beijingTime->Minute)*60;    
+    secSecNum = beijingTime->Second;
+ 
+ 	secNum = secDayNum + secHourNum + secMinNum + secSecNum;
+
+    //5.时区调整
+    secNum -= TIMEZONE*60*60;
+
+    return secNum;
+}
+
+
 
 #pragma vector=RTC_VECTOR
 __interrupt void RTC_ISR(void)
@@ -284,14 +437,23 @@ __interrupt void RTC_ISR(void)
 						WDTCTL  = WDT_MDLY_32;
 						SFRIE1 |= 1;  
 						Hal_ExitLowPower_Mode();
+					}		
+				}
+				g_MinuteTimeTick ++;
+				if(g_MinuteTimeTick == 60)
+				{
+					g_MinuteTimeTick = 0;
+					g_HourTimeTick ++;
+					if(g_HourTimeTick == 24)
+					{
+						g_HourTimeTick = 0;
+						App.Data.TransMethodData.SeqNumber = 0;
 					}
-					
 				}
 			} 
         	break;
         case  RTC_RTCRDYIFG:	//分钟
 			{
-
         
 			}
         	break;

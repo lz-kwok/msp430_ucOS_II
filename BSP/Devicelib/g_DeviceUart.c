@@ -36,8 +36,8 @@ const uint8_t USCIModulation[16] = {0x00,0x10,0x20,0x30,0x40,0x50,0x60,0x70,0x80
 uint8_t *Rcv_TimePoint;     //+++++++++++++//
 uint8_t Rcv_TimeNum = 0;
 uint8_t Rcv_TimeData[50];
-uint8_t TimebuffNum = 0;
-uint8_t TimeBuff_Hex[8] = {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00}; //16杩涘埗鐨勬椂闂碆uffer  2018骞�鏈�5鍙�20鏃�0鍒�0绉�鏄熸湡4
+// uint8_t TimebuffNum = 0;
+// uint8_t TimeBuff_Hex[8] = {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00}; //16杩涘埗鐨勬椂闂碆uffer  2018骞�鏈�5鍙�20鏃�0鍒�0绉�鏄熸湡4
 
 
 char aRxBuff[aRxLength];		//UART0 receive data buff
@@ -442,7 +442,7 @@ void UartRecTaskStart(void *p_arg)
 }
 
 
-//------USCI_A0涓柇鏈嶅姟鏈嶅姟鍑芥暟-------------------------------------------------+
+//------USCI_A0中断服务服务函数-------------------------------------------------+
 #pragma vector=USCI_A0_VECTOR
 __interrupt void USCI_A0_ISR(void)
 {
@@ -487,7 +487,7 @@ __interrupt void USCI_A0_ISR(void)
 }
 
 
-//------USCI_A1涓柇鏈嶅姟鏈嶅姟鍑芥暟-------------------------------------------------+
+//------USCI_A1中断服务服务函数-------------------------------------------------+
 #pragma vector=USCI_A1_VECTOR
 __interrupt void USCI_A1_ISR(void)
 {
@@ -531,7 +531,7 @@ __interrupt void USCI_A1_ISR(void)
 		default: break;
 	}
 }
-//------USCI_A2涓柇鏈嶅姟鏈嶅姟鍑芥暟-------------------------------------------------+
+//------USCI_A2中断服务服务函数-------------------------------------------------+
 #pragma vector=USCI_A2_VECTOR
 __interrupt void USCI_A2_ISR(void)
 {
@@ -558,7 +558,7 @@ __interrupt void USCI_A2_ISR(void)
 		default: break;
 	}
 }
-//------USCI_A3涓柇鏈嶅姟鏈嶅姟鍑芥暟-------------------------------------------------+
+//------USCI_A3中断服务服务函数-------------------------------------------------+
 #pragma vector=USCI_A3_VECTOR
 __interrupt void USCI_A3_ISR(void)
 {

@@ -6,7 +6,7 @@
 
 #if (TRANSMIT_TYPE == NBIoT_BC95_Mode)
 
-//¶ÏµãÐø´«Ê¹ÓÃ
+//ï¿½Ïµï¿½ï¿½ï¿½ï¿½ï¿½Ê¹ï¿½ï¿½
 #define MaxLength	5
 extern uint16_t BackupIndex;
 extern uint16_t StartFile;
@@ -25,7 +25,6 @@ enum NB_STATUS {
 	NB_Get_Receive,
 	NB_Check_Receive,
 	NB_Idel
-	
 };
 
 unsigned char NB_Config(unsigned char *c , unsigned char m, unsigned char t);
@@ -35,7 +34,8 @@ void g_Device_NB_GetIP(void);
 void g_Device_NB_Send(uint32_t *data ,uint8_t length);
 void g_Device_NBSignal(void);
 void g_Device_NB_Receive(void);
-
+// void Hex2Str(unsigned char *d,uint32_t *p,unsigned char Len, unsigned char offset);
+// void Hex2Str(unsigned char *d,uint8_t *p,unsigned char Len, unsigned char offset);
 void  TransmitTaskStart (void *p_arg);
 #endif
 

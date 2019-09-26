@@ -29,8 +29,14 @@
 */
 #include  <bsp.h>
 
-static OS_STK UartRecTaskStartStk[MINIMUM_TASK_STK_SIZE];
-static 	Queue_t  g_ConfigQueue;
+unsigned char *Uart0_RxBuff;     //+++++++++++++//
+unsigned char Uart0_RxBuff_Num=0;
+unsigned char Uart0_RxBuff_data[50];
+unsigned char TimebuffNum=0;
+unsigned char TimeBuff_Hex[8] = {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00}; //16杩涘埗鐨勬椂闂碆uffer  2018骞�3鏈�15鍙� 20鏃�50鍒�00绉� 鏄熸湡4
+
+static OS_STK   UartRecTaskStartStk[MINIMUM_TASK_STK_SIZE];
+static Queue_t  g_ConfigQueue;
 void *QConfiMsgTb[QConfigMsgTb_Size];
 
 
@@ -124,80 +130,80 @@ static void g_Device_WirelessUpload_Config(g_Device_Config_CMD uploadCmd)   //�
 			}
 		}
 #elif (TRANSMIT_TYPE == NBIoT_BC95_Mode)
-		// if(Hal_CheckString(uploadCmd.strcmd,"+NNMI") & Hal_CheckString(uploadCmd.strcmd,"FF") & Hal_CheckString(uploadCmd.strcmd,"AA"))
-		// {
-		// 	if(Hal_CheckString(uploadCmd.strcmd,"FF0102")) //修改上报周期
-		// 	{
-		// 		Uart0_RxBuff = strstr(aRxBuff,"FF0102");         //判断接收到的数据是否有效
-		// 		while(*(Uart0_RxBuff+6) != 0x0A)
-		// 		{
-		// 			Uart0_RxBuff_data[Uart0_RxBuff_Num] = *(Uart0_RxBuff+6);
-		// 			Uart0_RxBuff_Num++;
-		// 			Uart0_RxBuff++;
-		// 		}
-		// 		uint16_t Temp_SendPeriod = (Uart0_RxBuff_data[0]-0x30)*1000 + (Uart0_RxBuff_data[1]-0x30)*100
-		// 							+ (Uart0_RxBuff_data[2]-0x30)*10 + (Uart0_RxBuff_data[3]-0x30)*1;
-		// 		if( (Temp_SendPeriod >= 5) && (Temp_SendPeriod <= 240) )
-		// 		{
-		// 			uint8_t Flash_Tmp[14];  //flash操作中间变量
-		// 			App.Data.TerminalInfoData.SendPeriod = (uint8_t)(Temp_SendPeriod & 0x00FF);
-		// 			OSBsp.Device.Usart2.WriteString("NB Set SendPeriod OK\r\n");
-		// 			//将发送周期的信息存入Flash
-		// 			Flash_Tmp[0] = OSBsp.Device.InnerFlash.innerFLASHRead(0, infor_ChargeAddr);
-		// 			Flash_Tmp[1] = OSBsp.Device.InnerFlash.innerFLASHRead(1, infor_ChargeAddr);
-		// 			Flash_Tmp[2] = OSBsp.Device.InnerFlash.innerFLASHRead(2, infor_ChargeAddr);
-		// 			Flash_Tmp[3] = OSBsp.Device.InnerFlash.innerFLASHRead(3, infor_ChargeAddr);
-		// 			Flash_Tmp[4] = OSBsp.Device.InnerFlash.innerFLASHRead(4, infor_ChargeAddr);
-		// 			Flash_Tmp[5] = OSBsp.Device.InnerFlash.innerFLASHRead(5, infor_ChargeAddr);
-		// 			Flash_Tmp[6] = OSBsp.Device.InnerFlash.innerFLASHRead(6, infor_ChargeAddr);
-		// 			Flash_Tmp[7] = OSBsp.Device.InnerFlash.innerFLASHRead(7, infor_ChargeAddr);//终端类型
-		// 			Flash_Tmp[8] = OSBsp.Device.InnerFlash.innerFLASHRead(8, infor_ChargeAddr);//传输方式
-		// 			Flash_Tmp[9] = OSBsp.Device.InnerFlash.innerFLASHRead(9, infor_ChargeAddr);//DevEUI_H(高八位)
-		// 			Flash_Tmp[10] = OSBsp.Device.InnerFlash.innerFLASHRead(10, infor_ChargeAddr);//DevEUI_L(低八位)
-		// 			Flash_Tmp[11] = App.Data.TerminalInfoData.SendPeriod;//上传周期（min）
-		// 			OSBsp.Device.InnerFlash.FlashRsvWrite(Flash_Tmp, 12, infor_ChargeAddr, 0);
-		// 		}else{
-		// 			OSBsp.Device.Usart2.WriteString("NB Set SendPeriod Failed！\r\n");
-		// 		}
-		// 	}
-		// 	if(Hal_CheckString(uploadCmd.strcmd,"FF0208")) //同步设备时间
-		// 	{
-		// 		OSBsp.Device.Usart2.WriteString("Time Set Done!\r\n");
-		// 		Uart0_RxBuff = strstr(uploadCmd.strcmd,"FF0208");         //判断接收到的数据是否有效
-		// 		while(*(Uart0_RxBuff+6) != 0x0A)
-		// 		{
-		// 			Uart0_RxBuff_data[Uart0_RxBuff_Num] = *(Uart0_RxBuff+6);
-		// 			Uart0_RxBuff_Num++;
-		// 			Uart0_RxBuff++;
-		// 		}
+		if(Hal_CheckString(uploadCmd.strcmd,"+NNMI") & Hal_CheckString(uploadCmd.strcmd,"FF") & Hal_CheckString(uploadCmd.strcmd,"AA"))
+		{
+			if(Hal_CheckString(uploadCmd.strcmd,"FF0102")) //修改上报周期
+			{
+				Uart0_RxBuff = strstr(aRxBuff,"FF0102");         //判断接收到的数据是否有效
+				while(*(Uart0_RxBuff+6) != 0x0A)
+				{
+					Uart0_RxBuff_data[Uart0_RxBuff_Num] = *(Uart0_RxBuff+6);
+					Uart0_RxBuff_Num++;
+					Uart0_RxBuff++;
+				}
+				uint16_t Temp_SendPeriod = (Uart0_RxBuff_data[0]-0x30)*1000 + (Uart0_RxBuff_data[1]-0x30)*100
+									+ (Uart0_RxBuff_data[2]-0x30)*10 + (Uart0_RxBuff_data[3]-0x30)*1;
+				if( (Temp_SendPeriod >= 5) && (Temp_SendPeriod <= 240) )
+				{
+					uint8_t Flash_Tmp[14];  //flash操作中间变量
+					App.Data.TerminalInfoData.SendPeriod = (uint8_t)(Temp_SendPeriod & 0x00FF);
+					OSBsp.Device.Usart2.WriteString("NB Set SendPeriod OK\r\n");
+					//将发送周期的信息存入Flash
+					Flash_Tmp[0] = OSBsp.Device.InnerFlash.innerFLASHRead(0, infor_ChargeAddr);
+					Flash_Tmp[1] = OSBsp.Device.InnerFlash.innerFLASHRead(1, infor_ChargeAddr);
+					Flash_Tmp[2] = OSBsp.Device.InnerFlash.innerFLASHRead(2, infor_ChargeAddr);
+					Flash_Tmp[3] = OSBsp.Device.InnerFlash.innerFLASHRead(3, infor_ChargeAddr);
+					Flash_Tmp[4] = OSBsp.Device.InnerFlash.innerFLASHRead(4, infor_ChargeAddr);
+					Flash_Tmp[5] = OSBsp.Device.InnerFlash.innerFLASHRead(5, infor_ChargeAddr);
+					Flash_Tmp[6] = OSBsp.Device.InnerFlash.innerFLASHRead(6, infor_ChargeAddr);
+					Flash_Tmp[7] = OSBsp.Device.InnerFlash.innerFLASHRead(7, infor_ChargeAddr);//终端类型
+					Flash_Tmp[8] = OSBsp.Device.InnerFlash.innerFLASHRead(8, infor_ChargeAddr);//传输方式
+					Flash_Tmp[9] = OSBsp.Device.InnerFlash.innerFLASHRead(9, infor_ChargeAddr);//DevEUI_H(高八位)
+					Flash_Tmp[10] = OSBsp.Device.InnerFlash.innerFLASHRead(10, infor_ChargeAddr);//DevEUI_L(低八位)
+					Flash_Tmp[11] = App.Data.TerminalInfoData.SendPeriod;//上传周期（min）
+					OSBsp.Device.InnerFlash.FlashRsvWrite(Flash_Tmp, 12, infor_ChargeAddr, 0);
+				}else{
+					OSBsp.Device.Usart2.WriteString("NB Set SendPeriod Failed!\r\n");
+				}
+			}
+			if(Hal_CheckString(uploadCmd.strcmd,"FF0208")) //同步设备时间
+			{
+				OSBsp.Device.Usart2.WriteString("Time Set Done!\r\n");
+				Uart0_RxBuff = strstr(uploadCmd.strcmd,"FF0208");         //判断接收到的数据是否有效
+				while(*(Uart0_RxBuff+6) != 0x0A)
+				{
+					Uart0_RxBuff_data[Uart0_RxBuff_Num] = *(Uart0_RxBuff+6);
+					Uart0_RxBuff_Num++;
+					Uart0_RxBuff++;
+				}
 
-		// 		uint8_t TimebuffNum;
-		// 		uint8_t time_buf[8];
-		// 		for(TimebuffNum=0;TimebuffNum<8;TimebuffNum++)
-		// 		{
-		// 			TimeBuff_Hex[TimebuffNum] = (Uart0_RxBuff_data[TimebuffNum*2]-0x30)*10 + (Uart0_RxBuff_data[TimebuffNum*2+1]-0x30)*1;
-		// 		}
-		// 		if( (TimeBuff_Hex[0]==20) && (TimeBuff_Hex[1]>=18) && (TimeBuff_Hex[2]>=1) && (TimeBuff_Hex[2]<=12) && (TimeBuff_Hex[3]>=1) && (TimeBuff_Hex[3]<=31)
-		// 			&& (TimeBuff_Hex[4]<24)  && (TimeBuff_Hex[5]<60) && (TimeBuff_Hex[6]<60) && (TimeBuff_Hex[7]>=1) && (TimeBuff_Hex[7]<=7) )
-		// 		{
-		// 			for(TimebuffNum=0;TimebuffNum<8;TimebuffNum++)
-		// 			{
-		// 				time_buf[TimebuffNum]= HexToBCD(TimeBuff_Hex[TimebuffNum]);    //存“年月日时分秒周”
-		// 			}
-		// 			OSBsp.Device.RTC.ConfigExtTime(time_buf,RealTime);   //写入时间
-		// 			OSBsp.Device.Usart2.WriteString("NB Time Set Done\r\n");
-		// 		}else{
-		// 			OSBsp.Device.Usart2.WriteString("NB Time Set Failed！\r\n");
-		// 		}
+				uint8_t TimebuffNum;
+				uint8_t time_buf[8];
+				for(TimebuffNum=0;TimebuffNum<8;TimebuffNum++)
+				{
+					TimeBuff_Hex[TimebuffNum] = (Uart0_RxBuff_data[TimebuffNum*2]-0x30)*10 + (Uart0_RxBuff_data[TimebuffNum*2+1]-0x30)*1;
+				}
+				if( (TimeBuff_Hex[0]==20) && (TimeBuff_Hex[1]>=18) && (TimeBuff_Hex[2]>=1) && (TimeBuff_Hex[2]<=12) && (TimeBuff_Hex[3]>=1) && (TimeBuff_Hex[3]<=31)
+					&& (TimeBuff_Hex[4]<24)  && (TimeBuff_Hex[5]<60) && (TimeBuff_Hex[6]<60) && (TimeBuff_Hex[7]>=1) && (TimeBuff_Hex[7]<=7) )
+				{
+					for(TimebuffNum=0;TimebuffNum<8;TimebuffNum++)
+					{
+						time_buf[TimebuffNum]= HexToBCD(TimeBuff_Hex[TimebuffNum]);    //存“年月日时分秒周”
+					}
+					OSBsp.Device.RTC.ConfigExtTime(time_buf,RealTime);   //写入时间
+					OSBsp.Device.Usart2.WriteString("NB Time Set Done\r\n");
+				}else{
+					OSBsp.Device.Usart2.WriteString("NB Time Set Failed！\r\n");
+				}
 
-		// 	}
-		// 	if(Hal_CheckString(uploadCmd.strcmd,"FF0301")) //复位设备
-		// 	{
-		// 		OSBsp.Device.Usart2.WriteString("NB Reset Device OK!\r\n");
-		// 		hal_Delay_ms(100);hal_Delay_ms(100);hal_Delay_ms(100);
-		// 		hal_Reboot(); //******软件复位*******//
-		// 	}
-		// }
+			}
+			if(Hal_CheckString(uploadCmd.strcmd,"FF0301")) //复位设备
+			{
+				OSBsp.Device.Usart2.WriteString("NB Reset Device OK!\r\n");
+				hal_Delay_ms(100);hal_Delay_ms(100);hal_Delay_ms(100);
+				hal_Reboot(); //******软件复位*******//
+			}
+		}
 #endif
 	}
 }
@@ -364,12 +370,14 @@ static void g_Device_GPS_Config(g_Device_Config_CMD uploadCmd)
 
 static int FirmCMD_Receive(uint8_t *RxBuff, uint8_t RxNum)
 {
-	uint8_t Flash_Tmp[14];//flash操作中间变量
-	uint8_t Send_Tmp[15];
+	uint8_t Flash_Tmp[12];//flash操作中间变量
+	// uint8_t Send_Tmp[34];
+	uint32_t Send_Tmp[34];
+	uint8_t Send_Tmp_String[68];
 	int i;
-	if((RxNum==10)&& (RxBuff[0]==0x0D) && (RxBuff[RxNum-1]==0x0D)){
+	if((RxNum==12)&& (RxBuff[0]==0x0D) && (RxBuff[RxNum-1]==0x0D)){
 		hal_Delay_ms(10);
-		if(RxBuff[1] == 0xEF){	//固件升级请求指令
+		if(RxBuff[1] == 0xEF){	        //固件升级请求指令 存放于infor_BootAddr
 			g_Printf_info("Enter %s and System will goto bootloader\r\n",__func__);
 			loop5:
 				Flash_Tmp[0] = 0x01;
@@ -379,19 +387,22 @@ static int FirmCMD_Receive(uint8_t *RxBuff, uint8_t RxNum)
 					hal_Reboot();
 				else
 					goto loop5;
-			
 			return 0;	
 		}else if(RxBuff[1] == 0xF0){		//终端信息查询指令
 			g_Printf_info("Enter %s and Check device Info now\r\n",__func__);
-			Send_Tmp[0] = 0xFF;
-			Send_Tmp[1] = OSBsp.Device.InnerFlash.innerFLASHRead(1, infor_BootAddr);//固件版本号
-			for(i=2;i<14;i++){
-				Send_Tmp[i] = OSBsp.Device.InnerFlash.innerFLASHRead(i-2,infor_ChargeAddr);
+			GetADCValue();         //获取电池电量%
+			OSBsp.Device.InnerFlash.FlashRsvWrite(infor_ChargeAddrBuff, 32, infor_ChargeAddr, 0);//把终端信息写入FLASH
+			Send_Tmp[0] = 0xEE;
+			for(i=1;i<33;i++){
+				Send_Tmp[i] = OSBsp.Device.InnerFlash.innerFLASHRead(i-1,infor_ChargeAddr);
 			}
-			Send_Tmp[14] = 0xFF;
-			OSBsp.Device.Usart2.WriteNData(Send_Tmp, 15);
+			Send_Tmp[33] = 0xEE;
+			OSBsp.Device.Usart2.WriteNData(Send_Tmp, 34);
+
+			Hex2Str(Send_Tmp_String,Send_Tmp,34,0); //将16进制转化成字符串
+			g_Printf_info("InfoData:%s\r\n",Send_Tmp_String);
 			return 0;
-		}else if(RxBuff[1] == 0xF5){	//时钟同步
+		}else if(RxBuff[1] == 0xF5){	    //时钟同步
 			uint8_t time_buf[8];
 			for(i = 1; i < 8; i++){
 				time_buf[i]=RxBuff[i+1];	//存“年月日时分秒周”
@@ -402,47 +413,50 @@ static int FirmCMD_Receive(uint8_t *RxBuff, uint8_t RxNum)
 		}else if(RxBuff[1] == 0xFA){		//设置终端信息
 			loop6:
 				g_Printf_info("Enter %s and Set device type\r\n",__func__);
-				for(i=0;i<7;i++){
-					Flash_Tmp[i] = OSBsp.Device.InnerFlash.innerFLASHRead(i,infor_ChargeAddr);
-				}
-				Flash_Tmp[7] = RxBuff[2];//终端类型
-				Flash_Tmp[8] = RxBuff[3];//传输方式
-				Flash_Tmp[9] = RxBuff[4];//DevEUI_H(高八位)
-				Flash_Tmp[10] = RxBuff[5];//DevEUI_L(低八位)
-				Flash_Tmp[11] = RxBuff[6];//上传周期（min）
-				OSBsp.Device.InnerFlash.FlashRsvWrite(Flash_Tmp, 12, infor_ChargeAddr, 0);//把终端信息写入FLASH
+				infor_ChargeAddrBuff[9] = RxBuff[2];  //终端类型
+				infor_ChargeAddrBuff[10] = RxBuff[3]; //传输方式
+				infor_ChargeAddrBuff[11] = RxBuff[4]; //上传周期（min）(高八位)
+				infor_ChargeAddrBuff[12] = RxBuff[5]; //上传周期（min）(低八位)
+				infor_ChargeAddrBuff[20] = RxBuff[6]; //FLASH修改标志位       01允许修改  FF禁止修改
+				infor_ChargeAddrBuff[23] = RxBuff[7]; //模拟数据标志位        01允许修改  FF禁止修改                 
+				OSBsp.Device.InnerFlash.FlashRsvWrite(infor_ChargeAddrBuff, 32, infor_ChargeAddr, 0);//把终端信息写入FLASH
 				hal_Delay_ms(10);
-				if(OSBsp.Device.InnerFlash.innerFLASHRead(7, infor_ChargeAddr) == RxBuff[2] && 
-					OSBsp.Device.InnerFlash.innerFLASHRead(8, infor_ChargeAddr) == RxBuff[3] && 
-					OSBsp.Device.InnerFlash.innerFLASHRead(9, infor_ChargeAddr) == RxBuff[4] && 
-					OSBsp.Device.InnerFlash.innerFLASHRead(10, infor_ChargeAddr) == RxBuff[5] && 
-					OSBsp.Device.InnerFlash.innerFLASHRead(11, infor_ChargeAddr) == RxBuff[6]){
+				if( OSBsp.Device.InnerFlash.innerFLASHRead(9, infor_ChargeAddr) == RxBuff[2] && 
+					OSBsp.Device.InnerFlash.innerFLASHRead(10, infor_ChargeAddr) == RxBuff[3] && 
+					OSBsp.Device.InnerFlash.innerFLASHRead(11, infor_ChargeAddr) == RxBuff[4] && 
+					OSBsp.Device.InnerFlash.innerFLASHRead(12, infor_ChargeAddr) == RxBuff[5] && 
+					OSBsp.Device.InnerFlash.innerFLASHRead(20, infor_ChargeAddr) == RxBuff[6] && 
+					OSBsp.Device.InnerFlash.innerFLASHRead(23, infor_ChargeAddr) == RxBuff[7]) {
 					return 0;
 				}else
 					goto loop6;
-		}else if(RxBuff[1] == 0xFE){	//设置出厂信息
+		}else if(RxBuff[1] == 0xFE){	    //设置出厂信息
 			loop7:
 				g_Printf_info("Enter %s and Set device product date\r\n",__func__);
-				Flash_Tmp[0] = RxBuff[5];//设备编号高八位
-				Flash_Tmp[1] = RxBuff[6];//设备编号低八位
-				Flash_Tmp[2] = RxBuff[7];//出厂编号高八位
-				Flash_Tmp[3] = RxBuff[8];//出厂编号低八位
-				Flash_Tmp[4] = RxBuff[2];//出厂日期_年
-				Flash_Tmp[5] = RxBuff[3];//出厂日期_月
-				Flash_Tmp[6] = RxBuff[4];//出厂日期_日
-				OSBsp.Device.InnerFlash.FlashRsvWrite(Flash_Tmp, 7, infor_ChargeAddr, 0);//把终端信息写入FLASH
+				infor_ChargeAddrBuff[0] = RxBuff[2];//出厂日期_年
+				infor_ChargeAddrBuff[1] = RxBuff[3];//出厂日期_月
+				infor_ChargeAddrBuff[2] = RxBuff[4];//出厂日期_日
+				infor_ChargeAddrBuff[3] = RxBuff[5];//出厂编号高八位
+				infor_ChargeAddrBuff[4] = RxBuff[6];//出厂编号中八位
+				infor_ChargeAddrBuff[5] = RxBuff[7];//出厂编号低八位
+				infor_ChargeAddrBuff[6] = RxBuff[8];//设备编号高八位
+				infor_ChargeAddrBuff[7] = RxBuff[9];//设备编号中八位
+				infor_ChargeAddrBuff[8] = RxBuff[10];//设备编号低八位	
+				OSBsp.Device.InnerFlash.FlashRsvWrite(infor_ChargeAddrBuff, 32, infor_ChargeAddr, 0);//把终端信息写入FLASH
 				hal_Delay_ms(10);
-				if(OSBsp.Device.InnerFlash.innerFLASHRead(0, infor_ChargeAddr) == RxBuff[5] && 
-				OSBsp.Device.InnerFlash.innerFLASHRead(1, infor_ChargeAddr) == RxBuff[6] && 
-				OSBsp.Device.InnerFlash.innerFLASHRead(2, infor_ChargeAddr) == RxBuff[7] && 
-				OSBsp.Device.InnerFlash.innerFLASHRead(3, infor_ChargeAddr) == RxBuff[8] && 
-				OSBsp.Device.InnerFlash.innerFLASHRead(4, infor_ChargeAddr) == RxBuff[2] && 
-				OSBsp.Device.InnerFlash.innerFLASHRead(5, infor_ChargeAddr) == RxBuff[3] && 
-				OSBsp.Device.InnerFlash.innerFLASHRead(6, infor_ChargeAddr) == RxBuff[4]){
+				if( OSBsp.Device.InnerFlash.innerFLASHRead(0, infor_ChargeAddr) == RxBuff[2] && 
+					OSBsp.Device.InnerFlash.innerFLASHRead(1, infor_ChargeAddr) == RxBuff[3] && 
+					OSBsp.Device.InnerFlash.innerFLASHRead(2, infor_ChargeAddr) == RxBuff[4] && 
+					OSBsp.Device.InnerFlash.innerFLASHRead(3, infor_ChargeAddr) == RxBuff[5] && 
+					OSBsp.Device.InnerFlash.innerFLASHRead(4, infor_ChargeAddr) == RxBuff[6] && 
+					OSBsp.Device.InnerFlash.innerFLASHRead(5, infor_ChargeAddr) == RxBuff[7] && 
+					OSBsp.Device.InnerFlash.innerFLASHRead(6, infor_ChargeAddr) == RxBuff[8] && 
+					OSBsp.Device.InnerFlash.innerFLASHRead(7, infor_ChargeAddr) == RxBuff[9] && 
+					OSBsp.Device.InnerFlash.innerFLASHRead(8, infor_ChargeAddr) == RxBuff[10]) {
 					return 0;
 				}else
 					goto loop7;
-		}else if(RxBuff[1] == 0xFD){	//复位终端
+		}else if(RxBuff[1] == 0xFD){	    //复位终端
 			g_Printf_info("Enter %s and System will reboot\r\n",__func__);
 			hal_Delay_ms(100);
 			hal_Reboot();
@@ -450,16 +464,15 @@ static int FirmCMD_Receive(uint8_t *RxBuff, uint8_t RxNum)
 		}
 	}else if((RxNum > 10)&&(RxNum == (RxBuff[2]+4))&&(RxBuff[RxNum-1]==0x0D)){
 		if(RxBuff[1] == 0x01){
-			OSBsp.Device.InnerFlash.FlashRsvWrite(&RxBuff[2], RxBuff[2]+1, infor_ChargeAddr, 13);//把终端信息写入FLASH
-		}else if(RxBuff[1] == 0x02){
-			OSBsp.Device.InnerFlash.FlashRsvWrite(&RxBuff[2], RxBuff[2]+1, infor_ChargeAddr, 32);//把终端信息写入FLASH
-		}else if(RxBuff[1] == 0x03){
 			OSBsp.Device.InnerFlash.FlashRsvWrite(&RxBuff[2], RxBuff[2]+1, infor_ChargeAddr, 64);//把终端信息写入FLASH
+		}else if(RxBuff[1] == 0x02){
+			OSBsp.Device.InnerFlash.FlashRsvWrite(&RxBuff[2], RxBuff[2]+1, infor_ChargeAddr, 80);//把终端信息写入FLASH
+		}else if(RxBuff[1] == 0x03){
+			OSBsp.Device.InnerFlash.FlashRsvWrite(&RxBuff[2], RxBuff[2]+1, infor_ChargeAddr, 100);//把终端信息写入FLASH
 		}
 		g_Printf_info("Enter %s Set OK\r\n",__func__);
 		return 0;
 	}else if((RxNum == 27)&&(RxBuff[1] == 0xD1)&&(RxBuff[RxNum-1]==0x0D)){
-		OSBsp.Device.InnerFlash.FlashRsvWrite(&RxBuff[2], 24, infor_ChargeAddr, 100);
 		g_Printf_info("Enter %s Set OK\r\n",__func__);
 		return 0;
 	}
@@ -469,7 +482,7 @@ static int FirmCMD_Receive(uint8_t *RxBuff, uint8_t RxNum)
 
 /*******************************************************************************
 * 函数名		: g_Device_Board_Config
-* 描述	    	: 配置板载参数，主要油上位机设置；通信模块AT指令透传
+* 描述	    	: 配置板载参数，主要由上位机设置；通信模块AT指令透传
 * 输入参数  	: ClientCmd
 * 返回参数  	: 无
 *******************************************************************************/
@@ -490,7 +503,6 @@ static void g_Device_Board_Config(g_Device_Config_CMD ClientCmd)
 				g_Printf_info("ah hahahahahaha\n");
 			}
 		}
-
 		// memset(&cRxBuff,0x0,sizeof(g_Device_Config_CMD));
 	}
 }
@@ -507,12 +519,12 @@ void ManagerTaskStart(void *p_arg)
 				(void *)"UartRecTaskStart",
 				&UartRecTaskStartStk[MINIMUM_TASK_STK_SIZE-1u],
 				UART_REC_TASK_TASK_PRIO);
-    while (DEF_TRUE) {               /* Task body, always written as an infinite loop.       */
-        if(Hal_getCurrent_work_Mode() == 0){
+    while (DEF_TRUE) {               /* Task body, always written as an infinite loop.*/
+        if(Hal_getCurrent_work_Mode() == 0){    //非低功耗状态
 			struct hal_message ConfigMsg;
-			memset(&ConfigMsg,0x0,sizeof(struct hal_message));
+			memset(&ConfigMsg,0x0,sizeof(struct hal_message));  //清空结构体数组变量
 			int ret = Hal_QueueRecv(g_ConfigQueue,&ConfigMsg,0);
-			if(ret == 0){
+			if(ret == 0) {
 				// hal_Delay_ms(50);	        //延时等待接收完成
 				g_Printf_info("Recv message type %d\r\n",ConfigMsg.what);
 				g_Printf_info("Recv message content %s\r\n",(char *)ConfigMsg.content);
@@ -569,7 +581,6 @@ int g_Device_Config_QueuePost(uint32_t type,void *state)
 
 	return 0;
 }
-
 
 
 

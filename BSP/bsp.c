@@ -57,7 +57,7 @@
 *********************************************************************************************************
 */
 
-static  void  BSP_OSTickInit(void);
+static void BSP_OSTickInit(void);
 static void BSP_OSClockInit(void);
 static void BSP_OSCloseWatchDog(void);
 /*
@@ -91,10 +91,10 @@ void  BSP_Init(void)
 
     g_Device_InnerRTC_Init();   
     g_Device_IO_Init();
-    g_Device_Usart0_Init(9600);
-    g_Device_Usart1_Init(9600);
-    g_Device_Usart2_Init(115200);     
-    g_Device_Usart3_Init(9600);      
+    g_Device_Usart0_Init(9600);                                //通信模块串口
+    g_Device_Usart1_Init(9600);                                //Socket串口
+    g_Device_Usart2_Init(115200);                              //Debug串口
+    g_Device_Usart3_Init(9600);                                //485串口
     g_Device_ADC_Init(); 
     g_Device_SD_Init();
     g_Device_SPI3_Init();
@@ -140,8 +140,8 @@ static void  BSP_OSTickInit(void)
 
 static void BSP_OSClockInit(void){
     // Use the REFO oscillator as the FLL reference, and also for ACLK
-    UCSCTL3 = (UCSCTL3 & ~(SELREF_7)) | (SELREF__REFOCLK);   //璁剧疆FLL鍙傝�鏃堕挓涓篟EFOCLK(鍐呴�?32.768kHz鏅舵�?)锛涘綋鏈塜T2,閫夋嫨XT2鍚﹀垯閫塕EFOCLK
-    UCSCTL4 = (UCSCTL4 & ~(SELA_7)) | (SELA__REFOCLK);       //ACLK鍙傝�鏃堕挓婧愰�鎷╂帶鍒讹紱褰撴湁XT2,閫夋嫨XT2鍚﹀垯閫塂COCLKDIV
+    UCSCTL3 = (UCSCTL3 & ~(SELREF_7)) | (SELREF__REFOCLK);   //设置FLL参考时钟为REFOCLK(内部32.768kHz晶振)；当有XT2,选择XT2否则选REFOCLK
+    UCSCTL4 = (UCSCTL4 & ~(SELA_7)) | (SELA__REFOCLK);       //ACLK参考时钟源选择控制；当有XT2,选择XT2否则选DCOCLKDIV
     // Start the FLL, which will drive MCLK (not the crystal)
     Init_FLL(BSP_CPU_CLK_FREQ/1000, BSP_CPU_CLK_FREQ/32768);
 }
@@ -150,8 +150,6 @@ static void BSP_OSCloseWatchDog(void)
 {
 	WDTCTL = WDTPW + WDTHOLD;       //CloseWatchDog
 }
-
-
 
 
 
@@ -164,4 +162,5 @@ SystemStruct OSBsp =
 {
     Init,
 };
+
 

@@ -6,18 +6,19 @@
 
 #if (TRANSMIT_TYPE == LoRa_F8L10D_Mode)
 
-//¶ÏµãÐø´«Ê¹ÓÃ
-#define MaxLength	100
+//ï¿½Ïµï¿½ï¿½ï¿½ï¿½ï¿½Ê¹ï¿½ï¿½
+#define MaxLength	4
 extern uint16_t BackupIndex;
 extern uint16_t StartFile;
 extern uint16_t FullFlag;
 extern char RespFile[10];
 
 
-enum NB_STATUS {
+enum LoRa_STATUS {
 	LoRa_Power_off = 0,
 	LoRa_Power_on = 1,
 	LoRa_Boot,
+	LoRa_TimeSynchronization,
 	LoRa_Init_Done,
 	LoRa_Join_Over,
 	LoRa_Send_Done,

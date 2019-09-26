@@ -34,7 +34,7 @@ uint16_t br,bw;
 DIR dir;
 FIL fsrc;
 
-//创建文件路径
+//åˆ›å»ºæ–‡ä»¶è·¯å¾„
 void g_SD_FileName_Creat(const char *docPath,uint8_t *date,char *filename)
 {
 	char date_string[7];
@@ -64,7 +64,7 @@ void g_SD_File_Write(const char *file_path,const char *dat)
 		g_Printf_dbg("open file error = %d\n\r",res_s);
 	}else{
 		g_Printf_dbg("open file OK!\n\r");
-		f_lseek(&fsrc,fsrc.fsize);                      //移动指针到末�??
+		f_lseek(&fsrc,fsrc.fsize);                      //移动指针到末�?
 		res = f_write(&fsrc, dat, strlen(dat), &bw);    /* Write it to the dst file */
 		if(res == FR_OK){
 			uint32_t num_w;
@@ -79,7 +79,7 @@ void g_SD_File_Write(const char *file_path,const char *dat)
 	}
 	f_mount(0,NULL);
 }
-void del_txt(char *direction,char *file_path)//ɾ���ļ�
+void del_txt(char *direction,char *file_path)//É¾³ýÎÄ¼þ
 {
 	res = f_mount(0, &fs);
 	res = f_opendir(&dir , direction);
@@ -106,7 +106,7 @@ void del_txt(char *direction,char *file_path)//ɾ���ļ�
 
 	f_mount(0,NULL);
 }
-//��ָ��Ŀ¼��д�ļ�
+//ÏòÖ¸¶¨Ä¿Â¼ÖÐÐ´ÎÄ¼þ
 char Write_ToDirTxt(char *direction,char *file_path,char *dat)
 {
 	char result = 0;
@@ -146,7 +146,7 @@ char Write_ToDirTxt(char *direction,char *file_path,char *dat)
 	else
 	{
 		g_Printf_dbg("open file OK!\r\n");
-		f_lseek(&fsrc,fsrc.fsize);                     		 // �ƶ�ָ�뵽ĩβ
+		f_lseek(&fsrc,fsrc.fsize);                     		 // ÒÆ¶¯Ö¸Õëµ½Ä©Î²
 		res = f_write(&fsrc, dat, strlen(dat), &bw);         // Write it to the dst file
 //		res = f_write(&fsrc, "\r\n", 2, &bw);         // Write it to the dst file
 //		if(res == FR_OK)
@@ -164,7 +164,7 @@ char Write_ToDirTxt(char *direction,char *file_path,char *dat)
 	f_mount(0,NULL);
 	return result;
 }
-//��ȡ�ļ����ַ���
+//¶ÁÈ¡ÎÄ¼þÖÐ×Ö·û´®
 char Get_String(char *direction,char *file_path,char *buffer,int len)
 {
 	char result = 0;
@@ -191,7 +191,7 @@ char Get_String(char *direction,char *file_path,char *buffer,int len)
 	else
 	{
 		g_Printf_dbg("open file OK!\r\n");
-//		f_lseek(&fsrc,fsrc.fsize);                     		 // �ƶ�ָ�뵽ĩβ
+//		f_lseek(&fsrc,fsrc.fsize);                     		 // ÒÆ¶¯Ö¸Õëµ½Ä©Î²
 //		res = f_gets(buffer, len , &fsrc);         // Write it to the dst file
 		if(f_gets(buffer, len , &fsrc) != NULL)
 		{
@@ -204,14 +204,14 @@ char Get_String(char *direction,char *file_path,char *buffer,int len)
 		{
 			g_Printf_dbg("f_gets error\r\n");
 
-			result = 2;			//����ɾ����־
+			result = 2;			//ÓÃÓÚÉ¾³ý±êÖ¾
 //			f_chdir(direction);
 		}
 		/*close file */
 		f_close(&fsrc);
 		if(result == 2)
 		{
-			result = 0;			//ɾ���󷵻�0��û�л�ȡ���ַ���
+			result = 0;			//É¾³ýºó·µ»Ø0£¬Ã»ÓÐ»ñÈ¡µ½×Ö·û´®
 			res=f_unlink ((char *)file_path);
 			if(res != FR_OK)
 			{

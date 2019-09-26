@@ -29,10 +29,10 @@
 #include  <bsp.h>
 
 #if (TRANSMIT_TYPE == GPRS_Mode)
-// const char *g_30000IoT_HOST = "30000iot.cn:9001"; 
-// const char *g_30000IoT_PATH = "/api/Upload/data/";
-const char *g_30000IoT_HOST = "47.111.88.91:6096"; 
-const char *g_30000IoT_PATH = "/iot/data/receive";
+const char *g_30000IoT_HOST = "30000iot.cn:9001";    
+const char *g_30000IoT_PATH = "/api/Upload/data/";
+// const char *g_30000IoT_HOST = "47.111.88.91:6096"; 
+// const char *g_30000IoT_PATH = "/iot/data/receive";
 
 enum CoordinateSystem{
 	WGS_84 = 1,
@@ -43,6 +43,10 @@ static char gprs_tick = 0;
 static uint32_t HTTP_Status_Code = 0;
 static int g_has_response = 0;
 static char g_response[256];
+
+char *StartString = NULL;
+char *EndString  = NULL;
+char CSQBuffer[15]={'0'};
 
 //static char TimeString[20] = "20170804 16:00:00";
 
@@ -192,7 +196,7 @@ void g_Device_Establish_TCP_Connection(const char *ip,uint32_t port)
 * 输入参数  	: host,path,apikey,data,response,timeout(sec)
 * 返回参数  	: code
 *******************************************************************************/
-int g_Device_http_post(const char *host,const char* path,const char *apikey,const char *data,
+int16_t g_Device_http_post(const char *host,const char* path,const char *apikey,const char *data,
                       char *response,int timeout)
 {
 	int timer = 0;
@@ -231,7 +235,7 @@ int g_Device_http_post(const char *host,const char* path,const char *apikey,cons
 
 #ifdef AIR202
 	uint32_t datalen = 0;
-	int g_err = 0;
+	int16_t g_err = 0;
 	struct hal_timeval now;		
 	struct hal_timeval tmp_tv;
 	int32_t	sub_timeout_sec;
@@ -264,16 +268,15 @@ int g_Device_http_post(const char *host,const char* path,const char *apikey,cons
 			if(AppDataPointer->TransMethodData.GPRSATStatus == GPRS_Waitfor_OK){
 				g_Printf_dbg("AT+HTTPACTION=1\r\n");
 				User_Printf("AT+HTTPACTION=1\r\n");
-				OSTimeDly(1000);
+				OSTimeDly(1500);               //注意是否需要增加延时
 			}else if(AppDataPointer->TransMethodData.GPRSATStatus == GPRS_Get_HTTPACT){
 				gprs_tick = 3;
 				g_Printf_info("%s HTTP STATUS CODE = %d\r\n",__func__,HTTP_Status_Code);
-				if((HTTP_Status_Code == 200)&&(g_has_response > 0)){
+				if((HTTP_Status_Code == 200)&&(g_has_response > 0)){  //？？？？+++++++++++++++++++++++++++++++++++++++++++++++++++++
 					g_Printf_dbg("AT+HTTPREAD\r\n");
 					User_Printf("AT+HTTPREAD\r\n");
 					OSTimeDly(1000);
 				}
-
 				AppDataPointer->TransMethodData.GPRSATStatus = GPRS_Waitfor_OK;
 			}
 		}else if(gprs_tick == 3){
@@ -300,7 +303,7 @@ int g_Device_http_post(const char *host,const char* path,const char *apikey,cons
 			if((gprs_tick < 2)&&(gprs_tick > 0)){
 				g_Printf_info("%s para set timerout\r\n",__func__);						
 			}else if(gprs_tick == 2){
-				g_Printf_info("%s failed . http timerout\r\n",__func__);
+				g_Printf_info("%s failed.http timerout\r\n",__func__);
 				gprs_tick = 3;
 				User_Printf("AT+HTTPTERM\r\n");   //结束Http服务
 				OSTimeDly(1000);
@@ -376,6 +379,10 @@ void g_Device_check_Response(char *res)
 			if (Hal_CheckString(res,"0,0")){
 				AppDataPointer->TransMethodData.GPRSNet = 0;
 			}else{
+				memset(CSQBuffer, '\0', 15);	//清空buffer
+				StartString = strstr(aRxBuff,"+CSQ:");
+				EndString  = strstr(aRxBuff, ",");
+				memcpy(CSQBuffer, StartString + 6, EndString - StartString - 6);	//复制CSQ值
 				AppDataPointer->TransMethodData.GPRSNet = 1;
 				AppDataPointer->TransMethodData.GPRSStatus = GPRS_Preinit;
 			}
@@ -387,7 +394,7 @@ void g_Device_check_Response(char *res)
 			AppDataPointer->TransMethodData.GPRSATStatus = GPRS_Waitfor_Download;
 		}else if(Hal_CheckString(res,"+HTTPACTION: 1")){
 			AppDataPointer->TransMethodData.GPRSATStatus = GPRS_Get_HTTPACT;
-			HTTP_Status_Code = (res[15]-0x30)*100+(res[16]-0x30)*10+res[17]-0x30;
+			HTTP_Status_Code = (res[15]-0x30)*100+(res[16]-0x30)*10+(res[17]-0x30);
 			g_has_response = res[19]-0x30;
 		}else if(Hal_CheckString(res,"iotToken")){
 			// memcpy(iotTokenBuf,response,strlen(response));
@@ -433,6 +440,8 @@ void g_Device_check_Response(char *res)
 
 void  TransmitTaskStart (void *p_arg)
 {
+	uint32_t datalen = 0;
+	uint8_t scadaADCIndex = 0,scadaBATIndex = 0;
     (void)p_arg;   
     OSTimeDlyHMSM(0u, 0u, 0u, 100u);      
     g_Printf_info("%s ... ...\n",__func__);           
@@ -440,10 +449,10 @@ void  TransmitTaskStart (void *p_arg)
         if(Hal_getCurrent_work_Mode() == 0){
             if(AppDataPointer->TransMethodData.GPRSStatus == GPRS_Power_off){
                 OSBsp.Device.IOControl.PowerSet(BaseBoard_Power_On);
-                OSBsp.Device.IOControl.PowerSet(GPRS_Power_On);
-                OSBsp.Device.IOControl.PowerSet(LPModule_Power_On);
+                OSBsp.Device.IOControl.PowerSet(SIM800C_Power_On);
                 OSTimeDly(500); 
                 OSBsp.Device.IOControl.PowerSet(AIR202_Power_On);
+				OSBsp.Device.IOControl.PowerSet(LPModule_Power_On);
                 AppDataPointer->TransMethodData.GPRSStatus = GPRS_Power_on;
                 //上电后延时一段时间
                 OSTimeDly(2500);
@@ -455,24 +464,49 @@ void  TransmitTaskStart (void *p_arg)
                 OSTimeDly(1500);
                 AppDataPointer->TransMethodData.GPRSStatus = GPRS_Preinit;
             }else if((AppDataPointer->TransMethodData.GPRSStatus >= GPRS_Power_on)&&
-                        (AppDataPointer->TransMethodData.GPRSStatus < GPRS_Http_Init_Done)){
-                 g_Device_GPRS_Init();
+                    	(AppDataPointer->TransMethodData.GPRSStatus < GPRS_Http_Init_Done)){
+                g_Device_GPRS_Init();
             }else if(AppDataPointer->TransMethodData.GPRSStatus == GPRS_Http_Init_Done){
-                 if( AppDataPointer->TerminalInfoData.DeviceStatus == DEVICE_STATUS_POWER_SCAN_OVER){
-                     char *data = Hal_Malloc(512*sizeof(char *));
-                     char response[128];
-                     data = MakeJsonBodyData(AppDataPointer);
-                     g_Printf_info("data:%s\r\n",data);
-                     memset(response,0x0,128);
-                     int code = g_Device_http_post(g_30000IoT_HOST,g_30000IoT_PATH,null,data,response,15);
-                     Hal_Free(data);
-                     if(code == 200){
-                         g_Printf_info("response : %s \r\n",response);   //对response解析，可以执行配置或ota操作
-                         AppDataPointer->TransMethodData.GPRSStatus = GPRS_Http_Post_Done;
-                     }else{    //这里可以做失败重发操作
-                         g_Printf_dbg("http_post failed\r\n");
-                     }                        
-                 }    
+                if(AppDataPointer->TerminalInfoData.DeviceStatus == DEVICE_STATUS_POWER_SCAN_OVER){
+					if (App.Data.TerminalInfoData.DeviceFirstRunStatus == DEVICE_STATUS_FIRSTRUN_BEGIN) {
+						App.Data.TerminalInfoData.DeviceFirstRunStatus = DEVICE_STATUS_FIRSTRUN_OVER;
+						App.Data.TransMethodData.SeqNumber = 0;
+					}else {
+						App.Data.TransMethodData.SeqNumber++;
+					}
+					//************电量处理Begin************//
+	                GetADCValue();
+                    //************电量处理End*************//
+
+					char response[128];
+                    // char *data = Hal_Malloc(512*sizeof(char *));
+                    // data = MakeJsonBodyData(AppDataPointer);
+					// g_Printf_info("data:%s\r\n",data);
+					// datalen = strlen(data);
+				    // g_Printf_dbg("json data length = %d\r\n",datalen);   //malloc函数产生内存碎片影响运行
+			
+                    // char *data = MakeJsonBodyData(AppDataPointer);
+					// g_Printf_info("data:%s\r\n",data);
+					// datalen = strlen(data);
+				    // g_Printf_dbg("json data length = %d\r\n",datalen);
+
+					char data[512];
+					uint32_t datalen = snprintf(data,512,MakeJsonBodyData(AppDataPointer));
+					g_Printf_info("datalen:%d\ndata:%s\r\n",datalen,data);
+				
+                   
+                	memset(response,0x0,128);
+					int16_t code = 0;
+                    code = g_Device_http_post(g_30000IoT_HOST,g_30000IoT_PATH,null,data,response,20);//时间延长至20s
+                    Hal_Free(data);
+                    if(code == 200){
+                        g_Printf_info("response : %s \r\n",response);   //对response解析，可以执行配置或ota操作
+                        AppDataPointer->TransMethodData.GPRSStatus = GPRS_Http_Post_Done;
+                    }else{    //这里可以做失败重发操作
+					    AppDataPointer->TransMethodData.GPRSStatus = GPRS_Http_Post_Done;  //ML 20190828
+                        g_Printf_dbg("http_post failed\r\n");
+                    }                        
+                }    
             }else if(AppDataPointer->TransMethodData.GPRSStatus == GPRS_Http_Post_Done){
                 // OSBsp.Device.IOControl.PowerSet(AIR202_Power_On);
                 Hal_EnterLowPower_Mode();

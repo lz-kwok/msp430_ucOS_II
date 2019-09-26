@@ -1,4 +1,4 @@
-#ifndef __HAL_LAYER_API_H
+﻿#ifndef __HAL_LAYER_API_H
 #define __HAL_LAYER_API_H
 
 #include  <ucos_ii.h>
@@ -12,7 +12,7 @@
 **************************************************************************/
 #define hal_Reboot()                  PMMCTL0 = PMMPW + PMMSWBOR + (PMMCTL0 & 0x0003)
 
-#define null                          ((void *) 0)   //空指�?
+#define null                          ((void *) 0)   //空指针
 #define invalid                       0xFF
 
 typedef OS_EVENT*                     Queue_t;
@@ -23,7 +23,7 @@ typedef void                          (*message_free_cb)(void* content);
 
 
 struct hal_message{
-	uint32_t 	 what;			/*msg type*/
+	uint32_t   what;		/*msg type*/
 	void* 	content;		/*msg content*/
 	message_free_cb freecb; /* free content func */
 };
@@ -46,8 +46,8 @@ typedef union
 }Hex2Double;
 
 /*Bit Operation Function*/
-#define hal_SetBit(data, offset)      data |= 1 << offset      //置位某位�?1
-#define hal_ResetBit(data, offset)    data &= ~(1 << offset)   //复位某位�?0
+#define hal_SetBit(data, offset)      data |= 1 << offset      //置位某位为1
+#define hal_ResetBit(data, offset)    data &= ~(1 << offset)   //复位某位为0
 #define hal_GetBit(data, offset)      ((data >> offset) &0x01) //获取某位
 #define UshortToByte1(data)     	  ((uint8_t *)(&data))[0]  //获取ushort类型数据低位(low 8 bit)高位(high 8 bit)
 #define UshortToByte0(data)     	  ((uint8_t *)(&data))[1]  //获取ushort类型数据
@@ -62,6 +62,10 @@ typedef union
 #define DEVICE_NAME_LEN               (64)
 #define DEVICE_SECRET_LEN             (70)
 
+// void Hex2Str(unsigned char *d,uint8_t *p,unsigned char Len, unsigned char offset);
+void Hex2Str(unsigned char *d,uint32_t *p,unsigned char Len, unsigned char offset);
+uint8_t HexToBCD(uint8_t hex);
+char* Itoa(int val,char* dst,int radix);
 uint16_t Crc16(uint8_t *bufferpoint,int16_t sum);
 char Hal_CheckString(char *dst ,char *src);
 void *Hal_Malloc(int size);
@@ -86,7 +90,8 @@ uint32_t Hal_getDeviceID(void);
 uint32_t Hal_getManufactureDate(void);
 uint32_t Hal_getFirmwareVersion(void);
 uint32_t Hal_getSerialNumber(void);
-uint8_t Hal_getTransmitPeriod(void);
+uint32_t Hal_getTransmitPeriod(void);
+uint32_t Hal_getSensorFlashStatus(void);
 uint16_t Hal_getBackupIndex(void);
 uint16_t Hal_getStartFile(void);
 uint8_t Hal_getFullFlag(void);

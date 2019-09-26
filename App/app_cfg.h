@@ -81,7 +81,9 @@
 #define  TRACE_LEVEL_ERR                                3u
 #define  TRACE_LEVEL_DBG                                4u
 
+// #define  APP_CFG_TRACE_LEVEL                            TRACE_LEVEL_INFO
 #define  APP_CFG_TRACE_LEVEL                            TRACE_LEVEL_DBG
+
 
 
 

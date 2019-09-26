@@ -73,8 +73,10 @@ void  main (void)
 {
     OSInit();                                /* Initialize "uC/OS-II, The Real-Time Kernel"          */
     OSBsp.Init();                            /* Initialize BSP functions                             */
-    if(Hal_Platform_Init() == 0){
+    if(Hal_Platform_Init() == 0){            
         g_Printf_info("Hal_Platform_Init Success\r\n");
+        LED_OFF;
+        hal_Delay_ms(100);
     }
 
     Hal_ThreadCreate(ScadaTaskStart,
@@ -111,8 +113,14 @@ static  void  ScadaTaskStart (void *p_arg)
         if(Hal_getCurrent_work_Mode() == 0){
             if(AppDataPointer->TerminalInfoData.DeviceStatus == DEVICE_STATUS_POWER_OFF){
                 g_Printf_info("SenSor_Power_On\r\n");
+                OSBsp.Device.IOControl.PowerSet(BaseBoard_Power_On);
+                OSBsp.Device.IOControl.PowerSet(Sensor_Power_On);
+                OSBsp.Device.IOControl.PowerSet(Max485_Power_On);
                 //个别传感器需预热，任务挂起时间视情况而定，默认10s
-                OSTimeDly(5000);
+                OSTimeDly(5000);  //节拍2ms
+                if(App.Data.TerminalInfoData.SensorFlashReadStatus == SENSOR_STATUS_READFLASH_NOTYET) {
+                    InqureSensor();  
+                }
                 AppDataPointer->TerminalInfoData.DeviceStatus = DEVICE_STATUS_POWER_SCANNING;
                 g_Printf_info("%s ... ...\n",__func__);
                 Hal_GetTimeOfDay(&before_Scada);
@@ -122,11 +130,14 @@ static  void  ScadaTaskStart (void *p_arg)
                 Scada_timeout_sec = after_Scada.tv_sec - before_Scada.tv_sec;
                 g_Printf_info("Scada_timeout_sec = %d\r\n",Scada_timeout_sec);
                 // if(Scada_timeout_sec >= SCADATIME){
-                    if(Scada_timeout_sec >= 30){
-                    AppDataPointer->TerminalInfoData.DeviceStatus = DEVICE_STATUS_POWER_SCAN_OVER;
-                    g_Printf_info("ScadaTask is over\n");
-                    OSTimeDly(500);
-                    // OSBsp.Device.IOControl.PowerSet(SenSor_Power_Off);
+                // if(Scada_timeout_sec >= 30){
+                if(Scada_timeout_sec >= 10){
+                AppDataPointer->TerminalInfoData.DeviceStatus = DEVICE_STATUS_POWER_SCAN_OVER;
+                g_Printf_info("ScadaTask is over\n");
+                OSTimeDly(500);
+                OSBsp.Device.IOControl.PowerSet(Max485_Power_Off);
+                // OSBsp.Device.IOControl.PowerSet(BaseBoard_Power_Off);
+                OSBsp.Device.IOControl.PowerSet(Sensor_Power_Off);
                 }
             }
             

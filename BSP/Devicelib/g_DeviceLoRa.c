@@ -39,9 +39,17 @@ uint16_t BackupIndex = 0;
 uint16_t StartFile = 1;
 uint16_t FullFlag = 0;
 char RespFile[10];
-char Data_Backup[70];
+// char Data_Backup[70];
+char Data_Backup[120];
 uint8_t ResendData = 0;
 uint8_t cacheBuf[7];
+
+// //串口同步时间变量
+// unsigned char *Rcv_TimePoint;     //+++++++++++++//
+// unsigned char Rcv_TimeNum = 0;
+// unsigned char Rcv_TimeData[50];
+// unsigned char TimebuffNum = 0;
+// unsigned char TimeBuff_Hex[8] = {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00}; //16进制的时间Buffer  2018年3月15号 20时50分00秒 星期4
 
 //static char TimeString[20] = "20170804 16:00:00";
 /*******************************************************************************
@@ -102,6 +110,11 @@ void g_Device_LoRa_Init(void)
             User_Printf("AT+RJN\r\n");
             AppDataPointer->TransMethodData.LoRaStatus = LoRa_Init_Done;
         }
+
+		// if(AppDataPointer->TransMethodData.LoRaStatus == LoRa_Init_Done)  //自动校时
+        // {
+        //     User_Printf("AT+STI=1\r\n");    //初始化自动校时指令
+        // }
     }	
 }
 /*******************************************************************************
@@ -151,7 +164,7 @@ void g_Device_LoRa_Send(uint32_t *data , uint8_t length , uint8_t port)
         }
         else
         {
-        	User_Printf("%X",data[ii] & 0xff);				// & 0xff防止出现数据溢出
+        	User_Printf("%X",data[ii] & 0xff);	        // & 0xff防止出现数据溢出
         }
     }
     User_Printf("\r\n");
@@ -295,9 +308,31 @@ void g_Device_check_Response(char *res)
 		g_Printf_dbg("Get Server ACK...\r\n");
 		AppDataPointer->TransMethodData.LoRaSendStatus = 1;
 	}
+	// else if(Hal_CheckString(aRxBuff,"+STI"))   //自动校时
+	// {
+	// 	Rcv_TimePoint = strstr(aRxBuff,"+STI");         //判断接收到的数据是否有效
+	// 	while(*(Rcv_TimePoint+6) != '\r')
+	// 	{
+	// 		Rcv_TimeData[Rcv_TimeNum] = *(Rcv_TimePoint+6);
+	// 		Rcv_TimeNum++;
+	// 		Rcv_TimePoint++;
+	// 	}
+	// 	for(TimebuffNum=1;TimebuffNum<7;TimebuffNum++)
+	// 	{
+	// 		TimeBuff_Hex[TimebuffNum] = (Rcv_TimeData[(TimebuffNum-1)*3]-0x30)*10
+	// 									+ (Rcv_TimeData[(TimebuffNum-1)*3+1]-0x30)*1;
+	// 	}
+
+	// 	for(TimebuffNum=1;TimebuffNum<7;TimebuffNum++)
+	// 	{
+	// 		time_buf[TimebuffNum]= HexToBCD(TimeBuff_Hex[TimebuffNum]);    //存“年月日时分秒周”
+	// 	}
+	// 	DS1302_write_time();   //写入时间
+	// 	g_Printf_dbg("LoRa Automatic Time OK\r\n");
+	// }
 }
 /*******************************************************************************
-* 函数名            : CreatFileNum
+* 函数名  : CreatFileNum
 * 描述	  : 生成存储文件名称
 * 输入参数  : x	1——序号加；0——序号减
 * 返回参数  : 无
@@ -358,31 +393,32 @@ void CreatFileNum(char x)
       }
   }
 }
-void Hex2Str(unsigned char *d,uint32_t *p,unsigned char Len, unsigned char offset)
-{
-	unsigned char i;
-	for(i = 0; i<Len;i++)
-	{
-		d[2*i + offset] = (uint8_t)p[i]>>4;
-		d[2*i+1 + offset] = (uint8_t)p[i]&0xf;
-	}
-	for(i = 0 + offset; i<Len*2 + offset;i++)
-	{
-	//	dst[i] = HexToChar(str[i]);
-		if (d[i] < 10)
-		{
-			d[i] = d[i] + '0';
-		}
-		else
-		{
-			d[i] = d[i] -10 +'A';
-		}
-	}
-}
+// void Hex2Str(unsigned char *d,uint32_t *p,unsigned char Len, unsigned char offset)
+// {
+// 	unsigned char i;
+// 	for(i = 0; i<Len;i++)
+// 	{
+// 		d[2*i + offset] = (uint8_t)p[i]>>4;
+// 		d[2*i+1 + offset] = (uint8_t)p[i]&0xf;
+// 	}
+// 	for(i = 0 + offset; i<Len*2 + offset;i++)
+// 	{
+// 	//	dst[i] = HexToChar(str[i]);
+// 		if (d[i] < 10)
+// 		{
+// 			d[i] = d[i] + '0';
+// 		}
+// 		else
+// 		{
+// 			d[i] = d[i] -10 +'A';
+// 		}
+// 	}
+// }
 void WriteStoreData(void)
 {
 	uint8_t tempBuffer[20];
 	uint8_t cacheBuf[7];
+
 	CreatFileNum(1);		//参数1   BackupIndex++;
 	ltoa( (long)BackupIndex , RespFile);
 	strcat(RespFile , ".txt");
@@ -399,10 +435,12 @@ void WriteStoreData(void)
 		cacheBuf[2] = StartFile/256;
 		cacheBuf[3] = StartFile%256;
 		cacheBuf[4] = FullFlag%256;
-		OSBsp.Device.InnerFlash.FlashRsvWrite(cacheBuf,5,infor_ChargeAddr,18);	//存储成功后保存文件名序号至Flash
-		g_Printf_dbg(Data_Backup);
-		g_Printf_dbg(RespFile);
-		g_Printf_dbg("Write backup to SD\r\n");
+		// OSBsp.Device.InnerFlash.FlashRsvWrite(cacheBuf,5,infor_ChargeAddr,25);	//存储成功后保存文件名序号至Flash
+		g_Printf_dbg("FileCacheBuffer:%s\r\n",Data_Backup);
+		OSTimeDly(50);  //节拍2ms
+		g_Printf_dbg("FileCacheName:%s\r\n",RespFile);
+		OSTimeDly(50);  //节拍2ms
+		g_Printf_dbg("Write backup to SD ok\r\n");
 	}
 	else			//若存储失败则退回原来序号
 	{
@@ -454,14 +492,12 @@ void  TransmitTaskStart (void *p_arg)
         if(Hal_getCurrent_work_Mode() == 0){
             if(AppDataPointer->TransMethodData.LoRaStatus == LoRa_Power_off)
 			{
-				//LoRa 第一次开机时对NB上电操作，后续进入低功耗不关电
+				//LoRa 第一次开机时上电操作，后续进入低功耗不关电
             	OSBsp.Device.IOControl.PowerSet(LPModule_Power_On);		//打开LoRa电源
 				//reset脚电平
                 OSTimeDly(5000);				
                 AppDataPointer->TransMethodData.LoRaStatus = LoRa_Power_on;
-				g_Printf_dbg("LoRa Power ON\r\n");
-				
-                
+				g_Printf_dbg("LoRa power on\r\n");
             }
 			else if(AppDataPointer->TransMethodData.LoRaStatus == LoRa_Power_on)
 			{
@@ -481,44 +517,52 @@ void  TransmitTaskStart (void *p_arg)
 						char *data = Hal_Malloc(512*sizeof(char *));
 						//  char response[128];
 						//SeqNumber ++
-						AppDataPointer->TransMethodData.SeqNumber++;
-						if(AppDataPointer->TransMethodData.SeqNumber >= 65535)
-							AppDataPointer->TransMethodData.SeqNumber = 1;
+						if(App.Data.TerminalInfoData.DeviceFirstRunStatus == DEVICE_STATUS_FIRSTRUN_BEGIN) {
+							App.Data.TerminalInfoData.DeviceFirstRunStatus = DEVICE_STATUS_FIRSTRUN_OVER;
+							App.Data.TransMethodData.SeqNumber = 0;
+						}else {
+							App.Data.TransMethodData.SeqNumber++;
+							if(AppDataPointer->TransMethodData.SeqNumber >= 65535)
+								AppDataPointer->TransMethodData.SeqNumber = 1;
+						}
 						Send_Buffer[5] = AppDataPointer->TransMethodData.SeqNumber/256;
 						Send_Buffer[6] = AppDataPointer->TransMethodData.SeqNumber%256;
 						//Voltage
 						GetADCValue();
 						data = MakeJsonBodyData(AppDataPointer);		//组包json并存储SD卡
 						g_Printf_info("data:%s\r\n",data);
-						Hex2Str(Data_Backup,Send_Buffer,34,0);
+						// Hex2Str(Data_Backup,Send_Buffer,34,0);	
+						Hex2Str(Data_Backup,Send_Buffer,60,0);					
+						g_Printf_info("Hexdata:%s\r\n",Data_Backup);    //打印输出16进制发送数据
 					}
 					//  memset(response,0x0,128);
 					//发送数据
 					if(AppDataPointer->TransMethodData.LoRaNet == 1)
 					{
-						if(ResendData == 1)		//补发数据
+						if(ResendData == 1)		 //补发数据
 						{
-							SendLoRaStrHex(Data_Backup,68);
+							SendLoRaStrHex(Data_Backup,120);
 						}
-						else					//正常上报数据
+						else					 //正常上报数据
 						{
-							g_Device_LoRa_Send(Send_Buffer,34,15);
+							// g_Device_LoRa_Send(Send_Buffer,34,15);
+							g_Device_LoRa_Send(Send_Buffer,60,15);
 						}
-						OSTimeDly(2500);		//等待5s
-						g_Device_LoRa_Receive();	//查询有无下发数据
+						OSTimeDly(2500);		 //等待5s
+						g_Device_LoRa_Receive(); //查询有无下发数据
 						if(AppDataPointer->TransMethodData.LoRaSendStatus == 1)	//确认帧发送成功,发送数据前会置0
 						{
 							if(ResendData)
 							{
 								ResendData = 0;
-								del_txt("0:/INDEX",RespFile);				//删除临时存储，同时更改存储BackupIndex值
-								CreatFileNum(0);		//参数0   BackupIndex--;
+								del_txt("0:/INDEX",RespFile);//删除临时存储，同时更改存储BackupIndex值
+								CreatFileNum(0);		     //参数0   BackupIndex--;
 								cacheBuf[0] = BackupIndex/256;
 								cacheBuf[1] = BackupIndex%256;
 								cacheBuf[2] = StartFile/256;
 								cacheBuf[3] = StartFile%256;
 								cacheBuf[4] = FullFlag;
-								OSBsp.Device.InnerFlash.FlashRsvWrite(cacheBuf,5,infor_ChargeAddr,18);
+								// OSBsp.Device.InnerFlash.FlashRsvWrite(cacheBuf,5,infor_ChargeAddr,18);
 							}	
 							if(BackupIndex >=1)
 								GetStoreData();
@@ -536,8 +580,7 @@ void  TransmitTaskStart (void *p_arg)
 						//存储数据等待下次补传
 						WriteStoreData();
 						AppDataPointer->TransMethodData.LoRaStatus = LoRa_Idel;
-					}
-					
+					}		
 				}    
             }
 			else if(AppDataPointer->TransMethodData.LoRaStatus == LoRa_Idel)

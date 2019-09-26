@@ -155,6 +155,8 @@ void ADCRead1000Routine(void)
 void GetADCValue(void)
 {
 	static uint8_t i=0,j=0;
+	ScadaBAT_ON;
+	OSTimeDly(500); 
 	//************电量处理Begin************//
 	for(j=0;j<5;j++)
 	{
@@ -164,9 +166,9 @@ void GetADCValue(void)
 			OSTimeDlyHMSM(0u, 0u, 0u, 40);  
 		}
 	}
-	App.Data.TerminalInfoData.PowerQuantity = PowerQuantity;      			 //电量    3.4 10% 3.5 20% ———— 4.0 70%  4.2 90%
-	Send_Buffer[32] = PowerQuantity;
-	//************电量处理END************//
+	App.Data.TerminalInfoData.PowerQuantity = PowerQuantity;     //电量    3.4 10% 3.5 20% ———— 4.0 70%  4.2 90%
+	infor_ChargeAddrBuff[13] = PowerQuantity;                    //电池电量     
+	Send_Buffer[33] = App.Data.TerminalInfoData.PowerQuantity;        
 }
 
 

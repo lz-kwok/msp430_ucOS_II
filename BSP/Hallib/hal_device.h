@@ -53,38 +53,31 @@
 // 定义是否具备log存储功能
 #define HAVE_LOG_STORE_SERVICE
 //*****************终端类型*********************//
-#define Air_Station           		0x01	 //空气监测�?
-#define Voc_Station           		0x02	 //VOC监测�?
-#define Dust_Station	      		0x03	 //扬尘噪音监测�?
+#define Air_Station           		0x01	 //空气监测仪
+#define Voc_Station           		0x02	 //VOC监测仪
+#define Dust_Station	      		0x03	 //扬尘噪音监测仪
 #define WRain_Station	      		0x04	 //水雨情监测仪
-#define Wether_Station        		0x05	 //气象监测�?
-#define Water_Station	      		0x06	 //水质水况监测�?
-#define Soil_Station          		0x07	 //土壤墒情监测�?
-#define Agriculture_Station   		0x08	 //农业监测�?
+#define Wether_Station        		0x05	 //气象监测仪
+#define Water_Station	      		0x06	 //水质水况监测仪
+#define Soil_Station          		0x07	 //土壤墒情监测仪
+#define Agriculture_Station   		0x08	 //农业监测仪
 #define Flowmeter_Station     		0x09	 //流量计监测仪
-
 #define Seeper_Station        		0x11	 //易涝点液位监测仪
-#define Flow_Station          		0x12	 //窨井管道流量监测�?
-#define Rain_Station          		0x13	 //雨量监测�?
-#define IntegratedPitWell     		0x14	 //一体化窨井液位监测�?
+#define Flow_Station          		0x12	 //窨井管道流量监测仪
+#define Rain_Station          		0x13	 //雨量监测仪
+#define IntegratedPitWell     		0x14	 //一体化窨井液位监测仪
 #define InputmodeWell         		0x15	 //投入式窨井液位监测仪
-
-#define NoxiousGas_Station    		0x18	 //有害气体监测�?
-#define WetherSoil_Station    		0x19	 //气象土壤监测�?
+#define NoxiousGas_Station    		0x18	 //有害气体监测仪
+#define WetherSoil_Station    		0x19	 //气象土壤监测仪
 #define Planting_Station      		0x20	 //农作物种植环境监测仪
-
 #define LevelFlowrate_Station 		0x21	 //雷达水位流速监测仪
-
-#define TankMonitor_Station   		0x0A	 //TankMonitor监测�?
-#define MagicSTICK_Station    		0x0B	 //MagicSTICK监测�?
-#define AliveNest_Station     		0x0C	 //AliveNest监测�?     一体化空气检测仪
+#define TankMonitor_Station   		0x0A	 //TankMonitor监测仪
+#define MagicSTICK_Station    		0x0B	 //MagicSTICK监测仪
+#define AliveNest_Station     		0x0C	 //AliveNest监测仪     一体化空气检测仪
 #define CLCupboard_Station    		0x0D	 //氯离子柜式监测站
-
 #define Custom_Station	      		0x55	 //定制需求监测站
 
-
 #define PRODUCT_TYPE                Dust_Station
-
 
 //*****************通信方式*********************//
 #define GPRS_Mode		      		0x01
@@ -94,13 +87,16 @@
 #define LoRa_S78S_Mode		  		0x05
 #define LoRa_OM402_Mode		  		0x06
 #define GPRS_AIR202_Mode      		0x07
-#define TRANSMIT_TYPE 			    NBIoT_BC95_Mode
+
+// #define TRANSMIT_TYPE 			    GPRS_Mode
+// #define TRANSMIT_TYPE 			    NBIoT_BC95_Mode
+#define TRANSMIT_TYPE 			    LoRa_F8L10D_Mode
 
 #if (TRANSMIT_TYPE == GPRS_Mode)
-	//这俩预定义只能选一�?
+	//这俩预定义只能选一个
 	//#define SIM800C
 	#define AIR202
-	//这俩预定义只能选一�?
+	//这俩预定义只能选一个
 	#define ReportToAliOnly
 	// #define ReportTo30000IoT
 #endif
@@ -109,7 +105,7 @@
 #define GPS_Mode		      		0x01     //GPS配件
 #define RS485_Mode		      		0x02     //485配件
 #define RS232_Mode		      		0x03     //232配件
-#define None_Mode	          		0xFF     //无配�?
+#define None_Mode	          		0xFF     //无配件
 #define ACCESSORY_TYPR              GPS_Mode
 
 

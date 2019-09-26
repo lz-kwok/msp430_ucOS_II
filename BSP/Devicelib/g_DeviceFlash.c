@@ -30,7 +30,7 @@
 #include "MSP430F5xx_6xx\flashctl.h"
 
 
-
+uint8_t infor_ChargeAddrBuff[32] = {0x00};
 
 /*******************************************************************************
 * Function Name  : infoFLASH_read
