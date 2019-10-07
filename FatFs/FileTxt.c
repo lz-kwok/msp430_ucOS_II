@@ -51,11 +51,6 @@ void g_SD_FileName_Creat(const char *docPath,uint8_t *date,char *filename)
 
 void g_SD_File_Write(const char *file_path,const char *dat)
 {
-	// FRESULT res;
-	// FIL fsrc;
-	// FATFS fs;
-	// uint16_t bw;
-
 	g_Printf_dbg("write file to %s......\n\r",file_path);
 	res=f_mount(0, &fs);
 	res=f_open(&fsrc,(char *)file_path, FA_OPEN_ALWAYS | FA_WRITE);
@@ -69,8 +64,8 @@ void g_SD_File_Write(const char *file_path,const char *dat)
 		if(res == FR_OK){
 			uint32_t num_w;
 			num_w=strlen(dat);
-			g_Printf_info("%d bytes has been writted!\r\n",num_w);
-			g_Printf_info("write data ok! \n\r");
+			g_Printf_dbg("%d bytes has been writted!\r\n",num_w);
+			g_Printf_dbg("write data ok! \n\r");
 		}else{
 			g_Printf_dbg("write data error \n\r");
 		}

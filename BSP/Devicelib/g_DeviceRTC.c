@@ -429,7 +429,7 @@ __interrupt void RTC_ISR(void)
         case RTC_RTCTEVIFG:		//分钟
 			{
 				g_MinuteTick ++;
-				g_Printf_info("g_MinuteTick wakeup %d times\r\n",g_MinuteTick);
+				g_Printf_dbg("g_MinuteTick wakeup %d times\r\n",g_MinuteTick);
 				if(g_MinuteTick == App.Data.TerminalInfoData.SendPeriod){
 					g_MinuteTick = 0;
 					if(Hal_getCurrent_work_Mode() == 1){          //当前为低功耗状态

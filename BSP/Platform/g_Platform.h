@@ -93,6 +93,7 @@ typedef struct
 	char GPRSStatus;
 	char GPRSATStatus;
 	uint32_t Http_Cid;
+	uint32_t Ftp_Cid;
 	uint8_t  LoRaJoinNET;        //LoRa入网状态
 	uint8_t	 NBStatus;			//NB模组运行状态
 	uint8_t  NBNet;				//NB网络标志位
@@ -280,9 +281,20 @@ typedef struct
 
 typedef struct
 {
+	char ip[16];		     
+	uint32_t port;
+	char username[32];		
+	char password[32];  
+	char imgpath[32];
+	char imgname[32];
+	uint32_t imgversion;                
+}Fota_Info;             
+
+typedef struct
+{
     TerminalPlatform           TerminalInfoData;
     TransMethodPlatform        TransMethodData;
-
+	Fota_Info FotaInfor;
 #if (PRODUCT_TYPE == Voc_Station) 
     VOCPlatform                VOCData;
 #elif (PRODUCT_TYPE == Dust_Station) 

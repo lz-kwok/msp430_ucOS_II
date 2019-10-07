@@ -42,7 +42,8 @@ enum GPRS_STATUS {
 	GPRS_MQTT_Enable_Pulish,
 	GPRS_Waitfor_GetIP,
 	GPRS_Get_HTTPACT,
-	GPRS_Http_Post_Done
+	GPRS_Http_Post_Done,
+	GPRS_Fota_Process
 };
 
 

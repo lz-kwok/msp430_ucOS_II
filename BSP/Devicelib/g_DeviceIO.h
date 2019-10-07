@@ -91,6 +91,8 @@ typedef enum {
 #define ScadaBAT_ON		      P2OUT |= BIT0     //电池电量采集       允许
 #define ScadaBAT_OFF          P2OUT &=~BIT0     //电池电量采集       禁止
 
+#define CS_1		          P2OUT |= BIT2     
+#define CS_0                  P2OUT &=~BIT2     
 
 void g_Device_IO_Init(void);
 

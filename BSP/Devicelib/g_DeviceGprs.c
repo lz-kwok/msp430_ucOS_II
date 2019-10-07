@@ -29,10 +29,10 @@
 #include  <bsp.h>
 
 #if (TRANSMIT_TYPE == GPRS_Mode)
-const char *g_30000IoT_HOST = "30000iot.cn:9001";    
-const char *g_30000IoT_PATH = "/api/Upload/data/";
-// const char *g_30000IoT_HOST = "47.111.88.91:6096"; 
-// const char *g_30000IoT_PATH = "/iot/data/receive";
+// const char *g_30000IoT_HOST = "30000iot.cn:9001";    
+// const char *g_30000IoT_PATH = "/api/Upload/data/";
+const char *g_30000IoT_HOST = "47.111.88.91:6096"; 
+const char *g_30000IoT_PATH = "/iot/data/receive";
 
 enum CoordinateSystem{
 	WGS_84 = 1,
@@ -43,10 +43,16 @@ static char gprs_tick = 0;
 static uint32_t HTTP_Status_Code = 0;
 static int g_has_response = 0;
 static char g_response[256];
-
+char g_ftp_allow_get = 0;
+char g_ftp_allow_storage = 0;
 char *StartString = NULL;
 char *EndString  = NULL;
 char CSQBuffer[15]={'0'};
+
+char download_data_1[1536];
+uint16_t data1_len = 0;
+static long addr_write = FOTA_ADDR_START;
+
 
 //static char TimeString[20] = "20170804 16:00:00";
 
@@ -62,7 +68,7 @@ void g_Device_GPRS_Init(void)
 		if((AppDataPointer->TransMethodData.GPRSNet == 0)&&
 				(AppDataPointer->TransMethodData.GPRSAttached == 0)){
 			g_Printf_dbg("AT+CSQ\r\n");
-			User_Printf("AT+CSQ\r\n");   //查询信号质量		
+			User_Printf("AT+CSQ\r\n");   //查询信号质量
 			gprs_tick ++;
 			OSTimeDly(1000);
 			if(gprs_tick == 5){
@@ -300,26 +306,221 @@ int16_t g_Device_http_post(const char *host,const char* path,const char *apikey,
 		Hal_GetTimeOfDay(&tmp_tv);
 		sub_timeout_sec = tmp_tv.tv_sec - now.tv_sec;
 		if(sub_timeout_sec > timeout){
+			now.tv_sec = tmp_tv.tv_sec;
+			g_Printf_info("%s timerout ",__func__);	
 			if((gprs_tick < 2)&&(gprs_tick > 0)){
-				g_Printf_info("%s para set timerout\r\n",__func__);						
+				g_Printf_info(": para set timerout\r\n");	
+				g_err = -1;					
 			}else if(gprs_tick == 2){
-				g_Printf_info("%s failed.http timerout\r\n",__func__);
+				g_Printf_info(": failed.http timerout\r\n");
 				gprs_tick = 3;
 				User_Printf("AT+HTTPTERM\r\n");   //结束Http服务
 				OSTimeDly(1000);
 				AppDataPointer->TransMethodData.GPRSATStatus = GPRS_Waitfor_OK;
+				g_err = -2;
 			}
-
-			g_err = -1;
 		}
 	}
 
 	return g_err;
 #endif
 }
+char data_write[300];
+void g_Device_GPRS_Fota_Start(void)
+{
+	if(gprs_tick == 0){
+		if(AppDataPointer->TransMethodData.GPRSATStatus == GPRS_Waitfor_OK){
+			g_Printf_dbg("AT+SAPBR=3,1,\"CONTYPE\",\"GPRS\"\r\n");
+			User_Printf("AT+SAPBR=3,1,\"CONTYPE\",\"GPRS\"\r\n");
+			OSTimeDly(1000);
+		}else{
+			gprs_tick = 1;
+			AppDataPointer->TransMethodData.GPRSATStatus = GPRS_Waitfor_OK;
+		}
+	}else if(gprs_tick == 1){
+		if(AppDataPointer->TransMethodData.GPRSATStatus == GPRS_Waitfor_OK){
+			g_Printf_dbg("AT+SAPBR=3,1,\"APN\",\"CMNET\"\r\n");
+			User_Printf("AT+SAPBR=3,1,\"APN\",\"CMNET\"\r\n");
+			OSTimeDly(1000);
+		}else{
+			gprs_tick = 2;
+			AppDataPointer->TransMethodData.GPRSATStatus = GPRS_Waitfor_OK;
+		}
+	}else if(gprs_tick == 2){
+		if(AppDataPointer->TransMethodData.GPRSATStatus == GPRS_Waitfor_OK){
+			g_Printf_dbg("AT+SAPBR=1,1\r\n");
+			User_Printf("AT+SAPBR=1,1\r\n");
+			OSTimeDly(1000);
+		}else{
+			gprs_tick = 3;
+			AppDataPointer->TransMethodData.GPRSATStatus = GPRS_Waitfor_GetIP;
+		}
+	}else if(gprs_tick == 3){         
+		if(AppDataPointer->TransMethodData.GPRSATStatus == GPRS_Waitfor_GetIP){
+			AppDataPointer->TransMethodData.Ftp_Cid = 0;
+			g_Printf_dbg("AT+SAPBR=2,1\r\n");
+			User_Printf("AT+SAPBR=2,1\r\n");
+			OSTimeDly(1000);
+		}else{
+			gprs_tick = 4;
+			AppDataPointer->TransMethodData.GPRSATStatus = GPRS_Waitfor_OK;
+		}
+	}else if(gprs_tick == 4){          
+		if(AppDataPointer->TransMethodData.GPRSATStatus == GPRS_Waitfor_OK){
+			g_Printf_dbg("AT+FTPCID=%d\r\n",AppDataPointer->TransMethodData.Ftp_Cid);
+			User_Printf("AT+FTPCID=%d\r\n",AppDataPointer->TransMethodData.Ftp_Cid);
+			OSTimeDly(1000);
+		}else{
+			gprs_tick = 5;
+			AppDataPointer->TransMethodData.GPRSATStatus = GPRS_Waitfor_OK;
+			g_Printf_info("%s done and ready to get file\r\n",__func__);
+		}
+	}else if(gprs_tick == 5){      
+		if(AppDataPointer->TransMethodData.GPRSATStatus == GPRS_Waitfor_OK){
+			g_Printf_dbg("AT+FTPTYPE=\"%s\"\r\n","I");
+			User_Printf("AT+FTPTYPE=\"%s\"\r\n","I");
+			OSTimeDly(1000);
+		}else{
+			gprs_tick = 6;
+			AppDataPointer->TransMethodData.GPRSATStatus = GPRS_Waitfor_OK;
+		}
+	}else if(gprs_tick == 6){      
+		if(AppDataPointer->TransMethodData.GPRSATStatus == GPRS_Waitfor_OK){
+			g_Printf_dbg("AT+FTPSERV=\"%s\"\r\n",AppDataPointer->FotaInfor.ip);
+			User_Printf("AT+FTPSERV=\"%s\"\r\n",AppDataPointer->FotaInfor.ip);
+			OSTimeDly(1000);
+		}else{
+			gprs_tick = 7;
+			AppDataPointer->TransMethodData.GPRSATStatus = GPRS_Waitfor_OK;
+		}
+	}else if(gprs_tick == 7){      
+		if(AppDataPointer->TransMethodData.GPRSATStatus == GPRS_Waitfor_OK){
+			g_Printf_dbg("AT+FTPPORT=%d\r\n",AppDataPointer->FotaInfor.port);
+			User_Printf("AT+FTPPORT=%d\r\n",AppDataPointer->FotaInfor.port);
+			OSTimeDly(1000);
+		}else{
+			gprs_tick = 8;
+			AppDataPointer->TransMethodData.GPRSATStatus = GPRS_Waitfor_OK;
+		}
+	}else if(gprs_tick == 8){      
+		if(AppDataPointer->TransMethodData.GPRSATStatus == GPRS_Waitfor_OK){
+			g_Printf_dbg("AT+FTPUN=\"%s\"\r\n",AppDataPointer->FotaInfor.username);
+			User_Printf("AT+FTPUN=\"%s\"\r\n",AppDataPointer->FotaInfor.username);
+			OSTimeDly(1000);
+		}else{
+			gprs_tick = 9;
+			AppDataPointer->TransMethodData.GPRSATStatus = GPRS_Waitfor_OK;
+		}
+	}else if(gprs_tick == 9){      
+		if(AppDataPointer->TransMethodData.GPRSATStatus == GPRS_Waitfor_OK){
+			g_Printf_dbg("AT+FTPPW=\"%s\"\r\n",AppDataPointer->FotaInfor.password);
+			User_Printf("AT+FTPPW=\"%s\"\r\n",AppDataPointer->FotaInfor.password);
+			OSTimeDly(1000);
+		}else{
+			gprs_tick = 10;
+			AppDataPointer->TransMethodData.GPRSATStatus = GPRS_Waitfor_OK;
+		}
+	}else if(gprs_tick == 10){      
+		if(AppDataPointer->TransMethodData.GPRSATStatus == GPRS_Waitfor_OK){
+			g_Printf_dbg("AT+FTPGETNAME=\"%s\"\r\n",AppDataPointer->FotaInfor.imgname);
+			User_Printf("AT+FTPGETNAME=\"%s\"\r\n",AppDataPointer->FotaInfor.imgname);
+			OSTimeDly(1000);
+		}else{
+			gprs_tick = 11;
+			AppDataPointer->TransMethodData.GPRSATStatus = GPRS_Waitfor_OK;
+		}
+	}else if(gprs_tick == 11){      
+		if(AppDataPointer->TransMethodData.GPRSATStatus == GPRS_Waitfor_OK){
+			g_Printf_dbg("AT+FTPGETPATH=\"%s\"\r\n",AppDataPointer->FotaInfor.imgpath);
+			User_Printf("AT+FTPGETPATH=\"%s\"\r\n",AppDataPointer->FotaInfor.imgpath);
+			OSTimeDly(1000);
+		}else{
+			gprs_tick = 12;
+			AppDataPointer->TransMethodData.GPRSATStatus = GPRS_Waitfor_OK;
+		}
+	}else if(gprs_tick == 12){      
+		if(AppDataPointer->TransMethodData.GPRSATStatus == GPRS_Waitfor_OK){
+			g_Printf_info("AT+FTPGET=1\r\n");
+			User_Printf("AT+FTPGET=1\r\n");
+			g_Printf_info("start download ==");
+			OSTimeDly(1000);
+		}else{
+			gprs_tick = 13;
+			AppDataPointer->TransMethodData.GPRSATStatus = GPRS_Waitfor_OK;
+		}
+	}
+	int m;
+	if(g_ftp_allow_get == 1){
+		g_ftp_allow_get = 0;
+		if(data1_len != 0){
+			int addr = 0;
+			char *fm = mymalloc(1050*sizeof(char));
+			memset(fm,0x0,1050);
+			fm = strtok(download_data_1,"OK");
+			g_Printf_info("fm size = %d\r\n",strlen(fm));
+			int lenth = 1025;
+			OSBsp.Device.Usart2.WriteString(fm);
+			for(m=0;m<5;m++){
+				if(lenth > 256){
+					memset(data_write,0x0,300);
+					strncpy(data_write,&download_data_1[addr],256);
+					addr += 256;
+					g_SD_File_Write("0:/fm1.txt",data_write);
+					lenth -= 256;
+				}else{
+					memset(data_write,0x0,300);
+					strncpy(data_write,&download_data_1[addr],lenth);
+					g_SD_File_Write("0:/fm1.txt",data_write);
+					break;
+				}
+			}
+			memset(download_data_1,0x0,1536);
+			data1_len = 0;
+			
+			// addr_write = g_MTD_spiflash_writeSector(addr_write,fm,1024);
+		}
+
+		// g_Printf_info("AT+FTPGET=2,1024\r\n");	
+		User_Printf("AT+FTPGET=2,1024\r\n");	
+		
+		OSTimeDly(100);
+	}else if(g_ftp_allow_get == 2){
+		g_ftp_allow_get = 0;
+		if(data1_len != 0){
+			char *fm;
+			int addr = 0;
+			fm = strtok(download_data_1,"OK");
+			strncpy(data_write,fm,strlen(download_data_1)-3);
+			int lenth = strlen(download_data_1)-3;
+			OSBsp.Device.Usart2.WriteString(fm);
+			for(m=0;m<4;m++){
+				if(lenth > 256){
+					memset(data_write,0x0,300);
+					strncpy(data_write,&fm[addr],256);
+					addr += 256;
+					g_SD_File_Write("0:/fm1.txt",data_write);
+					lenth -= 256;
+				}else{
+					memset(data_write,0x0,300);
+					strncpy(data_write,&fm[addr],lenth);
+					g_SD_File_Write("0:/fm1.txt",data_write);
+					break;
+				}
+			}
+			// OSBsp.Device.Usart2.WriteString(fm);
+			// addr_write = g_MTD_spiflash_writeSector(addr_write,fm,strlen(download_data_1)-3);
+			// g_Printf_info("==>> end addr 0x%04x\r\n",addr_write);
+			memset(download_data_1,0x0,1536);
+			data1_len = 0;
+		}
+		
+		OSTimeDly(100);
+	}
+}
 
 void g_Device_check_Response(char *res)
 {
+	static uint8_t res_len = 0;
 	if(g_has_response == -1){
 		g_has_response = 0;
 		memset(g_response,0x0,256);
@@ -376,7 +577,7 @@ void g_Device_check_Response(char *res)
 				AppDataPointer->TransMethodData.GPRSAttached = 1;
 			}
 		}else if(Hal_CheckString(res,"+CSQ:")){
-			if (Hal_CheckString(res,"0,0")){
+			if (Hal_CheckString(res," 0,0")){
 				AppDataPointer->TransMethodData.GPRSNet = 0;
 			}else{
 				memset(CSQBuffer, '\0', 15);	//清空buffer
@@ -434,6 +635,22 @@ void g_Device_check_Response(char *res)
 			// memset(mqttbuf,0x0,512);
 			// memcpy(mqttbuf,response,strlen(response));
 		}
+	}else if(AppDataPointer->TransMethodData.GPRSStatus == GPRS_Fota_Process){
+		if(Hal_CheckString(res,"OK")){
+			AppDataPointer->TransMethodData.GPRSATStatus = GPRS_Get_OK;
+			if(g_ftp_allow_storage == 1){
+				g_ftp_allow_storage = 0;
+			}
+		}else if(Hal_CheckString(res,"+SAPBR:")){
+			AppDataPointer->TransMethodData.GPRSATStatus = GPRS_Waitfor_OK;
+			AppDataPointer->TransMethodData.Ftp_Cid = res[8] - 0x30;
+		}else if(Hal_CheckString(res,"+FTPGET: 1,1")){
+			g_ftp_allow_get = 1;
+		}else if(Hal_CheckString(res,"+FTPGET: 2")){
+			g_ftp_allow_storage = 1;
+		}else if(Hal_CheckString(res,"+FTPGET: 1,0")){
+			g_ftp_allow_get = 2;
+		}
 	}
 #endif
 }
@@ -478,18 +695,7 @@ void  TransmitTaskStart (void *p_arg)
 	                GetADCValue();
                     //************电量处理End*************//
 
-					char response[128];
-                    // char *data = Hal_Malloc(512*sizeof(char *));
-                    // data = MakeJsonBodyData(AppDataPointer);
-					// g_Printf_info("data:%s\r\n",data);
-					// datalen = strlen(data);
-				    // g_Printf_dbg("json data length = %d\r\n",datalen);   //malloc函数产生内存碎片影响运行
-			
-                    // char *data = MakeJsonBodyData(AppDataPointer);
-					// g_Printf_info("data:%s\r\n",data);
-					// datalen = strlen(data);
-				    // g_Printf_dbg("json data length = %d\r\n",datalen);
-
+					char response[256];
 					char data[512];
 					uint32_t datalen = snprintf(data,512,MakeJsonBodyData(AppDataPointer));
 					g_Printf_info("datalen:%d\ndata:%s\r\n",datalen,data);
@@ -498,15 +704,66 @@ void  TransmitTaskStart (void *p_arg)
                 	memset(response,0x0,128);
 					int16_t code = 0;
                     code = g_Device_http_post(g_30000IoT_HOST,g_30000IoT_PATH,null,data,response,20);//时间延长至20s
-                    Hal_Free(data);
                     if(code == 200){
                         g_Printf_info("response : %s \r\n",response);   //对response解析，可以执行配置或ota操作
-                        AppDataPointer->TransMethodData.GPRSStatus = GPRS_Http_Post_Done;
+
+						cJSON *payload;
+						cJSON *pMsg = NULL;
+						cJSON *pVersion;
+						payload = cJSON_Parse(response);
+						// pVersion = cJSON_GetObjectItem(payload,"Version");
+						// if(pVersion->valueint != AppDataPointer->TerminalInfoData.Version){
+						pMsg = cJSON_GetObjectItem(payload,"msg");
+						if(pMsg != NULL){
+							// cJSON *pIP = NULL;
+							cJSON *pPort = NULL;
+							// cJSON *pUsername = NULL;
+							// cJSON *pPassword = NULL;
+							// cJSON *pImgpath = NULL;
+							// cJSON *pImgName = NULL;
+							// pIP = cJSON_GetObjectItem(payload,"ip");
+							// pPort = cJSON_GetObjectItem(payload,"port");
+							// pUsername = cJSON_GetObjectItem(payload,"username");
+							// pPassword = cJSON_GetObjectItem(payload,"password");
+							// pImgpath = cJSON_GetObjectItem(payload,"imgpath");
+							// pImgName = cJSON_GetObjectItem(payload,"imgname");
+
+							// if(pIP != NULL){
+							// 	strcpy(AppDataPointer->FotaInfor.ip,pIP->valuestring);
+							//  AppDataPointer->FotaInfor.port = pPort->valueint;
+							// 	strcpy(AppDataPointer->FotaInfor.username,pUsername->valuestring);
+							// 	strcpy(AppDataPointer->FotaInfor.password,pPassword->valuestring);
+							// 	strcpy(AppDataPointer->FotaInfor.imgpath,pImgpath->valuestring);
+							// 	strcpy(AppDataPointer->FotaInfor.imgname,pImgName->valuestring);
+
+							// 	AppDataPointer->TransMethodData.GPRSStatus = GPRS_Fota_Process;
+							// }
+
+							strcpy(AppDataPointer->FotaInfor.ip,"114.55.93.183");
+							AppDataPointer->FotaInfor.port = 21;
+							strcpy(AppDataPointer->FotaInfor.username,"sanwanwulianw");
+							strcpy(AppDataPointer->FotaInfor.password,"e1KTMWXeujEEGr8iQpk");
+							strcpy(AppDataPointer->FotaInfor.imgpath,"/sanwanwulianw/web/");
+							strcpy(AppDataPointer->FotaInfor.imgname,"glz_msp430_ucOS_II.txt");
+
+							AppDataPointer->TransMethodData.GPRSStatus = GPRS_Fota_Process;
+
+							g_Printf_info("FotaInfor.ip:%s\r\n",AppDataPointer->FotaInfor.ip);
+							g_Printf_info("FotaInfor.port:%d\r\n",AppDataPointer->FotaInfor.port);
+							g_Printf_info("FotaInfor.username:%s\r\n",AppDataPointer->FotaInfor.username);
+							g_Printf_info("FotaInfor.password:%s\r\n",AppDataPointer->FotaInfor.password);
+							g_Printf_info("FotaInfor.imgpath:%s\r\n",AppDataPointer->FotaInfor.imgpath);
+							g_Printf_info("FotaInfor.imgname:%s\r\n",AppDataPointer->FotaInfor.imgname);
+						}else{
+							 AppDataPointer->TransMethodData.GPRSStatus = GPRS_Http_Post_Done;
+						}
                     }else{    //这里可以做失败重发操作
 					    AppDataPointer->TransMethodData.GPRSStatus = GPRS_Http_Post_Done;  //ML 20190828
                         g_Printf_dbg("http_post failed\r\n");
                     }                        
                 }    
+            }else if(AppDataPointer->TransMethodData.GPRSStatus == GPRS_Fota_Process){
+				g_Device_GPRS_Fota_Start();
             }else if(AppDataPointer->TransMethodData.GPRSStatus == GPRS_Http_Post_Done){
                 // OSBsp.Device.IOControl.PowerSet(AIR202_Power_On);
                 Hal_EnterLowPower_Mode();

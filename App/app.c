@@ -135,9 +135,9 @@ static  void  ScadaTaskStart (void *p_arg)
                 AppDataPointer->TerminalInfoData.DeviceStatus = DEVICE_STATUS_POWER_SCAN_OVER;
                 g_Printf_info("ScadaTask is over\n");
                 OSTimeDly(500);
-                OSBsp.Device.IOControl.PowerSet(Max485_Power_Off);
-                // OSBsp.Device.IOControl.PowerSet(BaseBoard_Power_Off);
-                OSBsp.Device.IOControl.PowerSet(Sensor_Power_Off);
+                // OSBsp.Device.IOControl.PowerSet(Max485_Power_Off);
+                // // OSBsp.Device.IOControl.PowerSet(BaseBoard_Power_Off);
+                // OSBsp.Device.IOControl.PowerSet(Sensor_Power_Off);
                 }
             }
             

@@ -441,7 +441,10 @@ void UartRecTaskStart(void *p_arg)
 	}
 }
 
-
+extern char g_ftp_allow_get;
+extern char g_ftp_allow_storage;
+extern char download_data_1[1536];
+extern uint16_t data1_len;
 //------USCI_A0中断服务服务函数-------------------------------------------------+
 #pragma vector=USCI_A0_VECTOR
 __interrupt void USCI_A0_ISR(void)
@@ -453,7 +456,7 @@ __interrupt void USCI_A0_ISR(void)
 		    __bic_SR_register_on_exit(LPM0_bits);	//
 			while(!(UCA0IFG&UCTXIFG));            // USCI_A3 TX buffer ready?
 			{
-				OSBsp.Device.Usart2.WriteData(UCA0RXBUF);  //
+				// OSBsp.Device.Usart2.WriteData(UCA0RXBUF);  //
 				aRxBuff[aRxNum++] = UCA0RXBUF;
 #if(TRANSMIT_TYPE == NBIoT_BC95_Mode)
 				if(aRxNum >= aRxLength)
@@ -476,7 +479,10 @@ __interrupt void USCI_A0_ISR(void)
 					aRxNum = 0;
 					g_Device_check_Response(aRxBuff);
 					memset(aRxBuff,0x0,256);
-					}
+				}
+				if(g_ftp_allow_storage != 0){
+					download_data_1[data1_len++] = UCA0RXBUF;
+				}
 #endif	//(TRANSMIT_TYPE == GPRS_Mode)
 				
 			}//while

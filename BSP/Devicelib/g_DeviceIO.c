@@ -106,7 +106,7 @@ static void Power(ControlPower type)
 			Sensor_12V_1_OFF;       //传感器电源接口1_12V 掉电
 			Sensor_12V_2_OFF;       //传感器电源接口2_12V 掉电
 			Sensor_5V_1_OFF;        //传感器电源接口1_5V  掉电
-			Sensor_5V_2_OFF;        //传感器电源接口2_5V  掉电  
+			Sensor_5V_2_OFF;        //传感器电源接口2_5V  掉电
 			break;
 		case AIR202_Power_On:
 			Transmit_5V_OFF;	    //通信模块5V电源    掉电
@@ -207,6 +207,8 @@ void g_Device_IO_Init(void)
 
 
 	OSBsp.Device.IOControl.PowerSet = Power;
+
+	P2REN |= BIT2;
 	// OSBsp.Device.IOControl.ResetWirelesModule = ResetWirelesModule;
 }
 

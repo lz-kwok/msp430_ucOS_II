@@ -70,6 +70,7 @@
 #include <g_DeviceGprs.h>
 #include <g_DevicePrintf.h>
 #include <g_DeviceConfig.h>
+#include <g_DeviceSPIFlash.h>
 
 #include <g_DeviceNB.h>
 #include <g_DeviceLoRa.h>

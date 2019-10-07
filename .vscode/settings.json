@@ -5,6 +5,8 @@
         "hal_pmm.h": "c",
         "hal_tlv.h": "c",
         "g_deviceprintf.h": "c",
-        "hal_device.h": "c"
+        "hal_device.h": "c",
+        "g_devicespiflash.h": "c",
+        "g_deviceflash.h": "c"
     }
 }
