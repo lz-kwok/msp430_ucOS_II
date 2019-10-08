@@ -62,7 +62,7 @@
 ///////函数声明
 extern void Write_Enable(void);
 extern void Write_Disable(void);
-extern void Read_StatReg(void);
+extern uint8_t Read_StatReg(void);
 extern void Write_StatReg(uint8_t com);
 extern void Erase_Page(long address);
 extern uint8_t Read_Byte(long address);
