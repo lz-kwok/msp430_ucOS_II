@@ -453,31 +453,38 @@ void g_Device_GPRS_Fota_Start(void)
 	if(g_ftp_allow_get == 1){
 		g_ftp_allow_get = 0;
 		if(data1_len != 0){
-			int addr = 0;
-			char *fm = mymalloc(1050*sizeof(char));
-			memset(fm,0x0,1050);
-			fm = strtok(download_data_1,"OK");
-			g_Printf_info("fm size = %d\r\n",strlen(fm));
-			int lenth = 1025;
-			OSBsp.Device.Usart2.WriteString(fm);
-			for(m=0;m<5;m++){
-				if(lenth > 256){
-					memset(data_write,0x0,300);
-					strncpy(data_write,&download_data_1[addr],256);
-					addr += 256;
-					g_SD_File_Write("0:/fm1.txt",data_write);
-					lenth -= 256;
-				}else{
-					memset(data_write,0x0,300);
-					strncpy(data_write,&download_data_1[addr],lenth);
-					g_SD_File_Write("0:/fm1.txt",data_write);
-					break;
-				}
+			int lenth = strlen(download_data_1);
+			for(m=0;m<lenth;m++){
+				while(Read_StatReg()&0x01);
+				Write_Enable();
+				Write_Byte(addr_write,download_data_1[m]);
+				addr_write++;
 			}
+			// int addr = 0;
+			// char *fm = mymalloc(1050*sizeof(char));
+			// memset(fm,0x0,1050);
+			// fm = strtok(download_data_1,"OK");
+			// g_Printf_info("fm size = %d\r\n",strlen(fm));
+			// int lenth = 1025;
+			// OSBsp.Device.Usart2.WriteString(fm);
+			// for(m=0;m<5;m++){
+			// 	if(lenth > 256){
+			// 		memset(data_write,0x0,300);
+			// 		strncpy(data_write,&download_data_1[addr],256);
+			// 		addr += 256;
+			// 		g_SD_File_Write("0:/fm1.txt",data_write);
+			// 		lenth -= 256;
+			// 	}else{
+			// 		memset(data_write,0x0,300);
+			// 		strncpy(data_write,&download_data_1[addr],lenth);
+			// 		g_SD_File_Write("0:/fm1.txt",data_write);
+			// 		break;
+			// 	}
+			// }
 			memset(download_data_1,0x0,1536);
 			data1_len = 0;
 			
-			addr_write = g_MTD_spiflash_writeSector(addr_write,fm,1024);  //SPI flash
+			// addr_write = g_MTD_spiflash_writeSector(addr_write,fm,1024);
 		}
 
 		// g_Printf_info("AT+FTPGET=2,1024\r\n");	
@@ -487,26 +494,33 @@ void g_Device_GPRS_Fota_Start(void)
 	}else if(g_ftp_allow_get == 2){
 		g_ftp_allow_get = 0;
 		if(data1_len != 0){
-			char *fm;
-			int addr = 0;
-			fm = strtok(download_data_1,"OK");
-			strncpy(data_write,fm,strlen(download_data_1)-3);
-			int lenth = strlen(download_data_1)-3;
-			OSBsp.Device.Usart2.WriteString(fm);
-			for(m=0;m<4;m++){
-				if(lenth > 256){
-					memset(data_write,0x0,300);
-					strncpy(data_write,&fm[addr],256);
-					addr += 256;
-					g_SD_File_Write("0:/fm1.txt",data_write);
-					lenth -= 256;
-				}else{
-					memset(data_write,0x0,300);
-					strncpy(data_write,&fm[addr],lenth);
-					g_SD_File_Write("0:/fm1.txt",data_write);
-					break;
-				}
+			int lenth = strlen(download_data_1);
+			for(m=0;m<lenth;m++){
+				while(Read_StatReg()&0x01);
+				Write_Enable();
+				Write_Byte(addr_write,download_data_1[m]);
+				addr_write++;  //
 			}
+			// char *fm;
+			// int addr = 0;
+			// fm = strtok(download_data_1,"OK");
+			// strncpy(data_write,fm,strlen(download_data_1)-3);
+			// int lenth = strlen(download_data_1)-3;
+			// OSBsp.Device.Usart2.WriteString(fm);
+			// for(m=0;m<4;m++){
+			// 	if(lenth > 256){
+			// 		memset(data_write,0x0,300);
+			// 		strncpy(data_write,&fm[addr],256);
+			// 		addr += 256;
+			// 		g_SD_File_Write("0:/fm1.txt",data_write);
+			// 		lenth -= 256;
+			// 	}else{
+			// 		memset(data_write,0x0,300);
+			// 		strncpy(data_write,&fm[addr],lenth);
+			// 		g_SD_File_Write("0:/fm1.txt",data_write);
+			// 		break;
+			// 	}
+			// }
 			// OSBsp.Device.Usart2.WriteString(fm);
 			// addr_write = g_MTD_spiflash_writeSector(addr_write,fm,strlen(download_data_1)-3);
 			// g_Printf_info("==>> end addr 0x%04x\r\n",addr_write);

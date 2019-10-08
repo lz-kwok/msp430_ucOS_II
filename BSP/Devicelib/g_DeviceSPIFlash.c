@@ -4,7 +4,7 @@
 
 
 //芯片写使能
-static void Write_Enable(void)
+void Write_Enable(void)
 {
   SD_CS_Low();
   hal_Delay_us(20);
@@ -16,7 +16,7 @@ static void Write_Enable(void)
 }
 
 ///芯片禁止写入
-static void Write_Disable(void)
+void Write_Disable(void)
 {
   SD_CS_Low();
   hal_Delay_us(20);
@@ -28,7 +28,7 @@ static void Write_Disable(void)
 }
 
 //读取芯片状态寄存器
-static uint8_t Read_StatReg(void)
+uint8_t Read_StatReg(void)
 {
   uint32_t temp;
   CS_1;
