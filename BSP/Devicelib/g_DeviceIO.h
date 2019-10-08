@@ -80,6 +80,8 @@ typedef enum {
 //****************通信模块电源*******************//
 #define Transmit_5V_ON		  P4OUT |= BIT2     //通信模块5V电源      上电
 #define Transmit_5V_OFF       P4OUT &=~BIT2     //通信模块5V电源      掉电
+#define Transmit_HighPower	  P2OUT |= BIT4     //通信模块5V模块      高电平
+#define Transmit_LowPower	  P2OUT &=~BIT4     //通信模块5V模块      低电平
 #define Transmit_3V3_ON		  P4OUT &=~BIT3     //通信模块3.3V电源    上电   由MCU_3V3 供电
 #define Transmit_3V3_OFF      P4OUT |= BIT3     //通信模块3.3V电源    掉电
 //*****************插件电源**********************//

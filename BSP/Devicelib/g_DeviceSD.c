@@ -45,13 +45,13 @@ void g_Device_SDCard_Check(void)
 		timeout++;
 	}
 	if(status != 0){
-		g_Printf_dbg("Init Failure,Please Check SD!\r\n");
+	    g_Printf_info("Init Failure,Please Check SD!\r\n");
 	}else
 	{
-		g_Printf_dbg("Init SD Success!\r\n");
+	    g_Printf_info("Init SD Success!\r\n");
 		cardSize =  MMC_ReadCardSize();                 //��SD���Ĵ�����ȡMMC/SD��������С�����س�����
 		// SDsizeDisplay(cardSize);
-        g_Printf_dbg("SD Size: %d MB",cardSize/1048576); 
+		g_Printf_info("SD Size: %d MB",cardSize/1048576);
 	}
 	/***********End*******************/
 }
@@ -268,7 +268,7 @@ uint8_t g_Device_SD_Init(void)
 	SD_CS_High();
     if(SD_Idle_Sta())
     	return 1;			//��ʱ����1 ���õ�idle ģʽʧ��
-    //-----------------SD����λ��idle����-----------------	 
+    //-----------------SD����λ��idle����-----------------
     //��ȡ��Ƭ��SD�汾��Ϣ
 // 	SD_CS_Low();
     SD_CS_Low();
@@ -283,7 +283,7 @@ uint8_t g_Device_SD_Init(void)
         SD_CS_High();
         //�෢8��CLK����SD������������
         OSBsp.Device.Spi2.WriteReadData(0xFF);	  
-        //-----------------SD����MMC����ʼ����ʼ-----------------	 
+        //-----------------SD����MMC����ʼ����ʼ-----------------
         //������ʼ��ָ��CMD55+ACMD41
         // �����Ӧ��˵����SD�����ҳ�ʼ�����
         // û�л�Ӧ��˵����MMC�������������Ӧ��ʼ��
@@ -292,13 +292,13 @@ uint8_t g_Device_SD_Init(void)
         {
             //�ȷ�CMD55��Ӧ����0x01���������
             r1 = SD_SendCommand(CMD55, 0, 0);
-            if(r1 == 0XFF)return r1;//ֻҪ����0xff,�ͽ��ŷ���	  
+            if(r1 == 0XFF)return r1;//ֻҪ����0xff,�ͽ��ŷ���
             //�õ���ȷ��Ӧ�󣬷�ACMD41��Ӧ�õ�����ֵ0x00����������200��
             r1 = SD_SendCommand(ACMD41, 0, 0);
             retry++;
         }while((r1!=0x00) && (retry<400));
         // �ж��ǳ�ʱ���ǵõ���ȷ��Ӧ
-        // ���л�Ӧ����SD����û�л�Ӧ����MMC��	  
+        // ���л�Ӧ����SD����û�л�Ӧ����MMC��
         //----------MMC�������ʼ��������ʼ------------
         if(retry==400)
         {
@@ -309,7 +309,7 @@ uint8_t g_Device_SD_Init(void)
                 r1 = SD_SendCommand(1,0,0);
                 retry++;
             }while((r1!=0x00)&& (retry<400));
-            if(retry==400)return 1;   //MMC����ʼ����ʱ		    
+            if(retry==400)return 1;   //MMC����ʼ����ʱ
             //д�뿨����
             SD_Type = SD_TYPE_MMC;
         }
@@ -317,15 +317,15 @@ uint8_t g_Device_SD_Init(void)
      
           
 		OSBsp.Device.Spi2.WriteReadData(0xFF);	 
-        //��ֹCRCУ��	   
+        //��ֹCRCУ��
 		r1 = SD_SendCommand(CMD59, 0, 0x95);
-        if(r1 != 0x00)return r1;  //������󣬷���r1   	   
+        if(r1 != 0x00)return r1;  //������󣬷���r1
         //����Sector Size
         r1 = SD_SendCommand(CMD16, 512, 0x95);
         if(r1 != 0x00)return r1;  //������󣬷���r1
         //-----------------SD����MMC����ʼ������-----------------
 
-    }//SD��ΪV1.0�汾�ĳ�ʼ������	 
+    }//SD��ΪV1.0�汾�ĳ�ʼ������
      //������V2.0���ĳ�ʼ��
      //������Ҫ��ȡOCR���ݣ��ж���SD2.0����SD2.0HC��
     else if(r1 == 0x01)
@@ -347,15 +347,15 @@ uint8_t g_Device_SD_Init(void)
     			r1 = SD_SendCommand(CMD55, 0, 0);
     			if(r1!=0x01)return r1;	   
     			r1 = SD_SendCommand(ACMD41, 0x40000000, 0);
-                if(retry>200)return r1;  //��ʱ�򷵻�r1״̬  
+                if(retry>200)return r1;  //��ʱ�򷵻�r1״̬
             }while(r1!=0);		  
-            //��ʼ��ָ�����ɣ���������ȡOCR��Ϣ		   
+            //��ʼ��ָ�����ɣ���������ȡOCR��Ϣ
             //-----------����SD2.0���汾��ʼ-----------
             r1 = SD_SendCommand_NoDeassert(CMD58, 0, 0);
             if(r1!=0x00)
 			{
 				SD_CS_High();//�ͷ�SDƬѡ�ź�
-				return r1;  //�������û�з�����ȷӦ��ֱ���˳�������Ӧ��	 
+				return r1;  //�������û�з�����ȷӦ��ֱ���˳�������Ӧ��
 			}//��OCRָ����󣬽�������4�ֽڵ�OCR��Ϣ
             buff[0] = OSBsp.Device.Spi2.WriteReadData(0xFF);
             buff[1] = OSBsp.Device.Spi2.WriteReadData(0xFF); 
@@ -366,9 +366,9 @@ uint8_t g_Device_SD_Init(void)
             OSBsp.Device.Spi2.WriteReadData(0xFF);	   
             //�����յ���OCR�е�bit30λ��CCS����ȷ����ΪSD2.0����SDHC
             //���CCS=1��SDHC   CCS=0��SD2.0
-            if(buff[0]&0x40)SD_Type = SD_TYPE_V2HC;    //���CCS	 
+            if(buff[0]&0x40)SD_Type = SD_TYPE_V2HC;    //���CCS
             else SD_Type = SD_TYPE_V2;	    
-            //-----------����SD2.0���汾����----------- 
+            //-----------����SD2.0���汾����-----------
             
         }	    
     }
@@ -473,7 +473,7 @@ uint32_t SD_GetCapacity(void)
 	    Capacity=((uint32_t)csd[8])<<8;
 		Capacity+=(uint32_t)csd[9]+1;
         Capacity = (Capacity)*1024;//�õ�������
-		Capacity*=512;//�õ��ֽ���			   
+		Capacity*=512;//�õ��ֽ���
     }
     else
     {		    
@@ -527,7 +527,7 @@ uint8_t SD_ReadSingleBlock(uint32_t sector, uint8_t *buffer)
     {
         sector = sector<<9;
     } 
-	r1 = SD_SendCommand(CMD17, sector, 0);//������	 		    
+	r1 = SD_SendCommand(CMD17, sector, 0);//������
 	if(r1 != 0x00)
 		return r1;
 
@@ -541,7 +541,7 @@ uint8_t SD_ReadSingleBlock(uint32_t sector, uint8_t *buffer)
 
 
 ////////////////////////////����2������ΪUSB��д����Ҫ��/////////////////////////
-//����SD���Ŀ��С	 				   
+//����SD���Ŀ��С
 #define BLOCK_SIZE 512 
 
 
@@ -568,15 +568,15 @@ uint8_t MSD_WriteBuffer(uint8_t *pBuffer, uint32_t WriteAddr, uint32_t NumByteTo
 		sector=WriteAddr+Offset;
 		if(SD_Type==SD_TYPE_V2HC)
 			sector>>=9;				//ִ������ͨ�����෴�Ĳ���
-		r1=SD_SendCommand_NoDeassert(CMD24,sector,0xff);//д����   
+		r1=SD_SendCommand_NoDeassert(CMD24,sector,0xff);//д����
  		if(r1)
 		{
 			SD_CS_High();
 
-			return 1;//Ӧ����ȷ��ֱ�ӷ��� 	   
+			return 1;//Ӧ����ȷ��ֱ�ӷ���
 	    }
 
-	    OSBsp.Device.Spi2.WriteReadData(0xFE);//����ʼ����0xFE   
+	    OSBsp.Device.Spi2.WriteReadData(0xFE);//����ʼ����0xFE
 	    //��һ��sector������
 	    for(i=0;i<512;i++)
 	    	OSBsp.Device.Spi2.WriteReadData(*pBuffer++);
@@ -721,7 +721,7 @@ uint8_t SD_WriteSingleBlock(uint32_t sector, const uint8_t *data)
 uint8_t SD_ReadMultiBlock(uint32_t sector, uint8_t *buffer, uint8_t count)
 {
 	uint8_t r1;
-    //SPIx_SetSpeed(SPI_SPEED_HIGH);//����Ϊ����ģʽ  
+    //SPIx_SetSpeed(SPI_SPEED_HIGH);//����Ϊ����ģʽ
  	//�������SDHC����sector��ַת��byte��ַ
     if(SD_Type!=SD_TYPE_V2HC)sector = sector<<9;  
     //SD_WaitDataReady();
@@ -761,11 +761,11 @@ uint8_t SD_WriteMultiBlock(uint32_t sector, const uint8_t *data, uint8_t count)
 {
 	uint8_t r1;
 	uint16_t kk;
-    //SPIx_SetSpeed(SPI_SPEED_HIGH);//����Ϊ����ģʽ	 
-    if(SD_Type != SD_TYPE_V2HC)sector = sector<<9;//�������SDHC����������sector��ַ������ת����byte��ַ  
-    if(SD_Type != SD_TYPE_MMC) r1 = SD_SendCommand(ACMD23, count, 0x00);//���Ŀ�꿨����MMC��������ACMD23ָ��ʹ��Ԥ����   
+    //SPIx_SetSpeed(SPI_SPEED_HIGH);//����Ϊ����ģʽ
+    if(SD_Type != SD_TYPE_V2HC)sector = sector<<9;//�������SDHC����������sector��ַ������ת����byte��ַ
+    if(SD_Type != SD_TYPE_MMC) r1 = SD_SendCommand(ACMD23, count, 0x00);//���Ŀ�꿨����MMC��������ACMD23ָ��ʹ��Ԥ����
     r1 = SD_SendCommand(CMD25, sector, 0x00);//�����д��ָ��
-    if(r1 != 0x00)return r1;  //Ӧ����ȷ��ֱ�ӷ���	 
+    if(r1 != 0x00)return r1;  //Ӧ����ȷ��ֱ�ӷ���
     SD_CS_Low();//��ʼ׼�����ݴ���
     OSBsp.Device.Spi2.WriteReadData(0xff);//�ȷ�3�������ݣ��ȴ�SD��׼����
     OSBsp.Device.Spi2.WriteReadData(0xff);   
@@ -796,7 +796,7 @@ uint8_t SD_WriteMultiBlock(uint32_t sector, const uint8_t *data, uint8_t count)
             SD_CS_High();    //�ȴ�SD��д����ɳ�ʱ��ֱ���˳�����
             return 1;
         }	   
-    }while(--count);//��sector���ݴ������  
+    }while(--count);//��sector���ݴ������
     //��������������0xFD
     r1 = OSBsp.Device.Spi2.WriteReadData(0xFD);
     if(r1==0x00)
@@ -832,7 +832,7 @@ uint8_t SD_Read_Bytes(uint32_t address,uint8_t *buf,uint16_t offset,uint16_t byt
 {
 	uint8_t r1;
 	uint16_t kk=0;
-    r1=SD_SendCommand(CMD17,address<<9,0);//���Ͷ���������      
+    r1=SD_SendCommand(CMD17,address<<9,0);//���Ͷ���������
     if(r1)
 	return r1;  			//Ӧ����ȷ��ֱ�ӷ���
 

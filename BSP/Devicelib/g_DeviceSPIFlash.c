@@ -31,6 +31,7 @@ static void Write_Disable(void)
 static uint8_t Read_StatReg(void)
 {
   uint32_t temp;
+  CS_1;
   SD_CS_High();
   hal_Delay_us(20);
   CS_0;  

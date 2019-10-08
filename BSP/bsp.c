@@ -97,7 +97,7 @@ void  BSP_Init(void)
     g_Device_Usart3_Init(9600);                                //485串口
     g_Device_ADC_Init(); 
     g_Device_SD_Init();
-    g_Device_SPI3_Init();
+    // g_Device_SPI3_Init();
     g_Device_InnerFlash_Init();
     hal_Delay_ms(100);
     g_Printf_info("BSP init over\r\n");

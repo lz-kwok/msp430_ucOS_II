@@ -113,6 +113,9 @@ static void Power(ControlPower type)
 			hal_Delay_sec(2);
 			g_Printf_info("%s AIR202 On\r\n",__func__);
 			Transmit_5V_ON;         //通信模块5V电源    上电
+			Transmit_LowPower;      //模块保持2s以上低电平开机，再保持1.5s以上低电平关机
+			OSTimeDly(1500);        //节拍2ms
+			Transmit_HighPower;
 			break;
 		case AIR202_Power_Off:
 			Transmit_5V_OFF;	    //通信模块5V电源    掉电

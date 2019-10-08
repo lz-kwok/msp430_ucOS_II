@@ -477,7 +477,7 @@ void g_Device_GPRS_Fota_Start(void)
 			memset(download_data_1,0x0,1536);
 			data1_len = 0;
 			
-			// addr_write = g_MTD_spiflash_writeSector(addr_write,fm,1024);
+			addr_write = g_MTD_spiflash_writeSector(addr_write,fm,1024);  //SPI flash
 		}
 
 		// g_Printf_info("AT+FTPGET=2,1024\r\n");	
