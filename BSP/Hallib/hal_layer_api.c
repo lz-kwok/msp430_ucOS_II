@@ -527,6 +527,7 @@ uint32_t Hal_getSensorFlashStatus(void)
 	temp += OSBsp.Device.InnerFlash.innerFLASHRead(22,infor_ChargeAddr);
     if(AppDataPointer->TerminalInfoData.SensorFlashWriteStatusPrintf == SENSOR_STATUS_WRITEFLASH_PRINTF_ENABLE) {
         AppDataPointer->TerminalInfoData.SensorFlashWriteStatusPrintf = SENSOR_STATUS_WRITEFLASH_PRINTF_DISABLE;
+        AppDataPointer->TerminalInfoData.SensorFlashStatus = temp; 
         // g_Printf_info("%s %x\n",__func__,temp);
 
         Itoa(temp,str,2); //2进制输出

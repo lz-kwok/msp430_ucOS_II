@@ -68,6 +68,7 @@ typedef struct
 	char SensorFlashWriteStatus;        //传感器Flash写入存储状态
 	char SensorFlashWriteStatusPrintf;  //传感器Flash写入存储状态
 	uint16_t SensorStatus;              //传感器状态
+	uint16_t SensorFlashStatus;         //传感器Flash存储状态
 	uint16_t SensorStatusSimulation;    //传感器数据模拟状态
 	uint16_t SensorStatusSimulation_Old; //传感器数据上一组模拟状态
 
@@ -94,10 +95,14 @@ typedef struct
 	char GPRSATStatus;
 	uint32_t Http_Cid;
 	uint32_t Ftp_Cid;
-	uint8_t  LoRaJoinNET;        //LoRa入网状态
+
+	float    RSRP;
+	float    SINR;
+	uint16_t PCI;
 	uint8_t	 NBStatus;			//NB模组运行状态
 	uint8_t  NBNet;				//NB网络标志位
 	uint8_t  NBSendStatus;		//NB发送状态，发送后以OK位判断，收到OK即发送成功
+	uint8_t  LoRaJoinNET;        //LoRa入网状态
 	uint8_t  LoRaStatus;		//LoRa模组运行状态
 	uint8_t  LoRaNet;			//LoRa网络状态
 	uint8_t	 LoRaSendStatus;	//LoRa发送状态，确认帧使用，发送数据收到ACK后置1
@@ -116,8 +121,8 @@ typedef struct
 
 typedef struct
 {
-	float Temperature;		     //室外温度         -40~60.0       ℃
-	float Humidity;				 //室外湿度          0~100.0    %
+	float Temperature;		     //室外温度             -40~60.0       ℃
+	float Humidity;				 //室外湿度             0~100.0    %
 	float WindSpeed;			 //风速                 0~30.0     m/s
 	int   WindDirection;		 //风向                 0~360      °
 	uint16_t PM25;			     //PM2.5     0~6000     ug/m3
@@ -127,16 +132,16 @@ typedef struct
 
 typedef struct
 {
-	float WindSpeed;			 //风速                 0~30.0    m/s
-	int   WindDirection;		 //风向                 0~360     °
-	float Temperature;		     //室外温度         -40~60.0      ℃
-	float Humidity;				 //室外湿度          0~100.0   %
-	float PM25;			         //PM2.5     0~6000    ug/m3
-	float PM10;			      	 //PM10      0~6000    ug/m3
-	uint32_t Illumination;       //光照                 0~200000  Lux
+	float WindSpeed;			 //风速                  0~30.0    m/s
+	int   WindDirection;		 //风向                  0~360     °
+	float Temperature;		     //室外温度             -40~60.0      ℃
+	float Humidity;				 //室外湿度              0~100.0   %
+	float PM25;			         //PM2.5     0~6000     ug/m3
+	float PM10;			      	 //PM10      0~6000     ug/m3
+	uint32_t Illumination;       //光照                  0~200000  Lux
 	float AirPressure;           //大气压
 	float RainGauge;             //雨量                  0~4.0     mm/min
-	float Radiation;             //总辐射              0~2000    W/m2
+	float Radiation;             //总辐射                0~2000    W/m2
 }MeteorologyPlatform;//气象检测平台
 
 typedef struct
@@ -148,25 +153,25 @@ typedef struct
 typedef struct
 {
 	float CODValue;
-	int16_t ORPValue;
-	float TemValue;
+	uint16_t ECValue;
 	float DoPercent;
 	float DOValue;
 	float DORealValue;
 	float NH4Value;
+	float TempValue;
+	int16_t ORPValue;
 	float ZSValue;
 	float PHValue;
-	uint16_t ECValue;
-	uint16_t LVValue;
 	float CHLValue; //叶绿素
+	uint16_t LVValue;
 }WaterPlatform;       //水质监测平台
 
 typedef struct
 {
 	float SoilTemp;				 //土壤温度                -40~80.00   ℃
-	float SoilHum;		         //土壤水分（湿度）   0~80.00   %
-	uint16_t SoilConductivity;	 //土壤电导率              0~20000   us/cm
-	float SoilPH;			     //土壤PH        0~14.00   PH
+	float SoilHum;		         //土壤水分（湿度）        0~80.00   %
+	uint16_t SoilConductivity;	 //土壤电导率             0~20000   us/cm
+	float SoilPH;			     //土壤PH                 0~14.00   PH
 }SoilPlatform;   //土壤检测平台
 
 typedef struct
@@ -276,7 +281,7 @@ typedef struct
 typedef struct
 {
 	float Temperature;		     //水温          0~50.00         ℃
-	float CL;		             //氯离子      0~10000.00    ℃    正常在200以下
+	float CL;		             //氯离子        0~10000.00      ℃    正常在200以下
 }CLCupboardPlatform;             //氯离子柜式监测站
 
 typedef struct
@@ -294,16 +299,18 @@ typedef struct
 {
     TerminalPlatform           TerminalInfoData;
     TransMethodPlatform        TransMethodData;
-	Fota_Info FotaInfor;
+	Fota_Info                  FotaInfor;
 #if (PRODUCT_TYPE == Voc_Station) 
     VOCPlatform                VOCData;
 #elif (PRODUCT_TYPE == Dust_Station) 
     DustPlatform               DustData;
 #elif (PRODUCT_TYPE == WRain_Station) 
     WRainPlatform              WRainData;
+#elif (PRODUCT_TYPE == Water_Station) 
+    WaterPlatform			   WaterData;	
 #endif
+
     MeteorologyPlatform        MeteorologyData;
-	WaterPlatform			   WaterData;
 #if (PRODUCT_TYPE == Soil_Station) 
 	SoilPlatform               SoilData;
 #elif (PRODUCT_TYPE == Agriculture_Station) 

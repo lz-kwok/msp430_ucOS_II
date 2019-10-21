@@ -130,8 +130,8 @@ static  void  ScadaTaskStart (void *p_arg)
                 Scada_timeout_sec = after_Scada.tv_sec - before_Scada.tv_sec;
                 g_Printf_info("Scada_timeout_sec = %d\r\n",Scada_timeout_sec);
                 // if(Scada_timeout_sec >= SCADATIME){
-                // if(Scada_timeout_sec >= 30){
-                if(Scada_timeout_sec >= 10){
+                if(Scada_timeout_sec >= 30){
+                // if(Scada_timeout_sec >= 10){
                 AppDataPointer->TerminalInfoData.DeviceStatus = DEVICE_STATUS_POWER_SCAN_OVER;
                 g_Printf_info("ScadaTask is over\n");
                 OSTimeDly(500);

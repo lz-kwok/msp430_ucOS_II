@@ -34,6 +34,7 @@ void g_Device_NB_GetIP(void);
 void g_Device_NB_Send(uint32_t *data ,uint8_t length);
 void g_Device_NBSignal(void);
 void g_Device_NB_Receive(void);
+void g_Device_check_Response(char *res);
 // void Hex2Str(unsigned char *d,uint32_t *p,unsigned char Len, unsigned char offset);
 // void Hex2Str(unsigned char *d,uint8_t *p,unsigned char Len, unsigned char offset);
 void  TransmitTaskStart (void *p_arg);

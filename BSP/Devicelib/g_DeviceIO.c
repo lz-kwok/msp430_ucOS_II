@@ -127,6 +127,10 @@ static void Power(ControlPower type)
 			Transmit_5V_OFF;	    //通信模块5V电源    掉电
 			break;
 		case LPModule_Power_On:
+			P2SEL &=~ (BIT3 + BIT4);//1:复用功能  0：普通功能     
+		    P2DIR &=~ BIT3;         //1:输出模式  0：输入模式     NB震铃端口
+			P2DIR |= BIT4;          //1:输出模式  0：输入模式     NB复位端口
+			P2OUT |= BIT4;          //1:输出为高  0：输出为低     NB复位端口输出为高
 			Transmit_3V3_ON;	    //通信模块3V3电源   上电
 			break;
 		case LPModule_Power_Off:

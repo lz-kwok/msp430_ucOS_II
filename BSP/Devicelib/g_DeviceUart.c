@@ -456,11 +456,17 @@ __interrupt void USCI_A0_ISR(void)
 		    __bic_SR_register_on_exit(LPM0_bits);	//
 			while(!(UCA0IFG&UCTXIFG));            // USCI_A3 TX buffer ready?
 			{
-				// OSBsp.Device.Usart2.WriteData(UCA0RXBUF);  //
+				OSBsp.Device.Usart2.WriteData(UCA0RXBUF);  //GLZ测试屏蔽+++++++++++++++++++++++++++++++++++
 				aRxBuff[aRxNum++] = UCA0RXBUF;
 #if(TRANSMIT_TYPE == NBIoT_BC95_Mode)
-				if(aRxNum >= aRxLength)
+				if(aRxNum >= aRxLength){
 					aRxNum = 0;
+				}
+				// if((aRxBuff[aRxNum-2] == 0x0D)&&(aRxBuff[aRxNum-1] == 0x0A)){
+				// 	// aRxNum = 0;
+				// 	g_Device_check_Response(aRxBuff);
+				// 	memset(aRxBuff,0x0,256);
+				// }
 #endif //(TRANSMIT_TYPE == NBIoT_BC95_Mode)
 #if(TRANSMIT_TYPE == LoRa_F8L10D_Mode)
 				if(aRxNum >= aRxLength)

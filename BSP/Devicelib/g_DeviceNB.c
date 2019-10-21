@@ -29,6 +29,10 @@
 #include  <bsp.h>
 
 #if (TRANSMIT_TYPE == NBIoT_BC95_Mode)
+
+static int g_has_response = 0;
+static char g_response[256];
+
 //断点续传使用
 uint16_t BackupIndex = 0;
 uint16_t StartFile = 1;
@@ -42,6 +46,7 @@ uint8_t cacheBuf[7];
 
 static unsigned char Singal_data[6]={0};
 static unsigned char SINR_data[5]={0};
+static unsigned char PCI_data[5]={0};
 // static unsigned char ECL_data=0;
 
 //static char TimeString[20] = "20170804 16:00:00";
@@ -110,6 +115,12 @@ void g_Device_NB_Restart(void)
 char g_Device_NB_Init(void)
 {
 	uint8_t ii = 0;
+	//ML
+	unsigned char *a;
+	unsigned char i=0,n=0,m=0;
+	unsigned char nb_Timedata[22]={0};
+	uint8_t time_buf[8];
+	uint8_t time_buf_bcd[8];
 	if(AppDataPointer->TransMethodData.NBStatus == NB_Boot)
 	{
 		NB_Config("AT+CFUN=0\r\n",5,5);
@@ -118,9 +129,14 @@ char g_Device_NB_Init(void)
 		OSTimeDly(100);
 		NB_Config("AT+NNMI=0\r\n",5,5);
 		OSTimeDly(100);
+		NB_Config("AT+CGSN=1\r\n",5,5);  //IMEI
+		OSTimeDly(100);
 		NB_Config("AT+NCDP=180.101.147.115\r\n",5,5);
+		// NB_Config("AT+NCDP=221.229.214.202,5683\r\n",5,5); //CTWing
 		OSTimeDly(100);
 		NB_Config("AT+CFUN=1\r\n",100,5);
+		OSTimeDly(100);
+		NB_Config("AT+CIMI\r\n",5,5);    //USIM卡IMSI号
 		OSTimeDly(100);
 		NB_Config("AT+CGDCONT=1,\"IP\",\"CTNB\"\r\n",5,5);
 		OSTimeDly(100);
@@ -158,6 +174,33 @@ char g_Device_NB_Init(void)
 		NB_Config("AT+NCONFIG=AUTOCONNECT,TRUE\r\n",2,5); //关闭自动连接
 		OSTimeDly(500);
 		AppDataPointer->TransMethodData.NBStatus = NB_Init_Done;
+		//ML*******//
+		User_Printf("AT+CCLK?\r\n");
+		OSTimeDly(200);			//等待串口接收
+        a=strstr(aRxBuff,"+CCLK:");
+	    if(a!=NULL)
+		{
+			while(*(a+6)!='\r')
+			{
+				nb_Timedata[i]=*(a+6);
+				i++;
+				a++;
+			}	
+			nb_Timedata[i]='\n';	
+			
+			time_buf[1]=(nb_Timedata[0]-0x30)*10+(nb_Timedata[1]-0x30)*1;	       //年
+			time_buf[2]=(nb_Timedata[3]-0x30)*10+(nb_Timedata[4]-0x30)*1;	       //月
+			time_buf[3]=(nb_Timedata[6]-0x30)*10+(nb_Timedata[7]-0x30)*1;	       //日
+			time_buf[4]=(nb_Timedata[9]-0x30)*10+(nb_Timedata[10]-0x30)*1+8;	   //时+时区
+			time_buf[5]=(nb_Timedata[12]-0x30)*10+(nb_Timedata[13]-0x30)*1;	       //分	
+			time_buf[6]=(nb_Timedata[15]-0x30)*10+(nb_Timedata[16]-0x30)*1;	       //秒	
+			for(m=1;m<7;m++) {
+				time_buf_bcd[m]= HexToBCD(time_buf[m]);    //存“年月日时分秒”
+			}
+			OSBsp.Device.RTC.ConfigExtTime(time_buf_bcd,RealTime);
+			g_Printf_dbg("NB Automatic Time OK\r\n");
+		}
+		//ML*******//
 		return 1;
 	}
 	return 0;
@@ -259,8 +302,9 @@ void g_Device_NBSignal(void)
 			dataTemp=dataTemp*10 + Singal_data[n]-0x30;
 		}
 		dataTemp=0-dataTemp;
-		Send_Buffer[27] = (dataTemp & 0xFF00) >> 8;
-		Send_Buffer[28] = dataTemp & 0xFF;
+		AppDataPointer->TransMethodData.RSRP = (float)dataTemp/10;
+		Send_Buffer[49] = (dataTemp & 0xFF00) >> 8;
+		Send_Buffer[50] = dataTemp & 0xFF;
 	}
 	if(dataTemp==-32768)		//无信号
 	{
@@ -273,16 +317,6 @@ void g_Device_NBSignal(void)
 		AppDataPointer->TransMethodData.NBStatus = NB_Power_on;
 		g_Device_NB_Init();
 	}
-	//get the ECL
-	i=0;
-	dataTemp = 0;
-	a=strstr(aRxBuff,"ECL:");
-	if(a!=NULL)
-	{
-		dataTemp=*(a+4)-0x30;
-		Send_Buffer[31] = (uint8_t)dataTemp;
-	}
-
 	//get the SINR
 	i=0;
 	dataTemp = 0;
@@ -312,8 +346,32 @@ void g_Device_NBSignal(void)
 				dataTemp=dataTemp*10 + SINR_data[n]-0x30;
 			}
 		}
-		Send_Buffer[29] = (dataTemp & 0xFF00) >> 8;
-		Send_Buffer[30] = dataTemp & 0xFF;
+		AppDataPointer->TransMethodData.SINR = (float)dataTemp/10;
+		Send_Buffer[51] = (dataTemp & 0xFF00) >> 8;
+		Send_Buffer[52] = dataTemp & 0xFF;
+		//get the PCI
+		i=0;
+		dataTemp = 0;
+		a=strstr(aRxBuff,"PCI:");
+		if(a!=NULL)
+		{
+			while(*(a+4)!='\r')
+			{
+				PCI_data[i]=*(a+4);
+				i++;
+				a++;
+			}
+			PCI_data[i]='\n';
+			dataTemp=0;
+			for(n=0;n<i;n++)
+			{
+				dataTemp=dataTemp*10 + PCI_data[n]-0x30;
+			}
+			AppDataPointer->TransMethodData.PCI = dataTemp;
+			Send_Buffer[53] = (dataTemp & 0xFF00) >> 8;
+			Send_Buffer[54] = dataTemp & 0xFF;
+		}
+
 	}
 }
 /*******************************************************************************
@@ -423,8 +481,52 @@ void g_Device_NB_Receive(void)
 	}
 	// AppDataPointer->TransMethodData.NBStatus = NB_Idel;
 }
+
+
+void g_Device_check_Response(char *res)
+{
+	if(g_has_response == -1){
+		g_has_response = 0;
+		memset(g_response,0x0,256);
+		strcpy(g_response,res);
+	}
+
+	// if(Hal_CheckString(res,"+TXDONE"))
+    // {
+	// 	if(AppDataPointer->TransMethodData.LoRaNet)
+    //         g_Printf_dbg("Send data to model OK...\r\n");
+    //     // AppDataPointer->TransMethodData.LoRaStatus = LoRa_Send_Done;
+	// }else if(Hal_CheckString(res,"AT_BUSY_ERROR"))
+    // {
+	// 	g_Printf_dbg("internal state is busy...\r\n");
+	// } else if(Hal_CheckString(res,"+NJS:1") | Hal_CheckString(res,"Joined") )
+
+	// else if(Hal_CheckString(aRxBuff,"+STI"))   //自动校时
+	// {
+	// 	Rcv_TimePoint = strstr(aRxBuff,"+STI");         //判断接收到的数据是否有效
+	// 	while(*(Rcv_TimePoint+6) != '\r')
+	// 	{
+	// 		Rcv_TimeData[Rcv_TimeNum] = *(Rcv_TimePoint+6);
+	// 		Rcv_TimeNum++;
+	// 		Rcv_TimePoint++;
+	// 	}
+	// 	for(TimebuffNum=1;TimebuffNum<7;TimebuffNum++)
+	// 	{
+	// 		TimeBuff_Hex[TimebuffNum] = (Rcv_TimeData[(TimebuffNum-1)*3]-0x30)*10
+	// 									+ (Rcv_TimeData[(TimebuffNum-1)*3+1]-0x30)*1;
+	// 	}
+
+	// 	for(TimebuffNum=1;TimebuffNum<7;TimebuffNum++)
+	// 	{
+	// 		time_buf[TimebuffNum]= HexToBCD(TimeBuff_Hex[TimebuffNum]);    //存“年月日时分秒周”
+	// 	}
+	// 	DS1302_write_time();   //写入时间
+	// 	g_Printf_dbg("LoRa Automatic Time OK\r\n");
+	// }
+}
+
 /*******************************************************************************
-* 函数名            : CreatFileNum
+* 函数名  : CreatFileNum
 * 描述	  : 生成存储文件名称
 * 输入参数  : x	1——序号加；0——序号减
 * 返回参数  : 无
@@ -586,13 +688,13 @@ void  TransmitTaskStart (void *p_arg)
             if(AppDataPointer->TransMethodData.NBStatus == NB_Power_off)
 			{
 				//NB-IoT 第一次开机时对NB上电操作，后续进入低功耗不关电
-				g_Printf_dbg("Turn ON NB Power\r\n");
+				g_Printf_dbg("Turn on NB power\r\n");
                 OSBsp.Device.IOControl.PowerSet(LPModule_Power_On);		//打开NB电源
 				//reset脚电平
                 OSTimeDly(5000);
                 // OSBsp.Device.IOControl.PowerSet(AIR202_Power_On);
                 AppDataPointer->TransMethodData.NBStatus = NB_Power_on;
-				g_Printf_dbg("NB Power ON\r\n");
+				g_Printf_dbg("NB power on\r\n");
                 
             }
 			else if(AppDataPointer->TransMethodData.NBStatus == NB_Power_on)
@@ -625,13 +727,13 @@ void  TransmitTaskStart (void *p_arg)
 						Send_Buffer[6] = AppDataPointer->TransMethodData.SeqNumber%256;
 						//Voltage
 						GetADCValue();
+						//检查信号质量
+						g_Device_NBSignal();
 						data = MakeJsonBodyData(AppDataPointer);		//组包json并存储SD卡
 						g_Printf_info("data:%s\r\n",data);
 						memset(response,0x0,128);
-						//检查信号质量
 						Hex2Str(Data_Backup,Send_Buffer,60,0);					
 						g_Printf_info("Hexdata:%s\r\n",Data_Backup);    //打印输出16进制发送数据
-						g_Device_NBSignal();
 						// Hex2Str(Data_Backup,Send_Buffer,34,0);
 					}
 					//发送数据
