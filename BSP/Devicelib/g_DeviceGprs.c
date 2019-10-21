@@ -29,10 +29,10 @@
 #include  <bsp.h>
 
 #if (TRANSMIT_TYPE == GPRS_Mode)
-// const char *g_30000IoT_HOST = "30000iot.cn:9001";    
-// const char *g_30000IoT_PATH = "/api/Upload/data/";
-const char *g_30000IoT_HOST = "47.111.88.91:6096"; 
-const char *g_30000IoT_PATH = "/iot/data/receive";
+const char *g_30000IoT_HOST = "30000iot.cn:9001";    
+const char *g_30000IoT_PATH = "/api/Upload/data/";
+// const char *g_30000IoT_HOST = "47.111.88.91:6096"; 
+// const char *g_30000IoT_PATH = "/iot/data/receive";
 
 enum CoordinateSystem{
 	WGS_84 = 1,

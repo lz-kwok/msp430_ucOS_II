@@ -69,7 +69,8 @@ const uint8_t ScadaCHL_WS[CMDLength]  = {0x0B,0x03,0x00,0x3A,0x00,0x02,0xE4,0xAC
 
 uint32_t sensorCahe = 0;
 uint32_t ssensorCahe = 0;
-float SimulationSensorCahe = 0.0;
+float SimulationSensorFloatCahe = 0.0;
+int32_t SimulationSensorIntCahe = 0;
 static uint8_t SensorStatus_H;
 static uint8_t SensorStatus_L;
 static uint8_t SensorReviseStatus_H;      //修正
@@ -127,8 +128,9 @@ static int AnalyzeComand(uint8_t *data,uint8_t Len)
 						AppDataPointer->WaterData.TempValue = (float)ssensorCahe/10;	
 						if((AppDataPointer->WaterData.TempValue==0)||(AppDataPointer->WaterData.TempValue>=40)) 
 						{
+							hal_SetBit(SensorReviseStatus_L, 7);    //传感器修正状态位置1
 							AppDataPointer->WaterData.TempValue = 18 + (rand()%16)/10;	
-							ssensorCahe = (uint32_t)(AppDataPointer->WaterData.TempValue*10);					
+							ssensorCahe = (uint32_t)(AppDataPointer->WaterData.TempValue*10);						
 						}
 						Send_Buffer[15] = ssensorCahe / 256;
 						Send_Buffer[16] = ssensorCahe % 256;
@@ -257,44 +259,44 @@ static int SimulationSensorData(void)
 					break;
 				case 7:
 					/**************ORP**************/
-					SimulationSensorCahe = -56 + rand()%20;
-					AppDataPointer->WaterData.ORPValue = SimulationSensorCahe;
+					SimulationSensorIntCahe = 71 + (rand()%2)*10;
+					AppDataPointer->WaterData.ORPValue = SimulationSensorIntCahe;
 					hal_SetBit(SensorStatus_L, 6);             //传感器状态位置1
 					hal_SetBit(SensorSimulationStatus_L, 6);   //传感器模拟状态位置1	
 					if(AppDataPointer->WaterData.ORPValue >= 0) {   //ORP为正数	
-						Send_Buffer[17] = (uint32_t)(SimulationSensorCahe) / 256;
-						Send_Buffer[18] = (uint32_t)(SimulationSensorCahe) % 256;
+						Send_Buffer[17] = (uint32_t)(SimulationSensorIntCahe) / 256;
+						Send_Buffer[18] = (uint32_t)(SimulationSensorIntCahe) % 256;
 					}else {                                         //ORP为负数
-						Send_Buffer[17] = (uint32_t)(0xFFFF - ~(int16_t)SimulationSensorCahe) / 256;
-						Send_Buffer[18] = (uint32_t)(0xFFFF - ~(int16_t)SimulationSensorCahe) % 256;
+						Send_Buffer[17] = (uint32_t)(0xFFFF - ~(int16_t)SimulationSensorIntCahe) / 256;
+						Send_Buffer[18] = (uint32_t)(0xFFFF - ~(int16_t)SimulationSensorIntCahe) % 256;
 					}
 					break;
 				case 8:
 					/**************Temp**************/
-					SimulationSensorCahe = 18 + (rand()%20)/10;
-					AppDataPointer->WaterData.TempValue = SimulationSensorCahe;
+					SimulationSensorFloatCahe = 18.1 + rand()%2;
+					AppDataPointer->WaterData.TempValue = SimulationSensorFloatCahe;
 					hal_SetBit(SensorStatus_L, 7);             //传感器状态位置1
 					hal_SetBit(SensorSimulationStatus_L, 7);   //传感器模拟状态位置1	
-					Send_Buffer[15] = (uint32_t)(SimulationSensorCahe*10) / 256;
-					Send_Buffer[16] = (uint32_t)(SimulationSensorCahe*10) % 256;
+					Send_Buffer[15] = (uint32_t)(SimulationSensorFloatCahe*10) / 256;
+					Send_Buffer[16] = (uint32_t)(SimulationSensorFloatCahe*10) % 256;
 					break;
 				case 9:
 					/**************NH4***************/
-					SimulationSensorCahe = 1.3 + (rand()%20)/10;
-					AppDataPointer->WaterData.NH4Value = SimulationSensorCahe;
+					SimulationSensorFloatCahe = 1.1 + rand()%2;
+					AppDataPointer->WaterData.NH4Value = SimulationSensorFloatCahe;
 					hal_SetBit(SensorStatus_H, 0);             //传感器状态位置1
 					hal_SetBit(SensorSimulationStatus_H, 0);   //传感器模拟状态位置1	
-					Send_Buffer[13] = (uint32_t)(SimulationSensorCahe*10) / 256;
-					Send_Buffer[14] = (uint32_t)(SimulationSensorCahe*10) % 256;
+					Send_Buffer[13] = (uint32_t)(SimulationSensorFloatCahe*10) / 256;
+					Send_Buffer[14] = (uint32_t)(SimulationSensorFloatCahe*10) % 256;
 					break;
 				case 10:
 					/**************DO****************/
-					SimulationSensorCahe = 2.31 + (rand()%100)/100;;
-					AppDataPointer->WaterData.DOValue = SimulationSensorCahe;
+					SimulationSensorFloatCahe = 2.31 + (rand()%10)/10;;
+					AppDataPointer->WaterData.DOValue = SimulationSensorFloatCahe;
 					hal_SetBit(SensorStatus_H, 1);             //传感器状态位置1
 					hal_SetBit(SensorSimulationStatus_H, 1);   //传感器模拟状态位置1	
-					Send_Buffer[11] = (uint32_t)(SimulationSensorCahe*100) / 256;
-					Send_Buffer[12] = (uint32_t)(SimulationSensorCahe*100) % 256;
+					Send_Buffer[11] = (uint32_t)(SimulationSensorFloatCahe*100) / 256;
+					Send_Buffer[12] = (uint32_t)(SimulationSensorFloatCahe*100) % 256;
 					break;
 				case 11:
 					/**************EC****************/
@@ -433,9 +435,11 @@ void InqureSensor(void)
 		if(AppDataPointer->TerminalInfoData.SensorFlashWriteStatus == SENSOR_STATUS_WRITEFLASH_NOTYET) 
 		{
 			AppDataPointer->TerminalInfoData.SensorFlashWriteStatus = SENSOR_STATUS_WRITEFLASH_ALREADY;
-			infor_ChargeAddrBuff[21] = 0b00000011;       //0000 0011 1100 0000     Do,氨氮，温度，ORP               //++++++
-			infor_ChargeAddrBuff[22] = 0b11000000;                                                                 //++++++
-			OSBsp.Device.InnerFlash.innerFLASHWrite(&infor_ChargeAddrBuff,(uint8_t *)(infor_ChargeAddr+0),32);     //++++++
+			//++++测试专用+++if+++++++//
+			// infor_ChargeAddrBuff[21] = 0b00000011;       //0000 0011 1100 0000     Do,氨氮，温度，ORP               //++++++
+			// infor_ChargeAddrBuff[22] = 0b11000000;                                                                 //++++++
+			// OSBsp.Device.InnerFlash.innerFLASHWrite(&infor_ChargeAddrBuff,(uint8_t *)(infor_ChargeAddr+0),32);     //++++++
+			//++++实际专用+++else+++++++//
 			if(OSBsp.Device.InnerFlash.innerFLASHRead(20,infor_ChargeAddr) == 0x01) //0x01才允许修改Flash
 			{
 				infor_ChargeAddrBuff[21] = SensorStatus_H;
@@ -459,6 +463,9 @@ void InqureSensor(void)
 				}
 			}
 		}
+
+		AppDataPointer->TerminalInfoData.ReviseSimulationCode = ((uint32_t)SensorReviseStatus_H*256 + (uint32_t)SensorReviseStatus_L)<<16;
+		AppDataPointer->TerminalInfoData.ReviseSimulationCode = AppDataPointer->TerminalInfoData.ReviseSimulationCode + (uint32_t)SensorSimulationStatus_H*256 + (uint32_t)SensorSimulationStatus_L;
 
 	} else {
 		OSTimeDly(10);     
@@ -567,6 +574,7 @@ char *MakeJsonBodyData(DataStruct *DataPointer)
 	g_Printf_info("Uptime:%s\r\n",Uptime);
 	cJSON_AddStringToObject(pJsonRoot, "Uptime",Uptime);
 	cJSON_AddNumberToObject(pJsonRoot, "UnixTimeStamp",UnixTimeStamp);
+	cJSON_AddNumberToObject(pJsonRoot, "ReSiC",DataPointer->TerminalInfoData.ReviseSimulationCode);
 
     p = cJSON_Print(pJsonRoot);
     if(NULL == p)

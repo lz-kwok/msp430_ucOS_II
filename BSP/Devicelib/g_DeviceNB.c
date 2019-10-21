@@ -170,6 +170,8 @@ char g_Device_NB_Init(void)
 			g_Printf_dbg("GET IP Succeed!\r\n");
 			AppDataPointer->TransMethodData.NBNet = 1;
 		}
+		OSTimeDly(100);
+		NB_Config("AT+CSQ\r\n",5,5);   //CSQ
 		OSTimeDly(500);
 		NB_Config("AT+NCONFIG=AUTOCONNECT,TRUE\r\n",2,5); //关闭自动连接
 		OSTimeDly(500);
@@ -689,6 +691,7 @@ void  TransmitTaskStart (void *p_arg)
 			{
 				//NB-IoT 第一次开机时对NB上电操作，后续进入低功耗不关电
 				g_Printf_dbg("Turn on NB power\r\n");
+				OSTimeDly(500);
                 OSBsp.Device.IOControl.PowerSet(LPModule_Power_On);		//打开NB电源
 				//reset脚电平
                 OSTimeDly(5000);

@@ -53,6 +53,8 @@ typedef struct
 //	float    Latitude;                 //地理位置纬度
 //	float    Altitude;                 //海拔高度
 
+	uint32_t ReviseSimulationCode;      //传感器修正仿真编码
+
 	uint32_t SerialNumber;              //SN
 	uint32_t PD;
 	uint32_t Version;                   //版本
