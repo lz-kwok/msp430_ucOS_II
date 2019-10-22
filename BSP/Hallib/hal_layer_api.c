@@ -672,6 +672,7 @@ void Hal_ExitLowPower_Mode(void)
 {
     hal_Delay_ms(100);
     g_Printf_info("Exit Low Power!\r\n");
+    // __bic_SR_register_on_exit(LPM0_bits);	//退出低功耗
     gManager.systemLowpower = 0;
     // OSBsp.Device.IOControl.PowerSet(BaseBoard_Power_On);
     // OSBsp.Device.IOControl.PowerSet(Sensor_Power_On);
