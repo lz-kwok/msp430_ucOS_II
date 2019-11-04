@@ -57,7 +57,7 @@
 #define SHIP_ID           0X90        //读取制造厂商ID信息和设备ID信息
 #define JEDEC_ID          0X9F        //JEDEC的ID信息
 
-#define FOTA_ADDR_START   0x70000
+#define FOTA_ADDR_START   0x80000
 
 ///////函数声明
 extern void Write_Enable(void);

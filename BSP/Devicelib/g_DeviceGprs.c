@@ -328,6 +328,7 @@ int16_t g_Device_http_post(const char *host,const char* path,const char *apikey,
 char data_write[300];
 void g_Device_GPRS_Fota_Start(void)
 {
+	uint8_t Flash_Tmp[3];					//flash操作中间变量
 	if(gprs_tick == 0){
 		if(AppDataPointer->TransMethodData.GPRSATStatus == GPRS_Waitfor_OK){
 			g_Printf_dbg("AT+SAPBR=3,1,\"CONTYPE\",\"GPRS\"\r\n");
@@ -499,8 +500,22 @@ void g_Device_GPRS_Fota_Start(void)
 				while(Read_StatReg()&0x01);
 				Write_Enable();
 				Write_Byte(addr_write,download_data_1[m]);
-				addr_write++;  //
+				addr_write++;  				
 			}
+			//判断存储数据头尾是否正确 然后配置启动标志位存放于infor_BootAddr
+			if(Read_Byte(addr_write-1) == 'q' && Read_Byte(FOTA_ADDR_START+1) == 'C')	//确认C400和q
+			{	        
+				g_Printf_info("Enter %s and System will goto bootloader\r\n",__func__);
+				loop8:
+					Flash_Tmp[0] = 0x02; 		//置位Flash 标志位	//把infor_BootAddr写0x02，建立FOTA升级标志位
+					OSBsp.Device.InnerFlash.FlashRsvWrite(Flash_Tmp, 1, infor_BootAddr, 0);
+					hal_Delay_ms(10);
+					if(OSBsp.Device.InnerFlash.innerFLASHRead(0, infor_BootAddr) == 0x02)
+						hal_Reboot();			//重启MCU
+					else
+						goto loop8;	
+			}
+			hal_Reboot();
 			// char *fm;
 			// int addr = 0;
 			// fm = strtok(download_data_1,"OK");
