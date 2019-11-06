@@ -453,7 +453,7 @@ __interrupt void USCI_A0_ISR(void)
 	{
 		case 0:break;                             // Vector 0 - no interrupt
 		case 2:                                   // Vector 2 - RXIFG
-		    __bic_SR_register_on_exit(LPM0_bits);	//
+		     __bic_SR_register_on_exit(LPM0_bits);//退出低功耗  ML20191022*********************************
 			while(!(UCA0IFG&UCTXIFG));            // USCI_A3 TX buffer ready?
 			{
 				OSBsp.Device.Usart2.WriteData(UCA0RXBUF);  //GLZ测试屏蔽+++++++++++++++++++++++++++++++++++

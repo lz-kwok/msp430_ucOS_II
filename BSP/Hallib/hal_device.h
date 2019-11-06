@@ -77,7 +77,8 @@
 #define CLCupboard_Station    		0x0D	 //氯离子柜式监测站
 #define Custom_Station	      		0x55	 //定制需求监测站
 
-#define PRODUCT_TYPE                Dust_Station
+
+#define PRODUCT_TYPE                Water_Station
 
 //*****************通信方式*********************//
 #define GPRS_Mode		      		0x01
@@ -88,8 +89,8 @@
 #define LoRa_OM402_Mode		  		0x06
 #define GPRS_AIR202_Mode      		0x07
 
- #define TRANSMIT_TYPE 			    GPRS_Mode
-// #define TRANSMIT_TYPE 			    NBIoT_BC95_Mode
+//  #define TRANSMIT_TYPE 			    GPRS_Mode
+#define TRANSMIT_TYPE 			    NBIoT_BC95_Mode
 //#define TRANSMIT_TYPE 			    LoRa_F8L10D_Mode
 
 #if (TRANSMIT_TYPE == GPRS_Mode)
