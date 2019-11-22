@@ -45,6 +45,11 @@ typedef union
 	float Data;
 }Hex2Double;
 
+enum Int_Src{
+	Rtc_Int = 0x1,		
+	Uart_Int
+};
+
 /*Bit Operation Function*/
 #define hal_SetBit(data, offset)      data |= 1 << offset      //置位某位为1
 #define hal_ResetBit(data, offset)    data &= ~(1 << offset)   //复位某位为0
@@ -102,7 +107,7 @@ int Hal_getDeviceSecret(char *devSecret);
 #endif
 
 void Hal_EnterLowPower_Mode(void);
-void Hal_ExitLowPower_Mode(void);
+void Hal_ExitLowPower_Mode(Int_Src src);
 char Hal_getCurrent_work_Mode(void);
 
 

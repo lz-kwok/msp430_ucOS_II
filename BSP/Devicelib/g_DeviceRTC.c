@@ -436,7 +436,7 @@ __interrupt void RTC_ISR(void)
 						__bic_SR_register_on_exit(LPM0_bits);
 						WDTCTL  = WDT_MDLY_32;
 						SFRIE1 |= 1;  
-						Hal_ExitLowPower_Mode();
+						Hal_ExitLowPower_Mode(Rtc_Int);
 					}		
 				}
 				g_MinuteTimeTick ++;

@@ -668,30 +668,37 @@ void Hal_EnterLowPower_Mode(void)
     __bis_SR_register(LPM0_bits + GIE);   //进入低功耗
 }
 
-void Hal_ExitLowPower_Mode(void)
+void Hal_ExitLowPower_Mode(Int_Src src)
 {
     hal_Delay_ms(100);
     g_Printf_info("Exit Low Power!\r\n");
     // __bic_SR_register_on_exit(LPM0_bits);	//退出低功耗
     gManager.systemLowpower = 0;
-    // OSBsp.Device.IOControl.PowerSet(BaseBoard_Power_On);
+
+    if(src == Rtc_Int){
+//  OSBsp.Device.IOControl.PowerSet(BaseBoard_Power_On);
     // OSBsp.Device.IOControl.PowerSet(Sensor_Power_On);
     // OSBsp.Device.IOControl.PowerSet(Max485_Power_On);
-    AppDataPointer->TerminalInfoData.DeviceStatus = DEVICE_STATUS_POWER_OFF;
+        AppDataPointer->TerminalInfoData.DeviceStatus = DEVICE_STATUS_POWER_OFF;
 #if (TRANSMIT_TYPE == GPRS_Mode)
-    AppDataPointer->TransMethodData.GPRSStatus = GPRS_Power_off;
+        AppDataPointer->TransMethodData.GPRSStatus = GPRS_Power_off;
 #endif
 #if (TRANSMIT_TYPE == NBIoT_BC95_Mode)
-    AppDataPointer->TransMethodData.NBStatus = NB_Init_Done;
+        AppDataPointer->TransMethodData.NBStatus = NB_Init_Done;
 #endif
 #if (TRANSMIT_TYPE == LoRa_F8L10D_Mode)
-    if(AppDataPointer->TransMethodData.LoRaNet)
-        AppDataPointer->TransMethodData.LoRaStatus = LoRa_Join_Over;
-    else    //进低功耗前入网失败，出低功耗后继续入网
-    {
-        AppDataPointer->TransMethodData.LoRaStatus = LoRa_Power_on;
-    }
+        if(AppDataPointer->TransMethodData.LoRaNet)
+            AppDataPointer->TransMethodData.LoRaStatus = LoRa_Join_Over;
+        else    //进低功耗前入网失败，出低功耗后继续入网
+        {
+            AppDataPointer->TransMethodData.LoRaStatus = LoRa_Power_on;
+        }
 #endif
+    }else if(src == Uart_Int){
+        AppDataPointer->TerminalInfoData.DeviceStatus = DEVICE_STATUS_POWER_IDLE;
+        AppDataPointer->TransMethodData.NBStatus = NB_Wait_Idle;
+    }
+    
 }
 
 char Hal_getCurrent_work_Mode(void)
